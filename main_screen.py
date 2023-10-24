@@ -13,6 +13,7 @@ from functions import update_database_field, get_elementid_from_database
 from functions import count_total_number_of_elements, check_internet, count_number_of_day_element
 from element_window_extended import element_window_extended
 from element_window_small import element_window_small
+from DBManager import DBManager
 
 #from move_to import move_task_to
 #from new_task import new_task
@@ -33,16 +34,18 @@ from element_window_small import element_window_small
 #from remarks_database import remarks_list
 #from maybe_sometimes_list import maybe_sometimes_list
 
-db = 'data'
-create_database(db)
-
 current_date = datetime.datetime.now()
 date_string = current_date.strftime("%d/%m/%Y")
+tomorrow = datetime.datetime.today() + datetime.timedelta(days=1)
+tomorrow_date = tomorrow.strftime('%d/%m/%Y')
 chosen_date = None
 chosen_deadline = None
 element_id = None
 project_name = None
+db = 'data'
+db_manager = DBManager(db)
 
+db_manager.create_db()
 
 def check_connection():
     check_internet(top_frame_left, top_frame_right)
@@ -108,43 +111,31 @@ def show_total_number_of_elements(db, category, delegated, done, frame, XX, YY):
 def task_done():
     selection = treeview.selection()
     if selection:
-        element_name = treeview.item(selection, 'values')[0]
+        element_name = treeview.item(selection, 'values')[0]        
+        element_id = db_manager.get_elementid_from_db('element', element_name)
+        element_id = element_id[0]
+        db_manager.set_element_id(element_id)
+        print(element_id)
+
+        db_manager.update_db_field('done', 'DONE')
     else:
         messagebox.showerror("Error", "No task selected. Please select a task to be done.")
-    
-    element_id = get_elementid_from_database(db, 'element', element_name)
-    update_database_field(db, element_id, 'done', 'DONE' )
 
 def do_task_tomorrow():
-    tomorrow = datetime.datetime.today() + datetime.timedelta(days=1)
-    tomorrow_date = tomorrow.strftime('%d/%m/%Y')
-
     selection = treeview.selection()
     if selection:
         element_name = treeview.item(selection, 'values')[0]
-        element_id = get_elementid_from_database(db, 'task', element_name)
+        element_id = db_manager.get_elementid_from_db('element', element_name)
+        element_id = element_id[0]
+        db_manager.set_element_id(element_id)
     else:
         messagebox.showerror("ERROR", "Select an element.")
-    try:
-        update_database_field(db, element_id, 'date', tomorrow_date)
-        conn = sqlite3.connect(db + '.db')
-        cursor = conn.cursor()
-        cursor.execute(f"SELECT deadline FROM {db} WHERE element_ID=?", (element_id,))
-        deadline_rows = cursor.fetchone()
-        
-        if str(deadline_rows).replace("(","").replace(")","").replace("'","").replace(",","") == date_string:
-            deadline = tomorrow_date
-            cursor.execute(f"UPDATE {db} SET deadline=? WHERE element_ID=?", (deadline, element_id))
-            conn.commit()
-        else:
-            pass
 
+    try:
+        db_manager.update_db_field('date', tomorrow_date)
         messagebox.showinfo("Info", "Task moved to tomorrow.")
-        cursor.close()
-        conn.close()
         progress_bar_of_day()
         insert_data_to_treeview(treeview, db, 'task')
-
     except Exception as e:
         messagebox.showerror("ERROR", f"ERROR: {e}")
 
