@@ -13,6 +13,7 @@ chosen_deadline = None
 now = datetime.now()
 today = now.strftime('%d/%m/%Y')
 
+
 def create_database(db):
     try:    
         conn = sqlite3.connect(db + '.db')

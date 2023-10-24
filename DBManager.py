@@ -1,23 +1,31 @@
-import datetime
 import sqlite3
+import datetime
 from tkinter import messagebox
 from functions import generate_element_id
 # Created on : 14. 10. 2023, 14:26:26
 # Author     : prohi
 
+current_date = datetime.datetime.now()
+date_string = current_date.strftime("%d/%m/%Y")
+tomorrow = datetime.datetime.today() + datetime.timedelta(days=1)
+tomorrow_date = tomorrow.strftime('%d/%m/%Y')
 
 class DBManager():  
     conn = None
     cursor = None
-    element_id = None
-    db = 'data'
     
-    def __init__(self, db, element_id):
-        self.conn = sqlite3.connect(db + '.db')
-        self.cursor = self.conn.cursor()
-
+    def __init__(self, db):
+        #self.conn = sqlite3.connect(db + '.db')
+        #self.cursor = self.conn.cursor()
         self.db = db
+        self.open_db()
+
+    def set_element_id(self, element_id):
         self.element_id = element_id
+
+    def open_db(self):
+        self.conn = sqlite3.connect(self.db + '.db')
+        self.cursor = self.conn.cursor()
 
     def close_db(self):
         self.cursor.close()
@@ -25,6 +33,7 @@ class DBManager():
 
     def create_db(self):
         try:
+            self.open_db()
             self.cursor.execute(f'CREATE TABLE IF NOT EXISTS {self.db} (id INTEGER PRIMARY KEY, element_ID TEXT, element TEXT, date TEXT, deadline TEXT, field1 TEXT, field2 TEXT, field3 TEXT, project TEXT, delegated TEXT, cooperating TEXT, field4 TEXT, field5 TEXT, remarks TEXT, keywords TEXT, category TEXT, done TEXT)')
 
         except Exception as e:
@@ -34,6 +43,7 @@ class DBManager():
 
     def delete_from_db(self):
         try:
+            self.open_db()
             self.cursor.execute(f"SELECT id FROM {self.db} WHERE element_ID=?", (self.element_id,))
             row = self.cursor.fetchone()
             row_id = row[0]
@@ -48,6 +58,7 @@ class DBManager():
     def save_to_db(self, element_id, element, date, deadline, field1, field2, field3, project, delegated, 
                             cooperating, field4, field5, remarks, keywords, category, done):
         try:
+            self.open_db()
             query = f"INSERT INTO {self.db} (element_ID, element, date, deadline, field1, field2, field3, project, delegated, cooperating, field4, field5, remarks, keywords, category, done) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             values = (element_id, element, date, deadline, field1, field2, field3, project, delegated, cooperating, field4, field5, remarks, keywords, category, done)
             self.cursor.execute(query, values)
@@ -60,18 +71,28 @@ class DBManager():
 
     def update_db_field(self, column_name, text):
         try:
-            conn = sqlite3.connect({self.db} + '.db')
-            cursor = conn.cursor()
-            cursor.execute(f'UPDATE {self.db} SET {column_name}={text} WHERE element_ID=?', (self.element_id,))
+            self.open_db()
+            self.cursor.execute(f'UPDATE {self.db} SET {column_name}=? WHERE element_ID=?', (text, self.element_id,))
+            if column_name == 'date':
+                self.cursor.execute(f"SELECT deadline FROM {self.db} WHERE element_ID=?", (self.element_id,))
+                deadline_rows = self.cursor.fetchone()
+                if deadline_rows[0] == date_string:
+                    deadline = tomorrow_date
+                    self.cursor.execute(f"UPDATE {self.db} SET deadline=? WHERE element_ID=?", (deadline, self.element_id))
+                    self.conn.commit()
+            else:
+                pass
         except Exception as e:
             messagebox.showwarning("ERROR", f"ERROR: {e}")
         finally:
             self.close_db()
 
-    def get_elementid_from_database(self, column_name, text):
+    def get_elementid_from_db(self, column_name, text):
         try:
+            self.open_db()
             self.cursor.execute(f"SELECT element_ID FROM {self.db} WHERE {column_name}=?", (text,))
             self.element_id = self.cursor.fetchone()
+            return self.element_id
         except Exception as e:
             messagebox.showerror("ERROR",f"ERROR: {e}")
         finally:
