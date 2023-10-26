@@ -47,22 +47,38 @@ class element_window_small: # Ahoc Task, Idea
                 db, element_id, win, row1, row2, row3
             )
 
+    def get_task_data_tuple(self):
+        data.element_id = self.element_id
+        data.element = self.element_description_row.get()
+        data.date = self.date_string
+        data.deadline = self.date_string
+        data.field2 = self.field2_row.get()
+        data.field3 = self.field3_row.get()
+        data.project = self.project_row.get()
+        data.keywords = self.keywords_row.get()
+        data.category = 'task'
+
+        data_tuple = data.make_tuple()
+        return data_tuple
+
+    def get_idea_data_tuple(self):
+        data.element_id = self.element_id
+        data.element = self.element_description_row.get()
+        data.date = self.date_string
+        data.field1 = self.field1_row.get()
+        data.field2 = self.field2_row.get()
+        data.category = 'idea'
+
+        data_tuple = data.make_tuple()
+        return data_tuple        
+
     def save_or_edit_task(self):
         answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                data.element_id = self.element_id
-                data.element = self.element_description_row.get()
-                data.date = self.date_string
-                data.deadline = self.date_string
-                data.field2 = self.field2_row.get()
-                data.field3 = self.field3_row.get()
-                data.project = self.project_row.get()
-                data.keywords = self.keywords_row.get()
-                data.category = 'task'
-
-                data_tuple = data.make_tuple()
-                db_manager.save_to_db(data_tuple)
+                task_tuple = self.get_task_data_tuple()
+                print(task_tuple)
+                db_manager.save_to_db(task_tuple)
 
                 if len(self.project_row.get()) != 0:
                     project_name = self.project_row.get()
@@ -90,19 +106,14 @@ class element_window_small: # Ahoc Task, Idea
         answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                data.element_id = self.element_id
-                data.element = self.element_description_row.get()
-                data.date = self.date_string
-                data.field1 = self.field1_row.get()
-                data.field2 = self.field2_row.get()
-                data.category = 'idea'
-
-                data_tuple = data.make_tuple()
+                idea_tuple = self.get_idea_data_tuple()
+                print(idea_tuple)
+                db_manager.save_to_db(idea_tuple)
                 
                 if element_id_already_exists(self.db, self.element_id):
-                    db_manager.update_db_fields(data_tuple)
+                    db_manager.update_db_fields(idea_tuple)
                 else:
-                    db_manager.save_to_db(data_tuple)
+                    db_manager.save_to_db(idea_tuple)
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
