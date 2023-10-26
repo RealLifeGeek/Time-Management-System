@@ -8,8 +8,6 @@ from tkinter import messagebox
 from datetime import datetime
 import datetime
 import time
-from functions import create_database, delete_from_database
-from functions import update_database_field, get_elementid_from_database
 from functions import count_total_number_of_elements, check_internet, count_number_of_day_element
 from element_window_extended import element_window_extended
 from element_window_small import element_window_small
@@ -43,7 +41,7 @@ chosen_deadline = None
 element_id = None
 project_name = None
 db = 'data'
-db_manager = DBManager(db)
+db_manager = DBManager()
 
 db_manager.create_db()
 
@@ -115,9 +113,8 @@ def task_done():
         element_id = db_manager.get_elementid_from_db('element', element_name)
         element_id = element_id[0]
         db_manager.set_element_id(element_id)
-        print(element_id)
 
-        db_manager.update_db_field('done', 'DONE')
+        db_manager.update_db_fields('done', 'DONE')
     else:
         messagebox.showerror("Error", "No task selected. Please select a task to be done.")
 
@@ -128,12 +125,12 @@ def do_task_tomorrow():
         element_id = db_manager.get_elementid_from_db('element', element_name)
         element_id = element_id[0]
         db_manager.set_element_id(element_id)
+
+        db_manager.update_db_fields('date', tomorrow_date)
+        messagebox.showinfo("Info", "Task moved to tomorrow.")
     else:
         messagebox.showerror("ERROR", "Select an element.")
-
     try:
-        db_manager.update_db_field('date', tomorrow_date)
-        messagebox.showinfo("Info", "Task moved to tomorrow.")
         progress_bar_of_day()
         insert_data_to_treeview(treeview, db, 'task')
     except Exception as e:
@@ -161,34 +158,34 @@ def delete_task_from_database():
     selection = treeview.selection()
     if selection:
         element_name = treeview.item(selection, 'values')[0]
-        element_id = get_elementid_from_database(db, 'element', element_name)
+        element_id = db_manager.get_elementid_from_db('element', element_name)
         element_id = element_id[0]
-    else:
-        messagebox.showerror("ERROR", "Select an element")
-    try:
+        db_manager.set_element_id(element_id)
+
         answer = messagebox.askyesno("DELETE", "DELETE from database?")
         if answer:
-            delete_from_database(db, element_id)
+            db_manager.delete_from_db()
             insert_data_to_treeview(treeview, db, 'task')
         else:
             pass
-    except Exception as e:
-        messagebox.showerror("ERROR", f"ERROR: {e}")
+    else:
+        messagebox.showerror("ERROR", "Select an element")
     
-    count_number_of_day_element(db, 'task', right_frame, 280, 162)
+    count_number_of_day_element(db, 'task', date_string)
 
 def delete_remark_from_database():
     selection = treeview_remarks.selection()
     if selection:
         element_name = treeview_remarks.item(selection, 'values')[0]
-        element_id = get_elementid_from_database(db, 'element', element_name)
+        element_id = db_manager.get_elementid_from_db('element', element_name)
+        db_manager.set_element_id(element_id)
     else:
         messagebox.showerror("ERROR", "Select an element")
 
     try:
-        answer = messagebox.askyesno("DELETE", "DELETE from database?")
+        answer = messagebox.askokcancel("DELETE", "DELETE from database?")
         if answer:
-            delete_from_database(db, element_id)
+            db_manager.delete_from_db()
             messagebox.showinfo("SUCCESS", "Successfuly DELETED")
             insert_data_to_treeview(treeview_remarks, db, 'remark')
         else:
@@ -200,14 +197,15 @@ def delete_event_from_database():
     selection = treeview_events.selection()
     if selection:
         element_name = treeview_events.item(selection, 'values')[0]
-        element_id = get_elementid_from_database(db, 'element', element_name)
+        element_id = db_manager.get_elementid_from_db('element', element_name)
+        db_manager.set_element_id(element_id)
     else:
         messagebox.showerror("ERROR", "Select an element")
 
     try:
-        answer = messagebox.askyesno("DELETE", "DELETE from database?")
+        answer = messagebox.askokcancel("DELETE", "DELETE from database?")
         if answer:
-            delete_from_database(db, element_id)
+            db_manager.delete_from_db()
             messagebox.showinfo("SUCCESS", "Successfuly DELETED")
             insert_data_to_treeview(treeview_events, db, 'event')
         else:
@@ -252,7 +250,7 @@ def progress_bar_of_day():
         messagebox.showerror("ERROR", f"Progress bar error: {e}")
 
 def exit_tms():
-    answer = messagebox.askyesno("Close TMS", "Do you want to close TMS?")
+    answer = messagebox.askokcancel("Close TMS", "Do you want to close TMS?")
     if answer:
         sys.exit()
     else:
@@ -268,7 +266,7 @@ def show_existing_task_window():
     selection = treeview.selection()
     if selection:
         element_name = treeview.item(selection, 'values')[0]
-        element_id = get_elementid_from_database(db, 'element', element_name)
+        element_id = db_manager.get_elementid_from_db('element', element_name)
         element_id = element_id[0]
     else:
         messagebox.showwarning("ERROR", f"Select an element")
@@ -288,7 +286,7 @@ def show_existing_event_window():
     selection = treeview_events.selection()
     if selection:
         element_name = treeview_events.item(selection, 'values')[0]
-        element_id = get_elementid_from_database(db, 'element', element_name)
+        element_id = db_manager.get_elementid_from_db('element', element_name)
         element_id = element_id[0]
     else:
         messagebox.showwarning("ERROR", f"Select an element")
@@ -308,7 +306,7 @@ def show_existing_remark_window():
     selection = treeview_remarks.selection()
     if selection:
         element_name = treeview_remarks.item(selection, 'values')[0]
-        element_id = get_elementid_from_database(db, 'element', element_name)
+        element_id = db_manager.get_elementid_from_db('element', element_name)
         element_id = element_id[0]
     else:
         messagebox.showwarning("ERROR", f"Select an element")

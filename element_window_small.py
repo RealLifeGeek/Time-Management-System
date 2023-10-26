@@ -1,8 +1,11 @@
 import tkinter as tk
 from tkinter import messagebox
 import datetime
-from functions import save_to_database, generate_element_id, project_name_already_exist, element_id_already_exists, delete_from_database
+from functions import generate_element_id, project_name_already_exist, element_id_already_exists
 from functions import insert_values_to_idea_form
+from DBManager import *
+
+db_manager = DBManager()
 
 
 class element_window_small: # Ahoc Task, Idea
@@ -43,19 +46,12 @@ class element_window_small: # Ahoc Task, Idea
             )
 
     def save_or_edit_task(self):
-        chosen_deadline = self.date_string
-
-        answer = messagebox.askyesno("SAVE", "SAVE changes?")
+        answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                if element_id_already_exists(self.db, self.element_id):
-                    delete_from_database(self.db, self.element_id)
-                else:
-                    pass
-
                 element = self.element_description_row.get()
                 date = self.date_string
-                deadline = chosen_deadline
+                deadline = self.date_string
                 field1 = ''
                 field2 = self.field2_row.get()
                 field3 = self.field3_row.get()
@@ -69,8 +65,12 @@ class element_window_small: # Ahoc Task, Idea
                 category = 'task'
                 done = 'No'
 
-                save_to_database(self.db, self.element_id, element, date, deadline, field1, field2, field3, project, delegated, 
-                        cooperating, field4, field5, remarks, keywords, category, done)
+                if element_id_already_exists(self.db, self.element_id):
+                    db_manager.update_db_fields(self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
+                                                cooperating, field4, field5, remarks, keywords, category, done)
+                else:
+                    db_manager.save_to_db(self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
+                                        cooperating, field4, field5, remarks, keywords, category, done)
 
                 if len(self.project_row.get()) != 0:
                     project_name = self.project_row.get()
@@ -78,7 +78,7 @@ class element_window_small: # Ahoc Task, Idea
                         element_id = generate_element_id(self.db, 'PR')
                         element = project
                         date = date
-                        deadline = chosen_deadline
+                        deadline = self.date_string
                         field1 = ''
                         field2 = ''
                         field3 = ''
@@ -92,8 +92,8 @@ class element_window_small: # Ahoc Task, Idea
                         category = 'project'
                         done = 'No'
 
-                        save_to_database(self.db, element_id, element, date, deadline, field1, field2, field3, project, delegated, 
-                                                cooperating, field4, field5, remarks, keywords, category, done)
+                        db_manager.save_to_db(self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
+                                              cooperating, field4, field5, remarks, keywords, category, done)
                 else:
                     pass
                 self.window.destroy()
@@ -104,14 +104,9 @@ class element_window_small: # Ahoc Task, Idea
             pass
 
     def save_or_edit_idea(self):
-        answer = messagebox.askyesno("SAVE", "SAVE changes?")
+        answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                if element_id_already_exists(self.db, self.element_id):
-                    delete_from_database(self.db, self.element_id)
-                else:
-                    pass
-
                 element = self.element_description_row.get()
                 date = self.date_string
                 deadline = None
@@ -127,9 +122,13 @@ class element_window_small: # Ahoc Task, Idea
                 keywords = ''
                 category = 'idea'
                 done = 'No'
-
-                save_to_database(self.db, self.element_id, element, date, deadline, field1, field2, field3, project, delegated, 
-                        cooperating, field4, field5, remarks, keywords, category, done)
+                
+                if element_id_already_exists(self.db, self.element_id):
+                    db_manager.update_db_fields(self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
+                                                cooperating, field4, field5, remarks, keywords, category, done)
+                else:
+                    db_manager.save_to_db(self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
+                                          cooperating, field4, field5, remarks, keywords, category, done)
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
@@ -326,7 +325,7 @@ class element_window_small: # Ahoc Task, Idea
                 text = "SAVE",
                 font = ('Arial', '10', 'bold'),
                 width = 11,
-                command = None,
+                command = self.save_or_edit_task,
                 background = '#A94102',
                 foreground = '#FFFFFF'
             )
