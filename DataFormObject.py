@@ -1,5 +1,5 @@
 # an object holding data to give them for further processing - DBManager, DayListManager etc.
-class DataForm():
+class DataForm:
     def __init__(self):
         self.element_id = ""
         self.element = ""

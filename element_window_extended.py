@@ -41,13 +41,14 @@ class element_window_extended: # task, remark, event
                 element_id = generate_element_id(db, 'EV')
         else:
             pass
-
+        
         self.element_id = element_id
         self.title = title
         self.db = db
         
-    def choose_date(self):
-        
+    def choose_date(self): # Make an Entry
+        global chosen_date
+
         if self.title == 'Event' or self.title == 'Event View':
             bg = "#A8A803"
         elif self.title == 'Remark' or self.title == 'Remark View':
@@ -55,9 +56,10 @@ class element_window_extended: # task, remark, event
         else:
             bg = "#2F3030"
         
+        chosen_date = self.calendar.get_date()
         self.chosen_date_label = tk.Label(
             self.middle_frame,
-            text = self.calendar.get_date(),
+            text = chosen_date,
             font = ('Montserrat', '12'),
             background = bg,
             foreground = "#FFFFFF"
@@ -67,49 +69,77 @@ class element_window_extended: # task, remark, event
         else:
             self.chosen_date_label.place(x = 180, y = 5)
 
-    def choose_deadline(self):
+    def choose_deadline(self): # Make an Entry
+        global chosen_deadline
 
+        chosen_deadline = self.calendar.get_date()
         self.chosen_deadline_label = tk.Label(
             self.middle_frame,
-            text = self.calendar.get_date(),
+            text = chosen_deadline,
             font = ('Montserrat', '12', 'bold'),
             background = '#970000',
             foreground = "#FFFFFF"
         )
         self.chosen_deadline_label.place(x = 180, y = 45)
 
+    def get_task_data_tuple(self):
+        data.element_id = self.element_id
+        data.element = self.element_description_row.get()
+        data.date = chosen_date
+        data.deadline = chosen_deadline       
+        data.field2 = self.field2_row.get()
+        data.field3 = self.field3_row.get()
+        data.project = self.project_row.get()
+        data.delegated = self.delegated_row.get()
+        data.cooperating = self.cooperating_row.get()
+        data.keywords = self.keywords_row.get()
+        data.category = 'task'
+
+        if data.date != None or data.deadline != None:
+            if data.date == None and data.deadline != None:
+                data.date = data.deadline
+            elif data.date != None and data.deadline == None:
+                data.deadline = data.date
+        else:
+            pass
+
+        data_tuple = data.make_tuple()
+        return data_tuple
+    
+    def get_event_data_tuple(self):
+        data.element_id = self.element_id
+        data.element = self.element_description_row.get()
+        data.date = chosen_date
+        data.deadline = chosen_deadline
+        data.field1 = self.field1_row.get()
+        data.field2 = self.field2_row.get()
+        data.field3 = self.field3_row.get()
+        data.field4 = self.field4_row.get()
+        data.category = 'event'
+
+        data_tuple = data.make_tuple()
+        return data_tuple
+
+    def get_remark_data_tuple(self):
+        data.element_id = self.element_id
+        data.element = self.element_description_row.get()
+        data.date = chosen_date
+        data.field1 = self.field1_row.get()
+        data.field2 = self.field2_row.get()
+        data.category = 'remark'
+
+        data_tuple = data.make_tuple()
+        return data_tuple()
+
     def save_or_edit_task(self):
         answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                data.element_id = self.element_id
-                data.element = self.element_description_row.get()
-                data.date = self.calendar.get_date()
-                data.deadline = self.calendar.get_date()    # This line gives me error: Cannot access local variable 'deadline' where
-                                                            # it is not associtated with a value
-                data.field2 = self.field2_row.get()
-                data.field3 = self.field3_row.get()
-                data.project = self.project_row.get()
-                data.delegated = self.delegated_row.get()
-                data.cooperating = self.cooperating_row.get()
-                data.keywords = self.keywords_row.get()
-                data.category = 'task'
-
-
-                if data.date != None or data.deadline != None:
-                    if data.date == None and data.deadline != None:
-                        data.date = data.deadline
-                    elif data.date != None and data.deadline == None:
-                        data.deadline = data.date
-                else:
-                    pass
-
-                data_tuple = data.make_tuple()
-
+                task_tuple = self.get_task_data_tuple()
                 if element_id_already_exists(self.db, self.element_id):
-                    db_manager.update_db_fields(data_tuple)
+                    db_manager.update_db_fields(task_tuple)
                 else:
-                    db_manager.save_to_db(data_tuple)
+                    db_manager.save_to_db(task_tuple)
 
                 if len(self.project_row.get()) != 0:
                     project_name = self.project_row.get()
@@ -142,26 +172,14 @@ class element_window_extended: # task, remark, event
         answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                data.element_id = self.element_id
-                data.element = self.element_description_row.get()
-                data.date = chosen_date
-                data.deadline = chosen_deadline
-                data.field1 = self.field1_row.get()
-                data.field2 = self.field2_row.get()
-                data.field3 = self.field3_row.get()
-                data.field4 = self.field4_row.get()
-                data.category = 'event'
-
-                data_tuple = data.make_tuple()
-
+                event_tuple = self.get_event_data_tuple()
                 if element_id_already_exists(self.db, self.element_id):
-                    db_manager.update_db_fields(data_tuple)
+                    db_manager.update_db_fields(event_tuple)
                 else:
-                    db_manager.save_to_db(data_tuple)
+                    db_manager.save_to_db(event_tuple)
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
-                print(e)
                 self.window.destroy()
     
     def save_or_edit_remark(self):
@@ -170,19 +188,11 @@ class element_window_extended: # task, remark, event
         answer = messagebox.askyesno("SAVE", "SAVE changes?")
         if answer:
             try:
-                data.element_id = self.element_id
-                data.element = self.element_description_row.get()
-                data.date = chosen_date
-                data.field1 = self.field1_row.get()
-                data.field2 = self.field2_row.get()
-                data.category = 'remark'
-
-                data_tuple = data.make_tuple()
-
+                remark_tuple = self.get_remark_data_tuple()
                 if element_id_already_exists(self.db, self.element_id):
-                    db_manager.update_db_fields(data_tuple)
+                    db_manager.update_db_fields(remark_tuple)
                 else:
-                    db_manager.save_to_db(data_tuple)
+                    db_manager.save_to_db(remark_tuple)
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
