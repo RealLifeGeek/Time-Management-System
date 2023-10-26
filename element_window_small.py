@@ -4,8 +4,10 @@ import datetime
 from functions import generate_element_id, project_name_already_exist, element_id_already_exists
 from functions import insert_values_to_idea_form
 from DBManager import *
+from DataFormObject import *
 
 db_manager = DBManager()
+data = DataForm()
 
 
 class element_window_small: # Ahoc Task, Idea
@@ -49,51 +51,32 @@ class element_window_small: # Ahoc Task, Idea
         answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                element = self.element_description_row.get()
-                date = self.date_string
-                deadline = self.date_string
-                field1 = ''
-                field2 = self.field2_row.get()
-                field3 = self.field3_row.get()
-                project = self.project_row.get()
-                delegated = ''
-                cooperating = ''
-                field4 = ''
-                field5 = ''
-                remarks = ''
-                keywords = self.keywords_row.get()
-                category = 'task'
-                done = 'No'
+                data.element_id = self.element_id
+                data.element = self.element_description_row.get()
+                data.date = self.date_string
+                data.deadline = self.date_string
+                data.field2 = self.field2_row.get()
+                data.field3 = self.field3_row.get()
+                data.project = self.project_row.get()
+                data.keywords = self.keywords_row.get()
+                data.category = 'task'
 
-                if element_id_already_exists(self.db, self.element_id):
-                    db_manager.update_db_fields(self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
-                                                cooperating, field4, field5, remarks, keywords, category, done)
-                else:
-                    db_manager.save_to_db(self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
-                                        cooperating, field4, field5, remarks, keywords, category, done)
+                data_tuple = data.make_tuple()
+                db_manager.save_to_db(data_tuple)
 
                 if len(self.project_row.get()) != 0:
                     project_name = self.project_row.get()
                     if not project_name_already_exist(self.db, project_name):
-                        element_id = generate_element_id(self.db, 'PR')
-                        element = project
-                        date = date
-                        deadline = self.date_string
-                        field1 = ''
-                        field2 = ''
-                        field3 = ''
-                        project = ''
-                        delegated = ''
-                        cooperating = ''
-                        field4 = ''
-                        field5 = ''
-                        remarks = ''
-                        keywords = self.keywords_row.get()
-                        category = 'project'
-                        done = 'No'
+                        data.element_id = generate_element_id(self.db, 'PR')
+                        data.element = self.project_row.get()
+                        data.date = self.date_string
+                        data.deadline = self.date_string
+                        data.keywords = self.keywords_row.get()
+                        data.category = 'project'
+                        data.done = 'No'
 
-                        db_manager.save_to_db(self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
-                                              cooperating, field4, field5, remarks, keywords, category, done)
+                        data_tuple = data.make_tuple()
+                        db_manager.save_to_db(data_tuple)
                 else:
                     pass
                 self.window.destroy()
@@ -107,28 +90,19 @@ class element_window_small: # Ahoc Task, Idea
         answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                element = self.element_description_row.get()
-                date = self.date_string
-                deadline = None
-                field1 = self.field1_row.get()
-                field2 = self.field2_row.get()
-                field3 = ''
-                project = ''
-                delegated = ''
-                cooperating = ''
-                field4 = ''
-                field5 = ''
-                remarks = ''
-                keywords = ''
-                category = 'idea'
-                done = 'No'
+                data.element_id = self.element_id
+                data.element = self.element_description_row.get()
+                data.date = self.date_string
+                data.field1 = self.field1_row.get()
+                data.field2 = self.field2_row.get()
+                data.category = 'idea'
+
+                data_tuple = data.make_tuple()
                 
                 if element_id_already_exists(self.db, self.element_id):
-                    db_manager.update_db_fields(self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
-                                                cooperating, field4, field5, remarks, keywords, category, done)
+                    db_manager.update_db_fields(data_tuple)
                 else:
-                    db_manager.save_to_db(self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
-                                          cooperating, field4, field5, remarks, keywords, category, done)
+                    db_manager.save_to_db(data_tuple)
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")

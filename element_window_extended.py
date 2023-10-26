@@ -4,11 +4,13 @@ from tkinter import messagebox
 from functions import generate_element_id, project_name_already_exist, element_id_already_exists
 from functions import insert_values_to_task_form, insert_values_to_event_form, insert_values_to_remark_form
 from DBManager import *
+from DataFormObject import *
 
 chosen_date = None
 chosen_deadline = None
 element_id = None
 db_manager = DBManager()
+data = DataForm()
 
 class element_window_extended: # task, remark, event
 # for new element use title as 'Task', 'Remark', 'Event'
@@ -40,13 +42,11 @@ class element_window_extended: # task, remark, event
         else:
             pass
 
-        chosen_date = self.calendar.get_date()
         self.element_id = element_id
         self.title = title
         self.db = db
         
     def choose_date(self):
-        global chosen_date
         
         if self.title == 'Event' or self.title == 'Event View':
             bg = "#A8A803"
@@ -55,10 +55,9 @@ class element_window_extended: # task, remark, event
         else:
             bg = "#2F3030"
         
-        chosen_date = self.calendar.get_date()
         self.chosen_date_label = tk.Label(
             self.middle_frame,
-            text = chosen_date,
+            text = self.calendar.get_date(),
             font = ('Montserrat', '12'),
             background = bg,
             foreground = "#FFFFFF"
@@ -69,12 +68,10 @@ class element_window_extended: # task, remark, event
             self.chosen_date_label.place(x = 180, y = 5)
 
     def choose_deadline(self):
-        global chosen_deadline
 
-        chosen_deadline = self.calendar.get_date()
         self.chosen_deadline_label = tk.Label(
             self.middle_frame,
-            text = chosen_deadline,
+            text = self.calendar.get_date(),
             font = ('Montserrat', '12', 'bold'),
             background = '#970000',
             foreground = "#FFFFFF"
@@ -82,65 +79,53 @@ class element_window_extended: # task, remark, event
         self.chosen_deadline_label.place(x = 180, y = 45)
 
     def save_or_edit_task(self):
-        global chosen_date
-        global chosen_deadline
-
-        if chosen_date != None or chosen_deadline != None:
-            if chosen_date == None and chosen_deadline != None:
-                chosen_date = chosen_deadline
-            elif chosen_date != None and chosen_deadline == None:
-                chosen_deadline = chosen_date
-        else:
-            pass
-    
         answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                element = self.element_description_row.get()
-                date = chosen_date
-                deadline = chosen_deadline
-                field1 = ''
-                field2 = self.field2_row.get()
-                field3 = self.field3_row.get()
-                project = self.project_row.get()
-                delegated = self.delegated_row.get()
-                cooperating = self.cooperating_row.get()
-                field4 = ''
-                field5 = ''
-                remarks = ''
-                keywords = self.keywords_row.get()
-                category = 'task'
-                done = 'No'
+                data.element_id = self.element_id
+                data.element = self.element_description_row.get()
+                data.date = self.calendar.get_date()
+                data.deadline = self.calendar.get_date()    # This line gives me error: Cannot access local variable 'deadline' where
+                                                            # it is not associtated with a value
+                data.field2 = self.field2_row.get()
+                data.field3 = self.field3_row.get()
+                data.project = self.project_row.get()
+                data.delegated = self.delegated_row.get()
+                data.cooperating = self.cooperating_row.get()
+                data.keywords = self.keywords_row.get()
+                data.category = 'task'
+
+
+                if data.date != None or data.deadline != None:
+                    if data.date == None and data.deadline != None:
+                        data.date = data.deadline
+                    elif data.date != None and data.deadline == None:
+                        data.deadline = data.date
+                else:
+                    pass
+
+                data_tuple = data.make_tuple()
 
                 if element_id_already_exists(self.db, self.element_id):
-                    db_manager.update_db_fields(self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
-                                                cooperating, field4, field5, remarks, keywords, category, done)
+                    db_manager.update_db_fields(data_tuple)
                 else:
-                    db_manager.save_to_db(self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
-                                     cooperating, field4, field5, remarks, keywords, category, done)
+                    db_manager.save_to_db(data_tuple)
 
                 if len(self.project_row.get()) != 0:
                     project_name = self.project_row.get()
                     if not project_name_already_exist(self.db, project_name):
-                        element_id = generate_element_id(self.db, 'PR')
-                        element = project
-                        date = chosen_date
-                        deadline = chosen_deadline
-                        field1 = ''
-                        field2 = ''
-                        field3 = ''
-                        project = ''
-                        delegated = self.delegated_row.get()
-                        cooperating = self.cooperating_row.get()
-                        field4 = ''
-                        field5 = ''
-                        remarks = ''
-                        keywords = self.keywords_row.get()
-                        category = 'project'
-                        done = 'No'
+                        data.element_id = generate_element_id(self.db, 'PR')
+                        data.element = project_name
+                        data.date = data.date
+                        data.deadline = data.deadline
+                        data.delegated = self.delegated_row.get()
+                        data.cooperating = self.cooperating_row.get()
+                        data.keywords = self.keywords_row.get()
+                        data.category = 'project'
 
-                        db_manager.save_to_db(element_id, element, date, deadline, field1, field2, field3, project, delegated, 
-                                                cooperating, field4, field5, remarks, keywords, category, done)
+                        data_tuple = data.make_tuple()
+
+                        db_manager.save_to_db(data_tuple)
                 else:
                     pass
                 self.window.destroy()
@@ -157,31 +142,26 @@ class element_window_extended: # task, remark, event
         answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                element = self.element_description_row.get()
-                date = chosen_date
-                deadline = chosen_deadline
-                field1 = self.field1_row.get()
-                field2 = self.field2_row.get()
-                field3 = self.field3_row.get()
-                project = ''
-                delegated = ''
-                cooperating = ''
-                field4 = self.field4_row.get()
-                field5 = ''
-                remarks = ''
-                keywords = ''
-                category = 'event'
-                done = 'No'
+                data.element_id = self.element_id
+                data.element = self.element_description_row.get()
+                data.date = chosen_date
+                data.deadline = chosen_deadline
+                data.field1 = self.field1_row.get()
+                data.field2 = self.field2_row.get()
+                data.field3 = self.field3_row.get()
+                data.field4 = self.field4_row.get()
+                data.category = 'event'
+
+                data_tuple = data.make_tuple()
 
                 if element_id_already_exists(self.db, self.element_id):
-                    db_manager.update_db_fields(self.db, self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
-                                                cooperating, field4, field5, remarks, keywords, category, done)
+                    db_manager.update_db_fields(data_tuple)
                 else:
-                    db_manager.save_to_db(self.db, self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
-                                            cooperating, field4, field5, remarks, keywords, category, done)
+                    db_manager.save_to_db(data_tuple)
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
+                print(e)
                 self.window.destroy()
     
     def save_or_edit_remark(self):
@@ -190,28 +170,19 @@ class element_window_extended: # task, remark, event
         answer = messagebox.askyesno("SAVE", "SAVE changes?")
         if answer:
             try:
-                element = self.element_description_row.get()
-                date = chosen_date
-                deadline = None
-                field1 = self.field1_row.get()
-                field2 = self.field2_row.get()
-                field3 = ''
-                project = ''
-                delegated = ''
-                cooperating = ''
-                field4 = ''
-                field5 = ''
-                remarks = ''
-                keywords = ''
-                category = 'remark'
-                done = 'No'
+                data.element_id = self.element_id
+                data.element = self.element_description_row.get()
+                data.date = chosen_date
+                data.field1 = self.field1_row.get()
+                data.field2 = self.field2_row.get()
+                data.category = 'remark'
+
+                data_tuple = data.make_tuple()
 
                 if element_id_already_exists(self.db, self.element_id):
-                    db_manager.update_db_fields(self.db, self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
-                                                cooperating, field4, field5, remarks, keywords, category, done)
+                    db_manager.update_db_fields(data_tuple)
                 else:
-                    db_manager.save_to_db(self.db, self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
-                                            cooperating, field4, field5, remarks, keywords, category, done)
+                    db_manager.save_to_db(data_tuple)
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")

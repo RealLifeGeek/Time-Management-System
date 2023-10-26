@@ -50,13 +50,11 @@ class DBManager():
         finally:
             self.close_db()
 
-    def save_to_db(self, element_id, element, date, deadline, field1, field2, field3, project, delegated, 
-                            cooperating, field4, field5, remarks, keywords, category, done):
+    def save_to_db(self, data_tuple):
         try:
             self.open_db()
             query = f"INSERT INTO {self.db} (element_ID, element, date, deadline, field1, field2, field3, project, delegated, cooperating, field4, field5, remarks, keywords, category, done) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-            values = (element_id, element, date, deadline, field1, field2, field3, project, delegated, cooperating, field4, field5, remarks, keywords, category, done)
-            self.cursor.execute(query, values)
+            self.cursor.execute(query, data_tuple)
             self.conn.commit()
             messagebox.showinfo("SUCCESS", "Successfully SAVED!")
         except Exception as e:
@@ -64,8 +62,7 @@ class DBManager():
         finally:
             self.close_db()
 
-    def update_db_fields(self, element_id, element, date, deadline, field1, field2, field3, project, delegated,
-                         cooperating, field4, field5, remarks, keywords, category, done):
+    def update_db_fields(self, data_tuple):
         if deadline == date_string:
             deadline = tomorrow_date
         else:
@@ -73,8 +70,7 @@ class DBManager():
         try:
             self.open_db()
             query = f"UPDATE {self.db} SET element = ?, date = ?, deadline = ?, field1 = ?, field2 = ?, field3 = ?, project = ?, delegated = ?, cooperating = ?, field4 = ?, field5 = ?, remarks = ?, keywords = ?, category = ?, done = ? WHERE element_ID = ?"
-            values = (element, date, deadline, field1, field2, field3, project, delegated, cooperating, field4, field5, remarks, keywords, category, done, element_id)
-            self.conn.execute(query, values)
+            self.conn.execute(query, data_tuple)
             self.conn.commit()
             messagebox.showinfo("UPDATED", "Successfully UPDATED!")
         except Exception as e:
