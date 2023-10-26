@@ -1,7 +1,6 @@
 import sqlite3
 import datetime
 from tkinter import messagebox
-from functions import generate_element_id
 # Created on : 14. 10. 2023, 14:26:26
 # Author     : prohi
 
@@ -10,13 +9,9 @@ date_string = current_date.strftime("%d/%m/%Y")
 tomorrow = datetime.datetime.today() + datetime.timedelta(days=1)
 tomorrow_date = tomorrow.strftime('%d/%m/%Y')
 
-class DBManager():  
-    conn = None
-    cursor = None
-    
-    def __init__(self, db):
-        #self.conn = sqlite3.connect(db + '.db')
-        #self.cursor = self.conn.cursor()
+class DBManager():   
+    def __init__(self):
+        db = 'data'
         self.db = db
         self.open_db()
 
@@ -69,19 +64,21 @@ class DBManager():
         finally:
             self.close_db()
 
-    def update_db_field(self, column_name, text):
+    def update_db_fields(self, element_id, element, date, deadline, field1, field2, field3, project, delegated,
+                         cooperating, field4, field5, remarks, keywords, category, done):
+        if deadline == date_string:
+            deadline = tomorrow_date
+        else:
+            pass
         try:
             self.open_db()
-            self.cursor.execute(f'UPDATE {self.db} SET {column_name}=? WHERE element_ID=?', (text, self.element_id,))
-            if column_name == 'date':
-                self.cursor.execute(f"SELECT deadline FROM {self.db} WHERE element_ID=?", (self.element_id,))
-                deadline_rows = self.cursor.fetchone()
-                if deadline_rows[0] == date_string:
-                    deadline = tomorrow_date
-                    self.cursor.execute(f"UPDATE {self.db} SET deadline=? WHERE element_ID=?", (deadline, self.element_id))
-                    self.conn.commit()
-            else:
-                pass
+
+            query = f"UPDATE {self.db} SET element = ?, date = ?, deadline = ?, field1 = ?, field2 = ?, field3 = ?, project = ?, delegated = ?, cooperating = ?, field4 = ?, field5 = ?, remarks = ?, keywords = ?, category = ?, done = ? WHERE element_ID = ?"
+            values = (element, date, deadline, field1, field2, field3, project, delegated, cooperating, field4, field5, remarks, keywords, category, done, element_id)
+            self.conn.execute(query, values)
+            self.conn.commit()
+            messagebox.showinfo("UPDATED", "Successfully UPDATED!")
+
         except Exception as e:
             messagebox.showwarning("ERROR", f"ERROR: {e}")
         finally:

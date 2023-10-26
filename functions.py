@@ -13,49 +13,6 @@ chosen_deadline = None
 now = datetime.now()
 today = now.strftime('%d/%m/%Y')
 
-
-def create_database(db):
-    try:    
-        conn = sqlite3.connect(db + '.db')
-        cursor = conn.cursor()
-
-        cursor.execute(f'CREATE TABLE IF NOT EXISTS {db} (id INTEGER PRIMARY KEY, element_ID TEXT, element TEXT, date TEXT, deadline TEXT, field1 TEXT, field2 TEXT, field3 TEXT, project TEXT, delegated TEXT, cooperating TEXT, field4 TEXT, field5 TEXT, remarks TEXT, keywords TEXT, category TEXT, done TEXT)')
-        cursor.close()
-        conn.close()
-    except Exception as e:
-        messagebox.showerror("ERROR", f"ERROR: {e}")
-        
-def delete_from_database(db, element_id):
-    try:
-        conn = sqlite3.connect(db + '.db')
-        cursor = conn.cursor()
-
-        cursor.execute(f"SELECT id FROM {db} WHERE element_ID=?", (element_id,))
-        row = cursor.fetchone()
-        row_id = row[0]
-        cursor.execute(f"DELETE FROM {db} WHERE id = ?", (row_id,))
-        conn.commit()
-        messagebox.showinfo("SUCCESS", "Successfully DELETED!")
-        cursor.close()
-        conn.close()
-    except Exception as e:
-        messagebox.showerror("ERROR",f"ERROR: {e}")
-
-def save_to_database(db, element_id, element, date, deadline, field1, field2, field3, project, delegated, 
-                         cooperating, field4, field5, remarks, keywords, category, done):
-    try:
-        conn = sqlite3.connect(db + '.db')
-        cursor = conn.cursor()
-        query = f"INSERT INTO {db} (element_ID, element, date, deadline, field1, field2, field3, project, delegated, cooperating, field4, field5, remarks, keywords, category, done) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-        values = (element_id, element, date, deadline, field1, field2, field3, project, delegated, cooperating, field4, field5, remarks, keywords, category, done)
-        cursor.execute(query, values)
-        conn.commit()
-        cursor.close()
-        conn.close()
-        messagebox.showinfo("SUCCESS", "Successfully SAVED!")
-    except Exception as e:
-        messagebox.showerror("ERROR",f"ERROR: {e}")
-
 def generate_element_id(db, letter_sign):
     while True:
         letters = letter_sign
@@ -90,30 +47,6 @@ def project_name_already_exist(db, project_name):
     else:
         return False
 
-def update_database_field(db, element_id, column_name, text):
-    conn = sqlite3.connect(db + '.db')
-    cursor = conn.cursor()
-    try:
-        conn = sqlite3.connect({db} + '.db')
-        cursor = conn.cursor()
-        cursor.execute(f'UPDATE {db} SET {column_name}={text} WHERE element_ID=?', (element_id,))
-        conn.commit()
-        conn.close() 
-    except Exception as e:
-        messagebox.showwarning("ERROR", f"ERROR: {e}")
-    cursor.close()
-    conn.close()
-
-def get_elementid_from_database(db, column_name, text):
-    conn = sqlite3.connect(db + '.db')
-    cursor = conn.cursor()
-    cursor.execute(f"SELECT element_ID FROM {db} WHERE {column_name}=?", (text,))
-    element_id = cursor.fetchone()
-    cursor.close()
-    conn.close()
-
-    return element_id
-
 def count_number_of_day_element(db, category, date_string):
     try:
         conn = sqlite3.connect(db + '.db')
@@ -143,8 +76,6 @@ def count_total_number_of_elements(db, category, delegated, done):
             cursor.execute(f'SELECT element FROM {db} WHERE category = ?', (category,))
         rows = cursor.fetchall()
         elements = [str(row[0]) for row in rows]
-        #my_tasks = [(str(row[0]).replace("{", "").replace("}", "").replace("[", "").replace("]", "").replace("(", "").replace(")", "")
-        #                  .replace(",", "").replace("'", "")) for row in rows] 
         number_elements = int(len(elements))
         return number_elements
     except Exception as e:

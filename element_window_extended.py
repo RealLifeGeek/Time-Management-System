@@ -1,12 +1,14 @@
 import tkinter as tk
 from tkcalendar import Calendar
 from tkinter import messagebox
-from functions import save_to_database, generate_element_id, project_name_already_exist, element_id_already_exists, delete_from_database
+from functions import generate_element_id, project_name_already_exist, element_id_already_exists
 from functions import insert_values_to_task_form, insert_values_to_event_form, insert_values_to_remark_form
+from DBManager import *
 
 chosen_date = None
 chosen_deadline = None
 element_id = None
+db_manager = DBManager()
 
 class element_window_extended: # task, remark, event
 # for new element use title as 'Task', 'Remark', 'Event'
@@ -91,14 +93,9 @@ class element_window_extended: # task, remark, event
         else:
             pass
     
-        answer = messagebox.askyesno("SAVE", "SAVE changes?")
+        answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                if element_id_already_exists(self.db, self.element_id):
-                    delete_from_database(self.db, self.element_id)
-                else:
-                    pass
-
                 element = self.element_description_row.get()
                 date = chosen_date
                 deadline = chosen_deadline
@@ -115,8 +112,12 @@ class element_window_extended: # task, remark, event
                 category = 'task'
                 done = 'No'
 
-                save_to_database(self.db, self.element_id, element, date, deadline, field1, field2, field3, project, delegated, 
-                        cooperating, field4, field5, remarks, keywords, category, done)
+                if element_id_already_exists(self.db, self.element_id):
+                    db_manager.update_db_fields(self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
+                                                cooperating, field4, field5, remarks, keywords, category, done)
+                else:
+                    db_manager.save_to_db(self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
+                                     cooperating, field4, field5, remarks, keywords, category, done)
 
                 if len(self.project_row.get()) != 0:
                     project_name = self.project_row.get()
@@ -138,7 +139,7 @@ class element_window_extended: # task, remark, event
                         category = 'project'
                         done = 'No'
 
-                        save_to_database(self.db, element_id, element, date, deadline, field1, field2, field3, project, delegated, 
+                        db_manager.save_to_db(element_id, element, date, deadline, field1, field2, field3, project, delegated, 
                                                 cooperating, field4, field5, remarks, keywords, category, done)
                 else:
                     pass
@@ -153,14 +154,9 @@ class element_window_extended: # task, remark, event
         global chosen_date
         global chosen_deadline
 
-        answer = messagebox.askyesno("SAVE", "SAVE changes?")
+        answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                if element_id_already_exists(self.db, self.element_id):
-                    delete_from_database(self.db, self.element_id)
-                else:
-                    pass
-
                 element = self.element_description_row.get()
                 date = chosen_date
                 deadline = chosen_deadline
@@ -177,8 +173,12 @@ class element_window_extended: # task, remark, event
                 category = 'event'
                 done = 'No'
 
-                save_to_database(self.db, self.element_id, element, date, deadline, field1, field2, field3, project, delegated, 
-                        cooperating, field4, field5, remarks, keywords, category, done)
+                if element_id_already_exists(self.db, self.element_id):
+                    db_manager.update_db_fields(self.db, self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
+                                                cooperating, field4, field5, remarks, keywords, category, done)
+                else:
+                    db_manager.save_to_db(self.db, self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
+                                            cooperating, field4, field5, remarks, keywords, category, done)
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
@@ -190,11 +190,6 @@ class element_window_extended: # task, remark, event
         answer = messagebox.askyesno("SAVE", "SAVE changes?")
         if answer:
             try:
-                if element_id_already_exists(self.db, self.element_id):
-                    delete_from_database(self.db, self.element_id)
-                else:
-                    pass
-
                 element = self.element_description_row.get()
                 date = chosen_date
                 deadline = None
@@ -211,8 +206,12 @@ class element_window_extended: # task, remark, event
                 category = 'remark'
                 done = 'No'
 
-                save_to_database(self.db, self.element_id, element, date, deadline, field1, field2, field3, project, delegated, 
-                        cooperating, field4, field5, remarks, keywords, category, done)
+                if element_id_already_exists(self.db, self.element_id):
+                    db_manager.update_db_fields(self.db, self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
+                                                cooperating, field4, field5, remarks, keywords, category, done)
+                else:
+                    db_manager.save_to_db(self.db, self.element_id, element, date, deadline, field1, field2, field3, project, delegated,
+                                            cooperating, field4, field5, remarks, keywords, category, done)
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
