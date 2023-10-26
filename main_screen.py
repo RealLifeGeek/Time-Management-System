@@ -114,7 +114,9 @@ def task_done():
         element_id = element_id[0]
         db_manager.set_element_id(element_id)
 
-        db_manager.update_db_fields('done', 'DONE')
+
+        db_manager.update_db_fields('done', 'DONE') # This won't work!! Need to take all standing data
+                                                      # from db and new data and insert them into brackets
     else:
         messagebox.showerror("Error", "No task selected. Please select a task to be done.")
 
@@ -125,12 +127,12 @@ def do_task_tomorrow():
         element_id = db_manager.get_elementid_from_db('element', element_name)
         element_id = element_id[0]
         db_manager.set_element_id(element_id)
-
-        db_manager.update_db_fields('date', tomorrow_date)
+        db_manager.update_db_fields('date', tomorrow_date) # Same as previous update
         messagebox.showinfo("Info", "Task moved to tomorrow.")
     else:
         messagebox.showerror("ERROR", "Select an element.")
     try:
+
         progress_bar_of_day()
         insert_data_to_treeview(treeview, db, 'task')
     except Exception as e:

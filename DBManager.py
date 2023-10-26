@@ -72,11 +72,13 @@ class DBManager():
             pass
         try:
             self.open_db()
+
             query = f"UPDATE {self.db} SET element = ?, date = ?, deadline = ?, field1 = ?, field2 = ?, field3 = ?, project = ?, delegated = ?, cooperating = ?, field4 = ?, field5 = ?, remarks = ?, keywords = ?, category = ?, done = ? WHERE element_ID = ?"
             values = (element, date, deadline, field1, field2, field3, project, delegated, cooperating, field4, field5, remarks, keywords, category, done, element_id)
             self.conn.execute(query, values)
             self.conn.commit()
             messagebox.showinfo("UPDATED", "Successfully UPDATED!")
+
         except Exception as e:
             messagebox.showwarning("ERROR", f"ERROR: {e}")
         finally:
