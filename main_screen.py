@@ -117,6 +117,7 @@ def task_done():
         data.element_id = element_id
         data.element = element_name
 
+
         db_manager.update_db_fields(data)
     else:
         messagebox.showerror("Error", "No task selected. Please select a task to be done.")
