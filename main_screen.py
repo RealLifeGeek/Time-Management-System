@@ -136,6 +136,7 @@ def do_task_tomorrow():
     else:
         messagebox.showerror("ERROR", "Select an element.")
     try:
+
         progress_bar_of_day()
         insert_data_to_treeview(treeview, db, 'task')
     except Exception as e:

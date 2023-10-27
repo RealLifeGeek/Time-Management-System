@@ -111,6 +111,7 @@ class DBManager:
             self.conn.execute(query, values)
             self.conn.commit()
             messagebox.showinfo("UPDATED", "Successfully UPDATED!")
+
         except Exception as e:
             messagebox.showwarning("ERROR", f"ERROR: {e}")
         finally:
