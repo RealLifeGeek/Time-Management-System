@@ -82,7 +82,7 @@ class element_window_extended: # task, remark, event
         )
         self.chosen_deadline_label.place(x = 180, y = 45)
 
-    def get_task_data_tuple(self):
+    def get_task_data(self):
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
         data.date = chosen_date
@@ -102,11 +102,8 @@ class element_window_extended: # task, remark, event
                 data.deadline = data.date
         else:
             pass
-
-        data_tuple = data.make_tuple()
-        return data_tuple
     
-    def get_event_data_tuple(self):
+    def get_event_data(self):
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
         data.date = chosen_date
@@ -117,10 +114,7 @@ class element_window_extended: # task, remark, event
         data.field4 = self.field4_row.get()
         data.category = 'event'
 
-        data_tuple = data.make_tuple()
-        return data_tuple
-
-    def get_remark_data_tuple(self):
+    def get_remark_data(self):
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
         data.date = chosen_date
@@ -128,18 +122,15 @@ class element_window_extended: # task, remark, event
         data.field2 = self.field2_row.get()
         data.category = 'remark'
 
-        data_tuple = data.make_tuple()
-        return data_tuple()
-
     def save_or_edit_task(self):
         answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                task_tuple = self.get_task_data_tuple()
+                self.get_task_data()
                 if element_id_already_exists(self.db, self.element_id):
-                    db_manager.update_db_fields(task_tuple)
+                    db_manager.update_db_fields(data)
                 else:
-                    db_manager.save_to_db(task_tuple)
+                    db_manager.save_to_db(data)
 
                 if len(self.project_row.get()) != 0:
                     project_name = self.project_row.get()
@@ -153,9 +144,7 @@ class element_window_extended: # task, remark, event
                         data.keywords = self.keywords_row.get()
                         data.category = 'project'
 
-                        data_tuple = data.make_tuple()
-
-                        db_manager.save_to_db(data_tuple)
+                        db_manager.save_to_db(data)
                 else:
                     pass
                 self.window.destroy()
@@ -172,11 +161,11 @@ class element_window_extended: # task, remark, event
         answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                event_tuple = self.get_event_data_tuple()
+                event_tuple = self.get_event_data()
                 if element_id_already_exists(self.db, self.element_id):
-                    db_manager.update_db_fields(event_tuple)
+                    db_manager.update_db_fields(data)
                 else:
-                    db_manager.save_to_db(event_tuple)
+                    db_manager.save_to_db(data)
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
@@ -188,11 +177,11 @@ class element_window_extended: # task, remark, event
         answer = messagebox.askyesno("SAVE", "SAVE changes?")
         if answer:
             try:
-                remark_tuple = self.get_remark_data_tuple()
+                remark_tuple = self.get_remark_data()
                 if element_id_already_exists(self.db, self.element_id):
-                    db_manager.update_db_fields(remark_tuple)
+                    db_manager.update_db_fields(data)
                 else:
-                    db_manager.save_to_db(remark_tuple)
+                    db_manager.save_to_db(data)
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")

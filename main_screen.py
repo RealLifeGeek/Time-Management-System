@@ -12,6 +12,7 @@ from functions import count_total_number_of_elements, check_internet, count_numb
 from element_window_extended import element_window_extended
 from element_window_small import element_window_small
 from DBManager import DBManager
+from DataFormObject import DataForm
 
 #from move_to import move_task_to
 #from new_task import new_task
@@ -42,6 +43,7 @@ element_id = None
 project_name = None
 db = 'data'
 db_manager = DBManager()
+data = DataForm()
 
 db_manager.create_db()
 
@@ -112,9 +114,10 @@ def task_done():
         element_name = treeview.item(selection, 'values')[0]        
         element_id = db_manager.get_elementid_from_db('element', element_name)
         element_id = element_id[0]
-        db_manager.set_element_id(element_id)
+        data.element_id = element_id
+        data.element = element_name
 
-        db_manager.update_db_fields('done', 'DONE')
+        db_manager.update_db_fields(data)
     else:
         messagebox.showerror("Error", "No task selected. Please select a task to be done.")
 
@@ -124,9 +127,11 @@ def do_task_tomorrow():
         element_name = treeview.item(selection, 'values')[0]
         element_id = db_manager.get_elementid_from_db('element', element_name)
         element_id = element_id[0]
-        db_manager.set_element_id(element_id)
+        data.element_id = element_id
+        data.element = element_name
+        data.date = tomorrow_date
 
-        db_manager.update_db_fields('date', tomorrow_date)
+        db_manager.update_db_fields(data)
         messagebox.showinfo("Info", "Task moved to tomorrow.")
     else:
         messagebox.showerror("ERROR", "Select an element.")
@@ -161,7 +166,6 @@ def delete_task_from_database():
         element_id = db_manager.get_elementid_from_db('element', element_name)
         element_id = element_id[0]
         db_manager.set_element_id(element_id)
-
         answer = messagebox.askyesno("DELETE", "DELETE from database?")
         if answer:
             db_manager.delete_from_db()
@@ -178,20 +182,16 @@ def delete_remark_from_database():
     if selection:
         element_name = treeview_remarks.item(selection, 'values')[0]
         element_id = db_manager.get_elementid_from_db('element', element_name)
+        element_id = element_id[0]
         db_manager.set_element_id(element_id)
-    else:
-        messagebox.showerror("ERROR", "Select an element")
-
-    try:
-        answer = messagebox.askokcancel("DELETE", "DELETE from database?")
+        answer = messagebox.askyesno("DELETE", "DELETE from database?")
         if answer:
             db_manager.delete_from_db()
-            messagebox.showinfo("SUCCESS", "Successfuly DELETED")
             insert_data_to_treeview(treeview_remarks, db, 'remark')
         else:
             pass
-    except Exception as e:
-        messagebox.showerror("Error", f"ERROR: {e}")
+    else:
+        messagebox.showerror("ERROR", "Select an element")
 
 def delete_event_from_database():
     selection = treeview_events.selection()
@@ -199,10 +199,6 @@ def delete_event_from_database():
         element_name = treeview_events.item(selection, 'values')[0]
         element_id = db_manager.get_elementid_from_db('element', element_name)
         db_manager.set_element_id(element_id)
-    else:
-        messagebox.showerror("ERROR", "Select an element")
-
-    try:
         answer = messagebox.askokcancel("DELETE", "DELETE from database?")
         if answer:
             db_manager.delete_from_db()
@@ -210,8 +206,8 @@ def delete_event_from_database():
             insert_data_to_treeview(treeview_events, db, 'event')
         else:
             pass
-    except Exception as e:
-        messagebox.showerror("Error", f"ERROR: {e}")
+    else:
+        messagebox.showerror("ERROR", "Select an element")
 
 def progress_bar_of_day():
     try:
@@ -589,7 +585,7 @@ if __name__ == "__main__":
     middle_frame_right.place(x = 510, y = 157)
 
     done_button_img = PhotoImage(
-    file = r"C:\Users\kalvo\OneDrive\Dokumenty\Python\New_Project\TMS_ver4\Pictures\done_icon.png"
+    file = r"Pictures\done_icon.png"
     )
     small_done_button_img = done_button_img.subsample(2)
 
@@ -605,7 +601,7 @@ if __name__ == "__main__":
     done_button.place(x = 10, y = 20)
 
     see_task_button_img = PhotoImage(
-    file = r"C:\Users\kalvo\OneDrive\Dokumenty\Python\New_Project\TMS_ver4\Pictures\magnifier_icon.png"
+    file = r"Pictures\magnifier_icon.png"
     )
     small_see_task_button_img = see_task_button_img.subsample(3)
 
@@ -621,7 +617,7 @@ if __name__ == "__main__":
     see_task_button.place(x = 10, y = 60)
 
     do_tommorrow_button_img = PhotoImage(
-    file = r"C:\Users\kalvo\OneDrive\Dokumenty\Python\New_Project\TMS_ver4\Pictures\tomorrow_icon.png"
+    file = r"Pictures\tomorrow_icon.png"
     )
     small_do_tommorrow_button_img = do_tommorrow_button_img.subsample(2)
 
@@ -637,7 +633,7 @@ if __name__ == "__main__":
     do_it_tomorrow_button.place(x = 10, y = 100)
 
     move_to_button_img = PhotoImage(
-    file = r"C:\Users\kalvo\OneDrive\Dokumenty\Python\New_Project\TMS_ver4\Pictures\change_icon.png"
+    file = r"Pictures\change_icon.png"
     )
     small_move_to_button_img = move_to_button_img.subsample(3)
 
@@ -653,7 +649,7 @@ if __name__ == "__main__":
     move_to_button.place(x = 10, y = 140)
 
     delete_button_img = PhotoImage(
-    file = r"C:\Users\kalvo\OneDrive\Dokumenty\Python\New_Project\TMS_ver4\Pictures\delete_icon.png"
+    file = r"Pictures\delete_icon.png"
     )
     small_delete_button_img = delete_button_img.subsample(1)
 
@@ -714,7 +710,7 @@ if __name__ == "__main__":
     treeview_remarks.place (x = 10, y = 35)
 
     view_database_button_img = PhotoImage(
-    file = r"C:\Users\kalvo\OneDrive\Dokumenty\Python\New_Project\TMS_ver4\Pictures\view_list.png"
+    file = r"Pictures\view_list.png"
     )
     small_view_database_button_img = view_database_button_img.subsample(2)
 
