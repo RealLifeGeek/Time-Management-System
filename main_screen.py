@@ -481,7 +481,6 @@ if __name__ == "__main__":
     )
     exit_button.place(x = 16, y = 480)
 
-
     top_frame_left = tk.Frame(
         None,
         width = 270,

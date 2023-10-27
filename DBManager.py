@@ -126,6 +126,8 @@ class DBManager:
             messagebox.showerror("ERROR",f"ERROR: {e}")
         finally:
             self.close_db()
+    
+    #insert_values_to_treeviews
 
 
             

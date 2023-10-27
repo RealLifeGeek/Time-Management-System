@@ -123,10 +123,7 @@ def check_internet(frame1, frame2):
 def exit_window(win_name):
     win_name.destroy()
 
-def insert_values_to_task_form(db, element_id, win, frame, row1, row2, row3, row4, row5, row6, row7):
-    global chosen_date
-    global chosen_deadline
-
+def insert_values_to_task_form(db, element_id, win, row1, row2, row3, row4, row5, row6, row7, row8, row9):
     conn = sqlite3.connect(db + '.db')
     cursor = conn.cursor()
 
@@ -149,57 +146,40 @@ def insert_values_to_task_form(db, element_id, win, frame, row1, row2, row3, row
 
     cursor.execute(f"SELECT date FROM {db} WHERE id = {row_id}")
     chosen_date = cursor.fetchone()[0]
-    result_date_label = tk.Label(
-        frame,
-        text = chosen_date,
-        font = ('Montserrat', '12'),
-        background = "#2F3030",
-        foreground = "#FFFFFF"
-    )
-    result_date_label.place(x = 180, y = 5)
+    row2.insert(0, chosen_date)
 
     cursor.execute(f"SELECT deadline FROM {db} WHERE id = {row_id}")
     chosen_deadline = cursor.fetchone()[0]
-    result_deadline_label = tk.Label(
-        frame,
-        text = chosen_deadline,
-        font = ('Montserrat', '12', 'bold'),
-        background = "#970000",
-        foreground = "#FFFFFF"
-    )
-    result_deadline_label.place(x = 180, y = 45)
+    row3.insert(0, chosen_deadline)
 
     cursor.execute(f"SELECT field2 FROM {db} WHERE id = {row_id}")
     result_expected_result = cursor.fetchone()[0]
-    row2.insert(0, result_expected_result)
+    row4.insert(0, result_expected_result)
 
     cursor.execute(f"SELECT field3 FROM {db} WHERE id = {row_id}")
     result_time = cursor.fetchone()[0]
-    row3.insert(0, result_time)
+    row5.insert(0, result_time)
 
     cursor.execute(f"SELECT project FROM {db} WHERE id = {row_id}")
     result_project = cursor.fetchone()[0]
-    row4.insert(0, result_project)
+    row6.insert(0, result_project)
 
     cursor.execute(f"SELECT delegated FROM {db} WHERE id = {row_id}")
     result_delegate_to = cursor.fetchone()[0]
-    row5.insert(0, result_delegate_to)
+    row7.insert(0, result_delegate_to)
 
     cursor.execute(f"SELECT cooperating FROM {db} WHERE id = {row_id}")
     result_cooperate_with = cursor.fetchone()[0]
-    row6.insert(0, result_cooperate_with)
+    row8.insert(0, result_cooperate_with)
 
     cursor.execute(f"SELECT keywords FROM {db} WHERE id = {row_id}")
     result_keywords = cursor.fetchone()[0]
-    row7.insert(0, result_keywords)
+    row9.insert(0, result_keywords)
 
     cursor.close()
     conn.close()
 
-def insert_values_to_event_form(db, element_id, win, frame, row1, row2, row3, row4, row5):
-    global chosen_date
-    global chosen_deadline
-
+def insert_values_to_event_form(db, element_id, win, row1, row2, row3, row4, row5, row6, row7):
     conn = sqlite3.connect(db + '.db')
     cursor = conn.cursor()
 
@@ -230,40 +210,24 @@ def insert_values_to_event_form(db, element_id, win, frame, row1, row2, row3, ro
     
     cursor.execute(f"SELECT date FROM {db} WHERE id=?", (row_id,))
     chosen_date = cursor.fetchone()[0]
-    result_start_date_label = tk.Label(
-        frame,
-        text = chosen_date,
-        font = ('Montserrat', '12', 'bold'),
-        background = "#A8A803",
-        foreground = "#FFFFFF"
-    )
-    result_start_date_label.place(x = 180, y = 5)
+    row4.insert(0, chosen_date)
 
     cursor.execute(f"SELECT deadline FROM {db} WHERE id=?", (row_id,))
     chosen_deadline = cursor.fetchone()[0]
-    result_end_date_label = tk.Label(
-        frame,
-        text = chosen_deadline,
-        font = ('Montserrat', '12', 'bold'),
-        background = "#970000",
-        foreground = "#FFFFFF"
-    )
-    result_end_date_label.place(x = 180, y = 45)
+    row5.insert(0, chosen_deadline)
 
     cursor.execute(f"SELECT field3 FROM {db} WHERE id=?", (row_id,))
     result_start_time = cursor.fetchone()[0]
-    row4.insert(0, result_start_time)
+    row6.insert(0, result_start_time)
 
     cursor.execute(f"SELECT field4 FROM {db} WHERE id=?", (row_id,))
     result_end_time = cursor.fetchone()[0]
-    row5.insert(0, result_end_time)
+    row7.insert(0, result_end_time)
 
     cursor.close()
     conn.close()
 
-def insert_values_to_remark_form(db, element_id, win, frame, row1, row2, row3):
-    global chosen_date
-
+def insert_values_to_remark_form(db, element_id, win, row1, row2, row3, row4):
     conn = sqlite3.connect(db + '.db')
     cursor = conn.cursor()
 
@@ -294,14 +258,7 @@ def insert_values_to_remark_form(db, element_id, win, frame, row1, row2, row3):
     
     cursor.execute(f"SELECT date FROM {db} WHERE id=?", (row_id,))
     chosen_date = cursor.fetchone()[0]
-    result_date_label = tk.Label(
-        frame,
-        text = chosen_date,
-        font = ('Montserrat', '12'),
-        background = "#9E019A",
-        foreground = "#FFFFFF"
-    )
-    result_date_label.place(x = 180, y = 25)
+    row4.insert(0, chosen_date)
 
     cursor.close()
     conn.close()
