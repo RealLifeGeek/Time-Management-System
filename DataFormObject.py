@@ -3,8 +3,8 @@ class DataForm:
     def __init__(self):
         self.element_id = ""
         self.element = ""
-        self.date = ""              # Date, Start Date
-        self.deadline = ""          # Deadline, End Date; Not used in Remarks
+        self.date = None              # Date, Start Date
+        self.deadline = None          # Deadline, End Date; Not used in Remarks
         self.field1 = ""            # Not used in Task
         self.field2 = ""            # in task: Expected Result
         self.field3 = ""            # Time, Start Time
@@ -17,23 +17,3 @@ class DataForm:
         self.keywords = ""
         self.category = ""
         self.done = "No"            # Initially 'No' for everything, when done the field is updated to 'DONE'
-
-    def make_tuple(self):
-        return (
-            self.element_id,
-            self.element,
-            self.date,
-            self.deadline,
-            self.field1,
-            self.field2,
-            self.field3,
-            self.project,
-            self.delegated,
-            self.cooperating,
-            self.field4,
-            self.field5,
-            self.remarks,
-            self.keywords,
-            self.category,
-            self.done
-        )
