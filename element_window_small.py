@@ -47,7 +47,7 @@ class element_window_small: # Ahoc Task, Idea
                 db, element_id, win, row1, row2, row3
             )
 
-    def get_task_data_tuple(self):
+    def get_task_data(self):
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
         data.date = self.date_string
@@ -58,27 +58,20 @@ class element_window_small: # Ahoc Task, Idea
         data.keywords = self.keywords_row.get()
         data.category = 'task'
 
-        data_tuple = data.make_tuple()
-        return data_tuple
-
-    def get_idea_data_tuple(self):
+    def get_idea_data(self):
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
         data.date = self.date_string
         data.field1 = self.field1_row.get()
         data.field2 = self.field2_row.get()
-        data.category = 'idea'
-
-        data_tuple = data.make_tuple()
-        return data_tuple        
+        data.category = 'idea'      
 
     def save_or_edit_task(self):
         answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                task_tuple = self.get_task_data_tuple()
-                print(task_tuple)
-                db_manager.save_to_db(task_tuple)
+                self.get_task_data()
+                db_manager.save_to_db(data)
 
                 if len(self.project_row.get()) != 0:
                     project_name = self.project_row.get()
@@ -91,8 +84,7 @@ class element_window_small: # Ahoc Task, Idea
                         data.category = 'project'
                         data.done = 'No'
 
-                        data_tuple = data.make_tuple()
-                        db_manager.save_to_db(data_tuple)
+                        db_manager.save_to_db(data)
                 else:
                     pass
                 self.window.destroy()
@@ -106,14 +98,13 @@ class element_window_small: # Ahoc Task, Idea
         answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                idea_tuple = self.get_idea_data_tuple()
-                print(idea_tuple)
-                db_manager.save_to_db(idea_tuple)
+                self.get_idea_data()
+                db_manager.save_to_db(data)
                 
                 if element_id_already_exists(self.db, self.element_id):
-                    db_manager.update_db_fields(idea_tuple)
+                    db_manager.update_db_fields(data)
                 else:
-                    db_manager.save_to_db(idea_tuple)
+                    db_manager.save_to_db(data)
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")

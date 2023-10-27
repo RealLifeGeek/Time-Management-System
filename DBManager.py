@@ -9,7 +9,7 @@ date_string = current_date.strftime("%d/%m/%Y")
 tomorrow = datetime.datetime.today() + datetime.timedelta(days=1)
 tomorrow_date = tomorrow.strftime('%d/%m/%Y')
 
-class DBManager():   
+class DBManager:   
     def __init__(self):
         db = 'data'
         self.db = db
@@ -50,11 +50,29 @@ class DBManager():
         finally:
             self.close_db()
 
-    def save_to_db(self, data_tuple):
+    def save_to_db(self, data):
         try:
             self.open_db()
             query = f"INSERT INTO {self.db} (element_ID, element, date, deadline, field1, field2, field3, project, delegated, cooperating, field4, field5, remarks, keywords, category, done) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-            self.cursor.execute(query, data_tuple)
+            values = (
+                data.element_id,
+                data.element,
+                data.date,
+                data.deadline,
+                data.field1,
+                data.field2,
+                data.field3,
+                data.project,
+                data.delegated,
+                data.cooperating,
+                data.field4,
+                data.field5,
+                data.remarks,
+                data.keywords,
+                data.category,
+                data.done
+            )
+            self.cursor.execute(query, values)
             self.conn.commit()
             messagebox.showinfo("SUCCESS", "Successfully SAVED!")
         except Exception as e:
@@ -62,16 +80,35 @@ class DBManager():
         finally:
             self.close_db()
 
-    def update_db_fields(self, data_tuple):
-        if deadline == date_string:
-            deadline = tomorrow_date
-        else:
-            pass
+    def update_db_fields(self, data):
         try:
-            self.open_db()
 
-            query = f"UPDATE {self.db} SET element = ?, date = ?, deadline = ?, field1 = ?, field2 = ?, field3 = ?, project = ?, delegated = ?, cooperating = ?, field4 = ?, field5 = ?, remarks = ?, keywords = ?, category = ?, done = ? WHERE element_ID = ?"
-            self.conn.execute(query, data_tuple)
+            self.open_db()
+            query = f"UPDATE {self.db} SET element = ?, date = ?, deadline = ?, field1 = ?, field2 = ?, field3 = ?, project = ?, delegated = ?, cooperating = ?, " \
+                    "field4 = ?, field5 = ?, remarks = ?, keywords = ?, category = ?, done = ? WHERE element_ID = ?"
+            if data.deadline == date_string or data.deadline == None:
+               data.deadline = tomorrow_date
+
+            values = (
+                data.element,
+                data.date,
+                data.deadline,
+                data.field1,
+                data.field2,
+                data.field3,
+                data.project,
+                data.delegated,
+                data.cooperating,
+                data.field4,
+                data.field5,
+                data.remarks,
+                data.keywords,
+                data.category,
+                data.done,
+                data.element_id
+            )
+
+            self.conn.execute(query, values)
             self.conn.commit()
             messagebox.showinfo("UPDATED", "Successfully UPDATED!")
 
@@ -90,6 +127,8 @@ class DBManager():
             messagebox.showerror("ERROR",f"ERROR: {e}")
         finally:
             self.close_db()
+    
+    #insert_values_to_treeviews
 
 
             

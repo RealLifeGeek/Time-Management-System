@@ -17,9 +17,6 @@ class element_window_extended: # task, remark, event
 # for view existing element use title as 'Task View', 'Remark View' or 'Event View'
 # for element_id use element_id or None
     def __init__(self, parent, title, db, element_id):
-        global chosen_date
-        global chosen_deadline
-
         self.window = tk.Toplevel(parent)
         self.window.geometry("600x400")
         self.window.configure(bg="#212121")
@@ -46,47 +43,21 @@ class element_window_extended: # task, remark, event
         self.title = title
         self.db = db
         
-    def choose_date(self): # Make an Entry
-        global chosen_date
-
-        if self.title == 'Event' or self.title == 'Event View':
-            bg = "#A8A803"
-        elif self.title == 'Remark' or self.title == 'Remark View':
-            bg = "#9E019A"
-        else:
-            bg = "#2F3030"
-        
+    def choose_date(self):
         chosen_date = self.calendar.get_date()
-        self.chosen_date_label = tk.Label(
-            self.middle_frame,
-            text = chosen_date,
-            font = ('Montserrat', '12'),
-            background = bg,
-            foreground = "#FFFFFF"
-        )
-        if self.title == 'Remark' or self.title == 'Remark View':
-            self.chosen_date_label.place(x = 180, y = 25)
-        else:
-            self.chosen_date_label.place(x = 180, y = 5)
+        self.date_row.delete(0, "end")
+        self.date_row.insert(0, chosen_date)
 
-    def choose_deadline(self): # Make an Entry
-        global chosen_deadline
-
+    def choose_deadline(self):
         chosen_deadline = self.calendar.get_date()
-        self.chosen_deadline_label = tk.Label(
-            self.middle_frame,
-            text = chosen_deadline,
-            font = ('Montserrat', '12', 'bold'),
-            background = '#970000',
-            foreground = "#FFFFFF"
-        )
-        self.chosen_deadline_label.place(x = 180, y = 45)
+        self.deadline_row.delete(0, "end")
+        self.deadline_row.insert(0, chosen_deadline)
 
-    def get_task_data_tuple(self):
+    def get_task_data(self):
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
-        data.date = chosen_date
-        data.deadline = chosen_deadline       
+        data.date = self.date_row.get()
+        data.deadline = self.deadline_row.get()     
         data.field2 = self.field2_row.get()
         data.field3 = self.field3_row.get()
         data.project = self.project_row.get()
@@ -102,44 +73,35 @@ class element_window_extended: # task, remark, event
                 data.deadline = data.date
         else:
             pass
-
-        data_tuple = data.make_tuple()
-        return data_tuple
     
-    def get_event_data_tuple(self):
+    def get_event_data(self):
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
-        data.date = chosen_date
-        data.deadline = chosen_deadline
+        data.date = self.date_row.get()
+        data.deadline = self.deadline_row.get()
         data.field1 = self.field1_row.get()
         data.field2 = self.field2_row.get()
         data.field3 = self.field3_row.get()
         data.field4 = self.field4_row.get()
         data.category = 'event'
 
-        data_tuple = data.make_tuple()
-        return data_tuple
-
-    def get_remark_data_tuple(self):
+    def get_remark_data(self):
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
-        data.date = chosen_date
+        data.date = self.deadline_row.get()
         data.field1 = self.field1_row.get()
         data.field2 = self.field2_row.get()
         data.category = 'remark'
-
-        data_tuple = data.make_tuple()
-        return data_tuple()
 
     def save_or_edit_task(self):
         answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                task_tuple = self.get_task_data_tuple()
+                self.get_task_data()
                 if element_id_already_exists(self.db, self.element_id):
-                    db_manager.update_db_fields(task_tuple)
+                    db_manager.update_db_fields(data)
                 else:
-                    db_manager.save_to_db(task_tuple)
+                    db_manager.save_to_db(data)
 
                 if len(self.project_row.get()) != 0:
                     project_name = self.project_row.get()
@@ -153,9 +115,7 @@ class element_window_extended: # task, remark, event
                         data.keywords = self.keywords_row.get()
                         data.category = 'project'
 
-                        data_tuple = data.make_tuple()
-
-                        db_manager.save_to_db(data_tuple)
+                        db_manager.save_to_db(data)
                 else:
                     pass
                 self.window.destroy()
@@ -166,33 +126,28 @@ class element_window_extended: # task, remark, event
             pass
 
     def save_or_edit_event(self):
-        global chosen_date
-        global chosen_deadline
-
         answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                event_tuple = self.get_event_data_tuple()
+                event_tuple = self.get_event_data()
                 if element_id_already_exists(self.db, self.element_id):
-                    db_manager.update_db_fields(event_tuple)
+                    db_manager.update_db_fields(data)
                 else:
-                    db_manager.save_to_db(event_tuple)
+                    db_manager.save_to_db(data)
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
                 self.window.destroy()
     
     def save_or_edit_remark(self):
-        global chosen_date
-
         answer = messagebox.askyesno("SAVE", "SAVE changes?")
         if answer:
             try:
-                remark_tuple = self.get_remark_data_tuple()
+                remark_tuple = self.get_remark_data()
                 if element_id_already_exists(self.db, self.element_id):
-                    db_manager.update_db_fields(remark_tuple)
+                    db_manager.update_db_fields(data)
                 else:
-                    db_manager.save_to_db(remark_tuple)
+                    db_manager.save_to_db(data)
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
@@ -202,9 +157,6 @@ class element_window_extended: # task, remark, event
         self.window.destroy()
 
     def create_window(self):
-        global chosen_date
-        global chosen_deadline
-
         self.header_label = tk.Label(
             self.window,
             text = self.title,
@@ -340,6 +292,16 @@ class element_window_extended: # task, remark, event
             )
             self.date_button.place(x = 10, y = 5)
 
+            self.date_row = tk.Entry(
+                self.middle_frame,
+                font = ("Open Sans", "12", "bold"),
+                width = 14,
+                insertbackground = "#FFFFFF",
+                background = "#000000",
+                foreground = "#A8A803"
+            )
+            self.date_row.place(x = 160, y = 8)
+
             self.deadline_button = tk.Button(
                 self.middle_frame,
                 text = "Choose End Date",
@@ -350,6 +312,16 @@ class element_window_extended: # task, remark, event
                 foreground = '#FFFFFF'
             )
             self.deadline_button.place(x = 10, y = 45)
+
+            self.deadline_row = tk.Entry(
+                self.middle_frame,
+                font = ("Open Sans", "12", "bold"),
+                width = 14,
+                insertbackground = "#FFFFFF",
+                background = "#000000",
+                foreground = "#FF0000"
+            )
+            self.deadline_row.place(x = 160, y = 48)
         
         if self.title == 'Remark' or self.title == 'Remark View':
             self.date_button = tk.Button(
@@ -362,6 +334,16 @@ class element_window_extended: # task, remark, event
                 foreground = '#FFFFFF'
             )
             self.date_button.place(x = 15, y = 25)
+    
+            self.date_row = tk.Entry(
+                self.middle_frame,
+                font = ("Open Sans", "12", "bold"),
+                width = 14,
+                insertbackground = "#FFFFFF",
+                background = "#000000",
+                foreground = "#E100B1"
+            )
+            self.date_row.place(x = 160, y = 28)
 
         else:
             self.date_button = tk.Button(
@@ -374,6 +356,16 @@ class element_window_extended: # task, remark, event
                 foreground = '#FFFFFF'
             )
             self.date_button.place(x = 10, y = 5)
+    
+            self.date_row = tk.Entry(
+                self.middle_frame,
+                font = ("Open Sans", "12", "bold"),
+                width = 14,
+                insertbackground = "#FFFFFF",
+                background = "#000000",
+                foreground = "#FFFFFF"
+            )
+            self.date_row.place(x = 160, y = 8)
 
             self.deadline_button = tk.Button(
                 self.middle_frame,
@@ -385,6 +377,16 @@ class element_window_extended: # task, remark, event
                 foreground = '#FFFFFF'
             )
             self.deadline_button.place(x = 10, y = 45)
+
+            self.deadline_row = tk.Entry(
+                self.middle_frame,
+                font = ("Open Sans", "12", "bold"),
+                width = 14,
+                insertbackground = "#FFFFFF",
+                background = "#000000",
+                foreground = "#FF0000"
+            )
+            self.deadline_row.place(x = 160, y = 48)
         
         if self.title == 'Remark' or self.title == 'Remark View':
             self.save_remark_button = tk.Button(
@@ -581,40 +583,42 @@ class element_window_extended: # task, remark, event
     def insert_values(self):
         if self.title == 'Task View':
             win = self.window
-            frame = self.middle_frame 
             row1 = self.element_description_row 
-            row2 = self.field2_row 
-            row3 = self.field3_row
-            row4 = self.project_row
-            row5 = self.delegated_row 
-            row6 = self.cooperating_row
-            row7 = self.keywords_row
+            row2 = self.date_row
+            row3 = self.deadline_row
+            row4 = self.field2_row 
+            row5 = self.field3_row
+            row6 = self.project_row
+            row7 = self.delegated_row 
+            row8 = self.cooperating_row
+            row9 = self.keywords_row
 
             insert_values_to_task_form(
-                self.db, self.element_id, win, frame, row1, row2, row3, row4, row5, row6, row7
+                self.db, self.element_id, win, row1, row2, row3, row4, row5, row6, row7, row8, row9
             )
             
         if self.title == 'Remark View':
             win = self.window
-            frame = self.middle_frame
             row1 = self.element_description_row
             row2 = self.field1_row
             row3 = self.field2_row
+            row4 = self.date_row
 
             insert_values_to_remark_form(
-                self.db, self.element_id, win, frame, row1, row2, row3
+                self.db, self.element_id, win, row1, row2, row3, row4
             )
 
         if self.title == 'Event View':
             win = self.window
-            frame = self.middle_frame
             row1 = self.element_description_row
             row2 = self.field1_row
             row3 = self.field2_row
-            row4 = self.field3_row
-            row5 = self.field4_row
+            row4 = self.date_row
+            row5 = self.deadline_row
+            row6 = self.field3_row
+            row7 = self.field4_row
 
             insert_values_to_event_form(
-                self.db, self.element_id, win, frame, row1, row2, row3, row4, row5
+                self.db, self.element_id, win, row1, row2, row3, row4, row5, row6, row7
             )
         
