@@ -3,8 +3,8 @@ class DataForm:
     def __init__(self):
         self.element_id = ""
         self.element = ""
-        self.date = None              # Date, Start Date
-        self.deadline = None          # Deadline, End Date; Not used in Remarks
+        self.date = None            # Date, Start Date
+        self.deadline = None        # Deadline, End Date; Not used in Remarks
         self.field1 = ""            # Not used in Task
         self.field2 = ""            # in task: Expected Result
         self.field3 = ""            # Time, Start Time

@@ -13,6 +13,7 @@ from element_window_extended import element_window_extended
 from element_window_small import element_window_small
 from DBManager import DBManager
 from DataFormObject import DataForm
+from DayDataManager import *
 
 #from move_to import move_task_to
 #from new_task import new_task
@@ -44,6 +45,7 @@ project_name = None
 db = 'data'
 db_manager = DBManager()
 data = DataForm()
+day_data_manager = DayDataManager()
 
 db_manager.create_db()
 
@@ -51,25 +53,8 @@ def check_connection():
     check_internet(top_frame_left, top_frame_right)
     root.after(10000, check_connection)
 
-def insert_data_to_treeview(treeview, db, category):
-    treeview.delete(*treeview.get_children())
-    try:
-        conn = sqlite3.connect(db + '.db')
-        cursor = conn.cursor()
-        if category == 'task':
-            cursor.execute(f'SELECT element, field3 FROM {db} WHERE category = ? AND date = ? AND delegated = ""', (category, date_string))
-        else:
-            cursor.execute(f'SELECT element FROM {db} WHERE category = ? AND date = ?', (category, date_string))
-            
-        rows = cursor.fetchall()
-        for row in rows:
-            treeview.insert('', 'end', text=row[0:], values = row[0:])
-        show_number_of_day_element(db, category, date_string)
-    except Exception as e:
-        messagebox.showerror("ERROR", f"ERROR: {e}")
-
-def show_number_of_day_element(db, category, date_string):
-        number_elements = count_number_of_day_element(db, category, date_string)
+def show_number_of_day_element(category):
+        number_elements = day_data_manager.count_number_of_day_element(category)
         if category == 'task':
             frame = middle_frame_left
             XX = 140
@@ -132,20 +117,24 @@ def do_task_tomorrow():
         data.date = tomorrow_date
 
         db_manager.update_db_fields(data)
+        day_data_manager.refresh_day_data_to_treeview(treeview, 'task')
         messagebox.showinfo("Info", "Task moved to tomorrow.")
     else:
         messagebox.showerror("ERROR", "Select an element.")
     try:
 
         progress_bar_of_day()
-        insert_data_to_treeview(treeview, db, 'task')
+        day_data_manager.insert_data_to_treeview(treeview, 'task')
     except Exception as e:
         messagebox.showerror("ERROR", f"ERROR: {e}")
 
 def refresh_main_screen():
-    insert_data_to_treeview(treeview, db, 'task')
-    insert_data_to_treeview(treeview_remarks, db, 'remark')
-    insert_data_to_treeview(treeview_events, db, 'event')
+    show_number_of_day_element('task')
+    show_number_of_day_element('remark')
+    show_number_of_day_element('event')
+    day_data_manager.refresh_day_data_to_treeview(treeview, 'task')
+    day_data_manager.refresh_day_data_to_treeview(treeview_remarks, 'remark')
+    day_data_manager.refresh_day_data_to_treeview(treeview_events, 'event')
     #remind_my_deadlines()
     #remind_deadlines_delegated()
     show_total_number_of_elements(db, 'task', '', 'No', right_frame, 200, 162)
@@ -170,13 +159,12 @@ def delete_task_from_database():
         answer = messagebox.askyesno("DELETE", "DELETE from database?")
         if answer:
             db_manager.delete_from_db()
-            insert_data_to_treeview(treeview, db, 'task')
+            day_data_manager.refresh_day_data_to_treeview(treeview, 'task')
+            show_number_of_day_element('task')
         else:
             pass
     else:
         messagebox.showerror("ERROR", "Select an element")
-    
-    count_number_of_day_element(db, 'task', date_string)
 
 def delete_remark_from_database():
     selection = treeview_remarks.selection()
@@ -188,7 +176,8 @@ def delete_remark_from_database():
         answer = messagebox.askyesno("DELETE", "DELETE from database?")
         if answer:
             db_manager.delete_from_db()
-            insert_data_to_treeview(treeview_remarks, db, 'remark')
+            day_data_manager.refresh_day_data_to_treeview(treeview_remarks, 'remark')
+            show_number_of_day_element('remark')
         else:
             pass
     else:
@@ -203,8 +192,8 @@ def delete_event_from_database():
         answer = messagebox.askokcancel("DELETE", "DELETE from database?")
         if answer:
             db_manager.delete_from_db()
-            messagebox.showinfo("SUCCESS", "Successfuly DELETED")
-            insert_data_to_treeview(treeview_events, db, 'event')
+            day_data_manager.refresh_day_data_to_treeview(treeview_events, 'event')
+            show_number_of_day_element('event')
         else:
             pass
     else:
@@ -888,9 +877,12 @@ if __name__ == "__main__":
 
     check_connection()
     progress_bar_of_day()
-    insert_data_to_treeview(treeview, db, 'task')
-    insert_data_to_treeview(treeview_remarks, db, 'remark')
-    insert_data_to_treeview(treeview_events, db, 'event')
+    show_number_of_day_element('task')
+    show_number_of_day_element('remark')
+    show_number_of_day_element('event')
+    day_data_manager.insert_data_to_treeview(treeview, 'task')
+    day_data_manager.insert_data_to_treeview(treeview_remarks, 'remark')
+    day_data_manager.insert_data_to_treeview(treeview_events, 'event')
     #remind_my_deadlines()
     #remind_deadlines_delegated()
     show_total_number_of_elements(db, 'task', '', 'No', right_frame, 200, 162)

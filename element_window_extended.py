@@ -2,7 +2,6 @@ import tkinter as tk
 from tkcalendar import Calendar
 from tkinter import messagebox
 from functions import generate_element_id, project_name_already_exist, element_id_already_exists
-from functions import insert_values_to_task_form, insert_values_to_event_form, insert_values_to_remark_form
 from DBManager import *
 from DataFormObject import *
 
@@ -88,7 +87,7 @@ class element_window_extended: # task, remark, event
     def get_remark_data(self):
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
-        data.date = self.deadline_row.get()
+        data.date = self.date_row.get()
         data.field1 = self.field1_row.get()
         data.field2 = self.field2_row.get()
         data.category = 'remark'
@@ -129,7 +128,7 @@ class element_window_extended: # task, remark, event
         answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                event_tuple = self.get_event_data()
+                self.get_event_data()
                 if element_id_already_exists(self.db, self.element_id):
                     db_manager.update_db_fields(data)
                 else:
@@ -143,7 +142,7 @@ class element_window_extended: # task, remark, event
         answer = messagebox.askyesno("SAVE", "SAVE changes?")
         if answer:
             try:
-                remark_tuple = self.get_remark_data()
+                self.get_remark_data()
                 if element_id_already_exists(self.db, self.element_id):
                     db_manager.update_db_fields(data)
                 else:
@@ -593,8 +592,8 @@ class element_window_extended: # task, remark, event
             row8 = self.cooperating_row
             row9 = self.keywords_row
 
-            insert_values_to_task_form(
-                self.db, self.element_id, win, row1, row2, row3, row4, row5, row6, row7, row8, row9
+            db_manager.insert_values_to_task_form(
+                self.element_id, win, row1, row2, row3, row4, row5, row6, row7, row8, row9
             )
             
         if self.title == 'Remark View':
@@ -604,8 +603,8 @@ class element_window_extended: # task, remark, event
             row3 = self.field2_row
             row4 = self.date_row
 
-            insert_values_to_remark_form(
-                self.db, self.element_id, win, row1, row2, row3, row4
+            db_manager.insert_values_to_remark_form(
+                self.element_id, win, row1, row2, row3, row4
             )
 
         if self.title == 'Event View':
@@ -618,7 +617,7 @@ class element_window_extended: # task, remark, event
             row6 = self.field3_row
             row7 = self.field4_row
 
-            insert_values_to_event_form(
-                self.db, self.element_id, win, row1, row2, row3, row4, row5, row6, row7
+            db_manager.insert_values_to_event_form(
+                self.element_id, win, row1, row2, row3, row4, row5, row6, row7
             )
         

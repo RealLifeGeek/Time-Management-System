@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import messagebox
 import datetime
 from functions import generate_element_id, project_name_already_exist, element_id_already_exists
-from functions import insert_values_to_idea_form
 from DBManager import *
 from DataFormObject import *
 
@@ -43,8 +42,8 @@ class element_window_small: # Ahoc Task, Idea
             row2 = self.field1_row 
             row3 = self.field2_row
 
-            insert_values_to_idea_form(
-                db, element_id, win, row1, row2, row3
+            db_manager.insert_values_to_idea_form(
+                self.element_id, win, row1, row2, row3
             )
 
     def get_task_data(self):
@@ -98,9 +97,7 @@ class element_window_small: # Ahoc Task, Idea
         answer = messagebox.askokcancel("SAVE", "SAVE changes?")
         if answer:
             try:
-                self.get_idea_data()
-                db_manager.save_to_db(data)
-                
+                self.get_idea_data()    
                 if element_id_already_exists(self.db, self.element_id):
                     db_manager.update_db_fields(data)
                 else:
