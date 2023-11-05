@@ -96,13 +96,13 @@ def task_done():
     selection = treeview.selection()
     if selection:
         element_name = treeview.item(selection, 'values')[0]        
-        element_id = db_manager.get_elementid_from_db('element', element_name)
-        element_id = element_id[0]
+        element_id = day_data_manager.get_element_id_from_data_tuple(element_name)
         data.element_id = element_id
         data.element = element_name
-
-
         db_manager.update_db_fields(data)
+        day_data_manager.make_day_data_tuple()
+        day_data_manager.insert_data_to_treeview(treeview, 'task')
+        show_number_of_day_element('task')
     else:
         messagebox.showerror("Error", "No task selected. Please select a task to be done.")
 
@@ -110,20 +110,18 @@ def do_task_tomorrow():
     selection = treeview.selection()
     if selection:
         element_name = treeview.item(selection, 'values')[0]
-        element_id = db_manager.get_elementid_from_db('element', element_name)
-        element_id = element_id[0]
+        element_id = day_data_manager.get_element_id_from_data_tuple(element_name)
         data.element_id = element_id
         data.element = element_name
         data.date = tomorrow_date
 
         db_manager.update_db_fields(data)
-        day_data_manager.refresh_day_data_to_treeview(treeview, 'task')
         messagebox.showinfo("Info", "Task moved to tomorrow.")
     else:
         messagebox.showerror("ERROR", "Select an element.")
     try:
-
         progress_bar_of_day()
+        day_data_manager.make_day_data_tuple()
         day_data_manager.insert_data_to_treeview(treeview, 'task')
         show_number_of_day_element('task')
     except Exception as e:
@@ -155,8 +153,7 @@ def delete_task_from_database():
     selection = treeview.selection()
     if selection:
         element_name = treeview.item(selection, 'values')[0]
-        element_id = db_manager.get_elementid_from_db('element', element_name)
-        element_id = element_id[0]
+        element_id = day_data_manager.get_element_id_from_data_tuple(element_name)
         db_manager.set_element_id(element_id)
         answer = messagebox.askyesno("DELETE", "DELETE from database?")
         if answer:
@@ -173,8 +170,7 @@ def delete_remark_from_database():
     selection = treeview_remarks.selection()
     if selection:
         element_name = treeview_remarks.item(selection, 'values')[0]
-        element_id = db_manager.get_elementid_from_db('element', element_name)
-        element_id = element_id[0]
+        element_id = day_data_manager.get_element_id_from_data_tuple(element_name)
         db_manager.set_element_id(element_id)
         answer = messagebox.askyesno("DELETE", "DELETE from database?")
         if answer:
@@ -191,7 +187,7 @@ def delete_event_from_database():
     selection = treeview_events.selection()
     if selection:
         element_name = treeview_events.item(selection, 'values')[0]
-        element_id = db_manager.get_elementid_from_db('element', element_name)
+        element_id = day_data_manager.get_element_id_from_data_tuple(element_name)
         db_manager.set_element_id(element_id)
         answer = messagebox.askokcancel("DELETE", "DELETE from database?")
         if answer:
