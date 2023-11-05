@@ -102,8 +102,10 @@ class element_window_extended: # task, remark, event
                 self.get_task_data()
                 if element_id_already_exists(self.db, self.element_id):
                     db_manager.update_db_fields(data)
+                    day_data_manager.make_day_data_tuple()
                 else:
                     db_manager.save_to_db(data)
+                    day_data_manager.make_day_data_tuple()
 
                 if len(self.project_row.get()) != 0:
                     project_name = self.project_row.get()
@@ -134,8 +136,10 @@ class element_window_extended: # task, remark, event
                 self.get_event_data()
                 if element_id_already_exists(self.db, self.element_id):
                     db_manager.update_db_fields(data)
+                    day_data_manager.make_day_data_tuple()
                 else:
                     db_manager.save_to_db(data)
+                    day_data_manager.make_day_data_tuple()
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
@@ -148,8 +152,10 @@ class element_window_extended: # task, remark, event
                 self.get_remark_data()
                 if element_id_already_exists(self.db, self.element_id):
                     db_manager.update_db_fields(data)
+                    day_data_manager.make_day_data_tuple()
                 else:
                     db_manager.save_to_db(data)
+                    day_data_manager.make_day_data_tuple()
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")

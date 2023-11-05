@@ -43,7 +43,7 @@ class DayDataManager:
         try:
             number_elements = 0
             for data_row in self.data_tuple:
-                if category == 'task' and data_row[15] == 'task' and data_row[9] == "":
+                if category == 'task' and data_row[15] == 'task' and data_row[9] == "" and data_row[16] == 'No':
                     number_elements += 1
                 elif data_row[15] == category and category != 'task':
                     number_elements += 1
