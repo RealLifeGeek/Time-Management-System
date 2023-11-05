@@ -4,12 +4,15 @@ from tkinter import messagebox
 from functions import generate_element_id, project_name_already_exist, element_id_already_exists
 from DBManager import *
 from DataFormObject import *
+from DayDataManager import *
 
 chosen_date = None
 chosen_deadline = None
 element_id = None
 db_manager = DBManager()
+day_data_manager = DayDataManager()
 data = DataForm()
+
 
 class element_window_extended: # task, remark, event
 # for new element use title as 'Task', 'Remark', 'Event'
@@ -592,7 +595,7 @@ class element_window_extended: # task, remark, event
             row8 = self.cooperating_row
             row9 = self.keywords_row
 
-            db_manager.insert_values_to_task_form(
+            day_data_manager.insert_values_to_task_form(
                 self.element_id, win, row1, row2, row3, row4, row5, row6, row7, row8, row9
             )
             
@@ -603,7 +606,7 @@ class element_window_extended: # task, remark, event
             row3 = self.field2_row
             row4 = self.date_row
 
-            db_manager.insert_values_to_remark_form(
+            day_data_manager.insert_values_to_remark_form(
                 self.element_id, win, row1, row2, row3, row4
             )
 
@@ -617,7 +620,7 @@ class element_window_extended: # task, remark, event
             row6 = self.field3_row
             row7 = self.field4_row
 
-            db_manager.insert_values_to_event_form(
+            day_data_manager.insert_values_to_event_form(
                 self.element_id, win, row1, row2, row3, row4, row5, row6, row7
             )
         
