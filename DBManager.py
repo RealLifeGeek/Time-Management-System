@@ -119,17 +119,17 @@ class DBManager:
         finally:
             self.close_db()
 
-    def get_elementid_from_db(self, column_name, text):
-        try:
-            self.open_db()
-            self.cursor.execute(f"SELECT element_ID FROM {self.db} WHERE {column_name}=?", (text,))
-            self.element_id = self.cursor.fetchone()
-            return self.element_id
-        except Exception as e:
-            messagebox.showerror("ERROR",f"ERROR: {e}")
-        finally:
-            self.close_db()
-    
+    #def get_elementid_from_db(self, column_name, text):
+    #    try:
+    #        self.open_db()
+    #        self.cursor.execute(f"SELECT element_ID FROM {self.db} WHERE {column_name}=?", (text,))
+    #        self.element_id = self.cursor.fetchone()
+    #        return self.element_id
+    #    except Exception as e:
+    #        messagebox.showerror("ERROR",f"ERROR: {e}")
+    #    finally:
+    #        self.close_db()
+
     def insert_values_to_task_form(self, element_id, win, row1, row2, row3, row4, row5, row6, row7, row8, row9):
         self.open_db()
 

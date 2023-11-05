@@ -2,13 +2,12 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import *
 import sys
-import sqlite3
 import datetime
 from tkinter import messagebox
 from datetime import datetime
 import datetime
 import time
-from functions import count_total_number_of_elements, check_internet, count_number_of_day_element
+from functions import count_total_number_of_elements, check_internet
 from element_window_extended import element_window_extended
 from element_window_small import element_window_small
 from DBManager import DBManager
@@ -126,6 +125,7 @@ def do_task_tomorrow():
 
         progress_bar_of_day()
         day_data_manager.insert_data_to_treeview(treeview, 'task')
+        show_number_of_day_element('task')
     except Exception as e:
         messagebox.showerror("ERROR", f"ERROR: {e}")
 
@@ -133,9 +133,10 @@ def refresh_main_screen():
     show_number_of_day_element('task')
     show_number_of_day_element('remark')
     show_number_of_day_element('event')
-    day_data_manager.refresh_day_data_to_treeview(treeview, 'task')
-    day_data_manager.refresh_day_data_to_treeview(treeview_remarks, 'remark')
-    day_data_manager.refresh_day_data_to_treeview(treeview_events, 'event')
+    day_data_manager.make_day_data_tuple()
+    day_data_manager.insert_data_to_treeview(treeview, 'task')
+    day_data_manager.insert_data_to_treeview(treeview_remarks, 'remark')
+    day_data_manager.insert_data_to_treeview(treeview_events, 'event')
     #remind_my_deadlines()
     #remind_deadlines_delegated()
     show_total_number_of_elements(db, 'task', '', 'No', right_frame, 200, 162)
@@ -160,7 +161,8 @@ def delete_task_from_database():
         answer = messagebox.askyesno("DELETE", "DELETE from database?")
         if answer:
             db_manager.delete_from_db()
-            day_data_manager.refresh_day_data_to_treeview(treeview, 'task')
+            day_data_manager.make_day_data_tuple()
+            day_data_manager.insert_data_to_treeview(treeview, 'task')
             show_number_of_day_element('task')
         else:
             pass
@@ -177,7 +179,8 @@ def delete_remark_from_database():
         answer = messagebox.askyesno("DELETE", "DELETE from database?")
         if answer:
             db_manager.delete_from_db()
-            day_data_manager.refresh_day_data_to_treeview(treeview_remarks, 'remark')
+            day_data_manager.make_day_data_tuple()
+            day_data_manager.insert_data_to_treeview(treeview_remarks, 'remark')
             show_number_of_day_element('remark')
         else:
             pass
@@ -193,7 +196,8 @@ def delete_event_from_database():
         answer = messagebox.askokcancel("DELETE", "DELETE from database?")
         if answer:
             db_manager.delete_from_db()
-            day_data_manager.refresh_day_data_to_treeview(treeview_events, 'event')
+            day_data_manager.make_day_data_tuple()
+            day_data_manager.insert_data_to_treeview(treeview_events, 'event')
             show_number_of_day_element('event')
         else:
             pass
@@ -202,7 +206,7 @@ def delete_event_from_database():
 
 def progress_bar_of_day():
     try:
-        number_tasks_done = count_total_number_of_elements(db, 'task', 'None', 'DONE')
+        number_tasks_done = count_total_number_of_elements(db, 'task', '', 'DONE')
         number_tasks_to_fulfill = count_total_number_of_elements(db, 'task', 'None', 'No')
         total_number_tasks = number_tasks_done + number_tasks_to_fulfill
         if total_number_tasks != 0:
@@ -253,8 +257,7 @@ def show_existing_task_window():
     selection = treeview.selection()
     if selection:
         element_name = treeview.item(selection, 'values')[0]
-        element_id = db_manager.get_elementid_from_db('element', element_name)
-        element_id = element_id[0]
+        element_id = day_data_manager.get_element_id_from_data_tuple(element_name)
     else:
         messagebox.showwarning("ERROR", f"Select an element")
     task_window = element_window_extended(
@@ -273,8 +276,7 @@ def show_existing_event_window():
     selection = treeview_events.selection()
     if selection:
         element_name = treeview_events.item(selection, 'values')[0]
-        element_id = db_manager.get_elementid_from_db('element', element_name)
-        element_id = element_id[0]
+        element_id = day_data_manager.get_element_id_from_data_tuple(element_name)
     else:
         messagebox.showwarning("ERROR", f"Select an element")
     event_window = element_window_extended(
@@ -293,8 +295,7 @@ def show_existing_remark_window():
     selection = treeview_remarks.selection()
     if selection:
         element_name = treeview_remarks.item(selection, 'values')[0]
-        element_id = db_manager.get_elementid_from_db('element', element_name)
-        element_id = element_id[0]
+        element_id = day_data_manager.get_element_id_from_data_tuple(element_name)
     else:
         messagebox.showwarning("ERROR", f"Select an element")
     remark_window = element_window_extended(

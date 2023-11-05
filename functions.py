@@ -47,23 +47,6 @@ def project_name_already_exist(db, project_name):
     else:
         return False
 
-def count_number_of_day_element(db, category, date_string):
-    try:
-        conn = sqlite3.connect(db + '.db')
-        cursor = conn.cursor()
-        if category == 'task':
-            cursor.execute(f'SELECT element, field3 FROM {db} WHERE category = ? AND date = ? AND delegated = ""', (category, date_string))
-        else:
-            cursor.execute(f'SELECT element FROM {db} WHERE category = ? AND date = ?', (category, date_string))
-        rows = cursor.fetchall()
-        elements = [str(row[0]) for row in rows]
-        number_elements = int(len(elements))
-        cursor.close()
-        conn.close()
-        return number_elements
-    except Exception as e:
-        messagebox.showerror("ERROR", f"ERROR: {e}")
-
 def count_total_number_of_elements(db, category, delegated, done):
     conn = sqlite3.connect(db + '.db')
     cursor = conn.cursor()
