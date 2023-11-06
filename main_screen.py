@@ -7,7 +7,7 @@ from tkinter import messagebox
 from datetime import datetime
 import datetime
 import time
-from functions import count_total_number_of_elements, check_internet
+from functions import check_internet
 from element_window_extended import element_window_extended
 from element_window_small import element_window_small
 from DBManager import DBManager
@@ -82,8 +82,8 @@ def show_number_of_day_element(category):
         number_of_elements_label.place(x = XX, y = YY)
         progress_bar_of_day()
 
-def show_total_number_of_elements(db, category, delegated, done, frame, XX, YY):
-    number_elements = count_total_number_of_elements(db, category, delegated, done)
+def show_total_number_of_elements(category, delegated, done, frame, XX, YY):
+    number_elements = db_manager.count_total_number_of_elements(category, delegated, done)
     number_elements_label = tk.Label(
         frame,
         text = f"{number_elements}   ",
@@ -128,13 +128,13 @@ def do_task_tomorrow():
         messagebox.showerror("ERROR", f"ERROR: {e}")
 
 def refresh_main_screen():
-    show_number_of_day_element('task')
-    show_number_of_day_element('remark')
-    show_number_of_day_element('event')
     data_store_manager.make_day_data_tuple()
     data_store_manager.insert_data_to_treeview(treeview, 'task')
     data_store_manager.insert_data_to_treeview(treeview_remarks, 'remark')
     data_store_manager.insert_data_to_treeview(treeview_events, 'event')
+    show_number_of_day_element('task')
+    show_number_of_day_element('remark')
+    show_number_of_day_element('event')
     #remind_my_deadlines()
     #remind_deadlines_delegated()
     show_total_number_of_elements(db, 'task', '', 'No', right_frame, 200, 162)
@@ -202,8 +202,8 @@ def delete_event_from_database():
 
 def progress_bar_of_day():
     try:
-        number_tasks_done = count_total_number_of_elements(db, 'task', '', 'DONE')
-        number_tasks_to_fulfill = count_total_number_of_elements(db, 'task', 'None', 'No')
+        number_tasks_done = db_manager.count_total_number_of_elements('task', '', 'DONE')
+        number_tasks_to_fulfill = db_manager.count_total_number_of_elements('task', 'None', 'No')
         total_number_tasks = number_tasks_done + number_tasks_to_fulfill
         if total_number_tasks != 0:
             task_value = 100/total_number_tasks

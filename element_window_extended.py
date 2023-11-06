@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkcalendar import Calendar
 from tkinter import messagebox
-from functions import generate_element_id, project_name_already_exist, element_id_already_exists
 from DBManager import *
 from DataFormObject import *
 from DataStoreManager import *
@@ -33,11 +32,11 @@ class element_window_extended: # task, remark, event
 
         if element_id == None:
             if title == 'Task':
-                element_id = generate_element_id(db, 'NT')
+                element_id = db_manager.generate_element_id('NT')
             elif title ==  'Remark':
-                element_id = generate_element_id(db, 'RE')
+                element_id = db_manager.generate_element_id('RE')
             elif title == 'Event':
-                element_id = generate_element_id(db, 'EV')
+                element_id = db_manager.generate_element_id('EV')
         else:
             pass
         
@@ -100,14 +99,14 @@ class element_window_extended: # task, remark, event
         if answer:
             try:
                 self.get_task_data()
-                if element_id_already_exists(self.db, self.element_id):
+                if db_manager.element_id_already_exists(self.element_id):
                     db_manager.update_db_fields(data)
                 else:
                     db_manager.save_to_db(data)
                 if len(self.project_row.get()) != 0:
                     project_name = self.project_row.get()
-                    if not project_name_already_exist(self.db, project_name):
-                        data.element_id = generate_element_id(self.db, 'PR')
+                    if not db_manager.project_name_already_exist(project_name):
+                        data.element_id = db_manager.generate_element_id('PR')
                         data.element = project_name
                         data.date = data.date
                         data.deadline = data.deadline
@@ -132,7 +131,7 @@ class element_window_extended: # task, remark, event
         if answer:
             try:
                 self.get_event_data()
-                if element_id_already_exists(self.db, self.element_id):
+                if db_manager.element_id_already_exists(self.element_id):
                     db_manager.update_db_fields(data)
                 else:
                     db_manager.save_to_db(data)
@@ -147,7 +146,7 @@ class element_window_extended: # task, remark, event
         if answer:
             try:
                 self.get_remark_data()
-                if element_id_already_exists(self.db, self.element_id):
+                if db_manager.element_id_already_exists(self.element_id):
                     db_manager.update_db_fields(data)
                 else:
                     db_manager.save_to_db(data)
