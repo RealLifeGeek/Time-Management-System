@@ -4,7 +4,7 @@ from DBManager import *
 
 db_manager = DBManager()
 
-class DayDataManager:
+class DataStoreManager:
     def __init__(self):
         if not hasattr(self, 'data_tuple'):
             self.data_tuple = self.make_day_data_tuple()
@@ -84,7 +84,7 @@ class DayDataManager:
             row4.insert(0, result_expected_result)
 
             result_time = data_row[7]
-            row5.insert(0, result_time)
+            row5.insert(0, result_time)            
 
             result_project = data_row[8]
             row6.insert(0, result_project)
@@ -99,7 +99,7 @@ class DayDataManager:
             row9.insert(0, result_keywords)
 
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR in DDM: {e}")
 
     def insert_values_to_event_form(self, element_id, win, row1, row2, row3, row4, row5, row6, row7):
         data_row = self.check_elementid_in_tuple(element_id)
@@ -164,4 +164,3 @@ class DayDataManager:
                 return data_row[1]
             else:
                 pass
-#DayDataManager()

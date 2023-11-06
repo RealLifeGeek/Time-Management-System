@@ -4,13 +4,13 @@ from tkinter import messagebox
 from functions import generate_element_id, project_name_already_exist, element_id_already_exists
 from DBManager import *
 from DataFormObject import *
-from DayDataManager import *
+from DataStoreManager import *
 
 chosen_date = None
 chosen_deadline = None
 element_id = None
 db_manager = DBManager()
-day_data_manager = DayDataManager()
+data_store_manager = DataStoreManager()
 data = DataForm()
 
 
@@ -102,11 +102,8 @@ class element_window_extended: # task, remark, event
                 self.get_task_data()
                 if element_id_already_exists(self.db, self.element_id):
                     db_manager.update_db_fields(data)
-                    day_data_manager.make_day_data_tuple()
                 else:
                     db_manager.save_to_db(data)
-                    day_data_manager.make_day_data_tuple()
-
                 if len(self.project_row.get()) != 0:
                     project_name = self.project_row.get()
                     if not project_name_already_exist(self.db, project_name):
@@ -122,6 +119,7 @@ class element_window_extended: # task, remark, event
                         db_manager.save_to_db(data)
                 else:
                     pass
+                data_store_manager.make_day_data_tuple()
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
@@ -136,11 +134,10 @@ class element_window_extended: # task, remark, event
                 self.get_event_data()
                 if element_id_already_exists(self.db, self.element_id):
                     db_manager.update_db_fields(data)
-                    day_data_manager.make_day_data_tuple()
                 else:
                     db_manager.save_to_db(data)
-                    day_data_manager.make_day_data_tuple()
                 self.window.destroy()
+                data_store_manager.make_day_data_tuple()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
                 self.window.destroy()
@@ -152,11 +149,10 @@ class element_window_extended: # task, remark, event
                 self.get_remark_data()
                 if element_id_already_exists(self.db, self.element_id):
                     db_manager.update_db_fields(data)
-                    day_data_manager.make_day_data_tuple()
                 else:
                     db_manager.save_to_db(data)
-                    day_data_manager.make_day_data_tuple()
                 self.window.destroy()
+                data_store_manager.make_day_data_tuple()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
                 self.window.destroy()
@@ -601,7 +597,7 @@ class element_window_extended: # task, remark, event
             row8 = self.cooperating_row
             row9 = self.keywords_row
 
-            day_data_manager.insert_values_to_task_form(
+            data_store_manager.insert_values_to_task_form(
                 self.element_id, win, row1, row2, row3, row4, row5, row6, row7, row8, row9
             )
             
@@ -612,7 +608,7 @@ class element_window_extended: # task, remark, event
             row3 = self.field2_row
             row4 = self.date_row
 
-            day_data_manager.insert_values_to_remark_form(
+            data_store_manager.insert_values_to_remark_form(
                 self.element_id, win, row1, row2, row3, row4
             )
 
@@ -626,7 +622,7 @@ class element_window_extended: # task, remark, event
             row6 = self.field3_row
             row7 = self.field4_row
 
-            day_data_manager.insert_values_to_event_form(
+            data_store_manager.insert_values_to_event_form(
                 self.element_id, win, row1, row2, row3, row4, row5, row6, row7
             )
         

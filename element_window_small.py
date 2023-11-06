@@ -3,10 +3,13 @@ from tkinter import messagebox
 import datetime
 from functions import generate_element_id, project_name_already_exist, element_id_already_exists
 from DBManager import *
+from DataStoreManager import *
 from DataFormObject import *
 
 db_manager = DBManager()
+data_store_manager = DataStoreManager()
 data = DataForm()
+
 
 
 class element_window_small: # Ahoc Task, Idea
@@ -86,6 +89,7 @@ class element_window_small: # Ahoc Task, Idea
                         db_manager.save_to_db(data)
                 else:
                     pass
+                data_store_manager.make_day_data_tuple()
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
@@ -102,6 +106,7 @@ class element_window_small: # Ahoc Task, Idea
                     db_manager.update_db_fields(data)
                 else:
                     db_manager.save_to_db(data)
+                data_store_manager.make_day_data_tuple()
                 self.window.destroy()
             except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
