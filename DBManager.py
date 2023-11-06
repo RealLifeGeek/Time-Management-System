@@ -2,6 +2,8 @@ import sqlite3
 import datetime
 from tkinter import messagebox
 import tkinter as tk
+import random
+import string
 # Created on : 14. 10. 2023, 14:26:26
 # Author     : prohi
 # Updated     : RealLifeGeek
@@ -317,8 +319,58 @@ class DBManager:
         finally:
             self.close_db()
 
+    def generate_element_id(self, letter_sign):
+        while True:
+            letters = letter_sign
+            random_number = ''.join(random.choice(string.digits) for i in range(2))
+            element_id = f"{letters}{random_number}_{date_string}"
+            if not self.element_id_already_exists(element_id):
+                return element_id
 
+    def element_id_already_exists(self, id):
+        self.open_db()
+        try:
+            self.cursor.execute(f"SELECT * FROM {self.db} WHERE element_ID=?", (id,))
+            result = self.cursor.fetchone()
 
+            if result is not None:
+                return True
+            else:
+                return False
+        except Exception as e:
+            messagebox.showerror("ERROR", f"ERROR: {e}")
+        finally:
+            self.close_db()
 
-            
-        
+    def project_name_already_exist(self, project_name):
+        self.open_db()
+        try:
+            self.cursor.execute(f"SELECT element_ID FROM {self.db} WHERE project=?", (project_name,))
+            rows = self.cursor.fetchone()
+
+            if rows is not None:
+                return True
+            else:
+                return False
+        except Exception as e:
+            messagebox.showerror("ERROR", f"ERROR: {e}")
+        finally:
+            self.close_db()
+
+    def count_total_number_of_elements(self, category, delegated, done):
+        self.open_db()
+        try:
+            if category == 'task' and delegated == '':
+                self.cursor.execute(f'SELECT element FROM {self.db} WHERE category = "task" AND delegated = "" AND done = ?', (done,))
+            elif category == 'task' and delegated != '':
+                self.cursor.execute(f'SELECT element FROM {self.db} WHERE category = "task" AND delegated != "" AND done = ?', (done,))
+            else:
+                self.cursor.execute(f'SELECT element FROM {self.db} WHERE category = ?', (category,))
+            rows = self.cursor.fetchall()
+            elements = [str(row[0]) for row in rows]
+            number_elements = int(len(elements))
+            return number_elements
+        except Exception as e:
+            messagebox.showwarning("ERROR", f"ERROR: {e}")
+        finally:
+            self.close_db()

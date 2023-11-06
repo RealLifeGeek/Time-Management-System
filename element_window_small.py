@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
 import datetime
-from functions import generate_element_id, project_name_already_exist, element_id_already_exists
 from DBManager import *
 from DataStoreManager import *
 from DataFormObject import *
@@ -25,9 +24,9 @@ class element_window_small: # Ahoc Task, Idea
 
         if element_id == None:
             if title == 'Adhoc Task':
-                element_id = generate_element_id(db, 'AD')
+                element_id = db_manager.generate_element_id('AD')
             elif title ==  'Idea':
-                element_id = generate_element_id(db, 'ID')
+                element_id = db_manager.generate_element_id('ID')
         else:
             pass
         
@@ -77,8 +76,8 @@ class element_window_small: # Ahoc Task, Idea
 
                 if len(self.project_row.get()) != 0:
                     project_name = self.project_row.get()
-                    if not project_name_already_exist(self.db, project_name):
-                        data.element_id = generate_element_id(self.db, 'PR')
+                    if not db_manager.project_name_already_exist(project_name):
+                        data.element_id = db_manager.generate_element_id('PR')
                         data.element = self.project_row.get()
                         data.date = self.date_string
                         data.deadline = self.date_string
@@ -102,7 +101,7 @@ class element_window_small: # Ahoc Task, Idea
         if answer:
             try:
                 self.get_idea_data()    
-                if element_id_already_exists(self.db, self.element_id):
+                if db_manager.element_id_already_exists(self.element_id):
                     db_manager.update_db_fields(data)
                 else:
                     db_manager.save_to_db(data)
