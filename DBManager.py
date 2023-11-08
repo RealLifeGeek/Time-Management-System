@@ -319,6 +319,18 @@ class DBManager:
         finally:
             self.close_db()
 
+    def get_list_data_tuple(self):        # Day data for DayDataManager
+        self.open_db()
+        try:
+            self.cursor.execute(f"SELECT * FROM {self.db}")
+            rows = self.cursor.fetchall()
+            print('Creating new list_tuple: DBManager')
+            return rows
+        except Exception as e:
+            messagebox.showerror("ERROR", f"ERROR: {e}")
+        finally:
+            self.close_db()
+
     def generate_element_id(self, letter_sign):
         while True:
             letters = letter_sign

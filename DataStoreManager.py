@@ -7,25 +7,29 @@ db_manager = DBManager()
 class DataStoreManager:
     def __init__(self):
         if not hasattr(self, 'data_tuple'):
-            self.data_tuple = self.make_day_data_tuple()
+            self.day_data_tuple = self.make_day_data_tuple()
+            self.list_data_tuple = self.make_list_data_tuple()
         else:
             print('Data_tuple already exists')
             pass
     
     def make_day_data_tuple(self):
-        self.data_tuple = db_manager.get_day_data_tuple()   # Tuple list stored as a variable - than I can take the data for treeviews 
-                                                       # and check them
-        print('Creating new data_tuple')
-        return self.data_tuple
+        self.day_data_tuple = db_manager.get_day_data_tuple()   # Tuple list stored as a variable - than I can take the data for treeviews 
+                                                                # and check them
+        return self.day_data_tuple
         # element [2]
         # time [7]
         # delegated [9]
         # category [15]
-    
-    def insert_data_to_treeview(self, treeview, category): 
+
+    def make_list_data_tuple(self):
+        self.list_data_tuple = db_manager.get_list_data_tuple()
+        return self.list_data_tuple
+
+    def insert_day_data_to_treeview(self, treeview, category): # Inserting data to treeviews on MAIN SCREEN
         treeview.delete(*treeview.get_children())
         try:
-            for data_row in self.data_tuple:
+            for data_row in self.day_data_tuple:
                 if category == 'task':
                     if data_row [15] == 'task' and data_row[9] == "":
                         treeview.insert('', 'end', values=(data_row[2], data_row[7]))
@@ -39,10 +43,40 @@ class DataStoreManager:
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
 
+    def insert_list_data_to_treeview(self, treeview, list_category): # Inserting data to treeviews in LIST WINDOW
+        treeview.delete(*treeview.get_children())
+        try:
+            for data_row in self.list_data_tuple:
+                if list_category == 'My Tasks':
+                    if data_row [15] == 'task' and data_row[9] == "":
+                        treeview.insert('', 'end', values=(data_row[2], data_row[3], data_row[4], data_row[9]))
+                elif list_category == 'Delegated Tasks':
+                    if data_row [15] == 'task' and data_row[9] != "":
+                        treeview.insert('', 'end', values=(data_row[2], data_row[3], data_row[4], data_row[9]))
+                elif list_category == 'People Cards':
+                    if data_row[15] == 'personal card':
+                        treeview.insert('', 'end', values=(data_row[12], data_row[2], data_row[3], data_row[4]))
+                elif list_category == 'Events':
+                    if data_row[15] == 'event':
+                        treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4]))
+                elif list_category == 'Remarks':
+                    if data_row[15] == 'remark':
+                        treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[5]))
+                elif list_category == 'Ideas':
+                    if data_row[15] == 'idea':
+                        treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[5]))
+                elif list_category == 'Maybe/Sometimes':
+                    if data_row[15] == 'maybe/sometimes':
+                        treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[5]))
+                else:
+                    pass
+        except Exception as e:
+            messagebox.showerror("ERROR", f"ERROR: {e}")
+
     def count_number_of_day_element(self, category): # no need of today date_string, data_tuple is generated for today
         try:
             number_elements = 0
-            for data_row in self.data_tuple:
+            for data_row in self.day_data_tuple:
                 if category == 'task' and data_row[15] == 'task' and data_row[9] == "" and data_row[16] == 'No':
                     number_elements += 1
                 elif data_row[15] == category and category != 'task':
@@ -55,7 +89,7 @@ class DataStoreManager:
 
 
     def check_elementid_in_tuple(self, element_id):
-        for data_row in self.data_tuple:
+        for data_row in self.day_data_tuple:
             if element_id in data_row:
                 return data_row
 
@@ -158,8 +192,15 @@ class DataStoreManager:
         chosen_date = data_row[3]
         row4.insert(0, chosen_date)
 
-    def get_element_id_from_data_tuple(self, element_name):
-        for data_row in self.data_tuple:
+    def get_element_id_from_day_data_tuple(self, element_name):
+        for data_row in self.day_data_tuple:
+            if element_name in data_row:
+                return data_row[1]
+            else:
+                pass
+
+    def get_element_id_from_list_data_tuple(self, element_name):
+        for data_row in self.list_data_tuple:
             if element_name in data_row:
                 return data_row[1]
             else:

@@ -15,7 +15,7 @@ class element_window_small: # Ahoc Task, Idea
     # for new element use title as 'Adhoc Task', 'Idea'
     # for view existing element use title as 'Idea View'
     # for element_id use element_id or None
-    def __init__(self, parent, title, db, element_id):
+    def __init__(self, parent, title, element_id):
 
         self.window = tk.Toplevel(parent)
         self.window.geometry("600x240")
@@ -35,7 +35,6 @@ class element_window_small: # Ahoc Task, Idea
 
         self.date_string = date_string
         self.element_id = element_id
-        self.db = db
         self.title = title
 
         if self.title == 'Idea View':

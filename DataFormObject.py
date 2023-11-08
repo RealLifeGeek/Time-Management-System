@@ -4,7 +4,7 @@ class DataForm:
         self.element_id = ""
         self.element = ""
         self.date = None            # Date, Start Date
-        self.deadline = None        # Deadline, End Date; Not used in Remarks
+        self.deadline = None        # Deadline, End Date; Not used in Remarks; in People Cards this is the Year of Birth
         self.field1 = ""            # Not used in Task
         self.field2 = ""            # in task: Expected Result
         self.field3 = ""            # Time, Start Time
@@ -12,7 +12,7 @@ class DataForm:
         self.delegated = ""         # Not used in Remarks, Events
         self.cooperating = ""       # Not used in Remarks, Events
         self.field4 = ""            # End time
-        self.field5 = ""            # Empty field - not used so far
+        self.field5 = ""            # Titles
         self.remarks = ""
         self.keywords = ""
         self.category = ""
