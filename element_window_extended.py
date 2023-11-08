@@ -17,7 +17,7 @@ class element_window_extended: # task, remark, event
 # for new element use title as 'Task', 'Remark', 'Event'
 # for view existing element use title as 'Task View', 'Remark View' or 'Event View'
 # for element_id use element_id or None
-    def __init__(self, parent, title, db, element_id):
+    def __init__(self, parent, title, element_id):
         self.window = tk.Toplevel(parent)
         self.window.geometry("600x400")
         self.window.configure(bg="#212121")
@@ -42,7 +42,6 @@ class element_window_extended: # task, remark, event
         
         self.element_id = element_id
         self.title = title
-        self.db = db
         
     def choose_date(self):
         chosen_date = self.calendar.get_date()
