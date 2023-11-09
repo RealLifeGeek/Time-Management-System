@@ -19,7 +19,7 @@ class element_window_extended: # task, remark, event
 # for element_id use element_id or None
     def __init__(self, parent, title, element_id):
         self.window = tk.Toplevel(parent)
-        self.window.geometry("600x400")
+        self.window.geometry("600x400+100+100")
         self.window.configure(bg="#212121")
         self.window.title(title)
 
@@ -66,11 +66,10 @@ class element_window_extended: # task, remark, event
         data.keywords = self.keywords_row.get()
         data.category = 'task'
 
-        if data.date != None or data.deadline != None:
-            if data.date == None and data.deadline != None:
-                data.date = data.deadline
-            elif data.date != None and data.deadline == None:
-                data.deadline = data.date
+        if data.date is not None and data.deadline is None:
+            data.deadline = data.date
+        elif data.date is None and data.deadline is not None:
+            data.date = data.deadline
         else:
             pass
     
@@ -94,66 +93,60 @@ class element_window_extended: # task, remark, event
         data.category = 'remark'
 
     def save_or_edit_task(self):
-        answer = messagebox.askokcancel("SAVE", "SAVE changes?")
-        if answer:
-            try:
-                self.get_task_data()
-                if db_manager.element_id_already_exists(self.element_id):
-                    db_manager.update_db_fields(data)
-                else:
-                    db_manager.save_to_db(data)
-                if len(self.project_row.get()) != 0:
-                    project_name = self.project_row.get()
-                    if not db_manager.project_name_already_exist(project_name):
-                        data.element_id = db_manager.generate_element_id('PR')
-                        data.element = project_name
-                        data.date = data.date
-                        data.deadline = data.deadline
-                        data.delegated = self.delegated_row.get()
-                        data.cooperating = self.cooperating_row.get()
-                        data.keywords = self.keywords_row.get()
-                        data.category = 'project'
+        try:
+            self.get_task_data()
+            if db_manager.element_id_already_exists(self.element_id):
+                db_manager.update_db_fields(data)
+            else:
+                db_manager.save_to_db(data)
+            if len(self.project_row.get()) != 0:
+                project_name = self.project_row.get()
+                if not db_manager.project_name_already_exist(project_name):
+                    data.element_id = db_manager.generate_element_id('PR')
+                    data.element = project_name
+                    data.date = data.date
+                    data.deadline = data.deadline
+                    data.delegated = self.delegated_row.get()
+                    data.cooperating = self.cooperating_row.get()
+                    data.keywords = self.keywords_row.get()
+                    data.category = 'project'
 
-                        db_manager.save_to_db(data)
-                else:
-                    pass
-                data_store_manager.make_day_data_tuple()
-                self.window.destroy()
-            except Exception as e:
+                    db_manager.save_to_db(data)
+            else:
+                pass
+            data_store_manager.make_day_data_tuple()
+            self.window.destroy()
+        except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
                 self.window.destroy()
         else:
             pass
 
     def save_or_edit_event(self):
-        answer = messagebox.askokcancel("SAVE", "SAVE changes?")
-        if answer:
-            try:
-                self.get_event_data()
-                if db_manager.element_id_already_exists(self.element_id):
-                    db_manager.update_db_fields(data)
-                else:
-                    db_manager.save_to_db(data)
-                self.window.destroy()
-                data_store_manager.make_day_data_tuple()
-            except Exception as e:
-                messagebox.showerror("ERROR", f"ERROR: {e}")
-                self.window.destroy()
+        try:
+            self.get_event_data()
+            if db_manager.element_id_already_exists(self.element_id):
+                db_manager.update_db_fields(data)
+            else:
+                db_manager.save_to_db(data)
+            self.window.destroy()
+            data_store_manager.make_day_data_tuple()
+        except Exception as e:
+            messagebox.showerror("ERROR", f"ERROR: {e}")
+            self.window.destroy()
     
     def save_or_edit_remark(self):
-        answer = messagebox.askyesno("SAVE", "SAVE changes?")
-        if answer:
-            try:
-                self.get_remark_data()
-                if db_manager.element_id_already_exists(self.element_id):
-                    db_manager.update_db_fields(data)
-                else:
-                    db_manager.save_to_db(data)
-                self.window.destroy()
-                data_store_manager.make_day_data_tuple()
-            except Exception as e:
-                messagebox.showerror("ERROR", f"ERROR: {e}")
-                self.window.destroy()
+        try:
+            self.get_remark_data()
+            if db_manager.element_id_already_exists(self.element_id):
+                db_manager.update_db_fields(data)
+            else:
+                db_manager.save_to_db(data)
+            self.window.destroy()
+            data_store_manager.make_day_data_tuple()
+        except Exception as e:
+            messagebox.showerror("ERROR", f"ERROR: {e}")
+            self.window.destroy()
 
     def exit(self):
         self.window.destroy()

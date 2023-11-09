@@ -2,9 +2,12 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import *
 from tkinter import messagebox
+from functions import exit_window
 from DBManager import *
 from DataFormObject import *
 from DataStoreManager import *
+from element_window_extended import *
+from element_window_small import *
 
 db_manager = DBManager()
 data_store_manager = DataStoreManager()
@@ -13,7 +16,7 @@ data = DataForm()
 class ListWindow:
     def __init__(self, parent, title):
         self.window = tk.Toplevel(parent)
-        self.window.geometry("800x550")
+        self.window.geometry("800x550+100+100")
         self.window.configure(bg="#AFAFAF")
         self.window.title(title)
         self.window.resizable(0,0)
@@ -22,6 +25,96 @@ class ListWindow:
         
         style = ttk.Style()
         style.theme_use('clam')
+        data_store_manager.make_list_data_tuple()
+
+    def show_existing_element_window(self):
+        selection = self.treeview.selection()
+        if selection:
+            element_name = self.treeview.item(selection, 'values')[0]
+            element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+        else:
+            messagebox.showwarning("ERROR", f"Select an element")
+
+        if self.title == 'Ideas':
+            new_title = 'Idea View'
+            idea_window = element_window_small(
+                self.window, new_title, element_id
+            )
+            idea_window.create_window()
+            idea_window.insert_values()
+            
+        else:
+            if self.title == 'My Tasks' or self.title == 'Delegated Tasks':
+                new_title = 'Task View'
+            elif self.title == 'Remarks':
+                new_title = 'Remark View'
+            elif self.title == 'Events':
+                new_title = 'Event View'
+            else:
+                pass
+            element_window = element_window_extended(
+                self.window, new_title, element_id
+            )
+            element_window.create_window()
+            element_window.insert_values()
+
+    def show_new_element_window(self):
+        if self.title == 'My Tasks' or self.title == 'Delegated Tasks':
+            task_window = element_window_extended(
+            self.window, 'Task', None
+            )
+            task_window.create_window()
+        elif self.title == 'Remarks':
+            remark_window = element_window_extended(
+                self.window, "Remark", None
+            )
+            remark_window.create_window()
+        elif self.title == 'Events':
+            event_window = element_window_extended(
+                self.window, 'Event', None
+            )
+            event_window.create_window()
+        elif self.title == 'Projects':
+            pass
+        elif self.title == 'People Cards':
+            pass
+        elif self.title == 'Ideas':
+            idea_window = element_window_small(
+            self.window, 'Idea', None
+            )
+            idea_window.create_window()
+        else:
+            print('Not matched in def show_new_elemenet_window in ListWindow')
+
+    def done(self):
+        selection = self.treeview.selection()
+        if selection:
+            element_name = self.treeview.item(selection, 'values')[0]        
+            element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+            data.element_id = element_id
+            data.element = element_name
+            data.done = 'DONE'
+            db_manager.update_db_fields(data)
+            data_store_manager.make_list_data_tuple()
+            data_store_manager.insert_list_data_to_treeview(self.treeview, self.title)
+        else:
+            messagebox.showwarning("Error", "Select an element to be done.")
+    
+    def delete_from_database(self):
+        selection = self.treeview.selection()
+        if selection:
+            element_name = self.treeview.item(selection, 'values')[0]
+            element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+            db_manager.set_element_id(element_id)
+            answer = messagebox.askyesno("DELETE", "DELETE from database?")
+            if answer:
+                db_manager.delete_from_db()
+                data_store_manager.make_list_data_tuple()
+                data_store_manager.insert_list_data_to_treeview(self.treeview, self.title)
+            else:
+                pass
+        else:
+            messagebox.showwarning("ERROR", "Select an element")
 
     def create_window(self):
         self.header_label = tk.Label(
@@ -107,7 +200,7 @@ class ListWindow:
                 text = "+",
                 font = ('Arial', '15', 'bold'),
                 width = 3,
-                command = None,
+                command = self.show_new_element_window,
                 background = '#029F00',
                 foreground = '#FFFFFF'
             )
@@ -119,7 +212,7 @@ class ListWindow:
                 text = "DONE",
                 font = ('Arial', '12', 'bold'),
                 width = 15,
-                command = None,
+                command = self.done,
                 background = '#046702',
                 foreground = '#FFFFFF'
             )
@@ -130,7 +223,7 @@ class ListWindow:
             text = "VIEW",
             font = ('Arial', '12', 'bold'),
             width = 15,
-            command = None,
+            command = self.show_existing_element_window,
             background = '#02266A',
             foreground = '#FFFFFF'
         )
@@ -141,7 +234,7 @@ class ListWindow:
             text = "DELETE",
             font = ('Arial', '12', 'bold'),
             width = 15,
-            command = None,
+            command = self.delete_from_database,
             background = '#970000',
             foreground = '#FFFFFF'
         )
@@ -283,5 +376,6 @@ class ListWindow:
             )
             maybe_sometimes_button.place(x=660, y=500)
 
+        data_store_manager.make_list_data_tuple()
         data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )        
 
