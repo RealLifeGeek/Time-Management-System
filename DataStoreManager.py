@@ -6,27 +6,18 @@ db_manager = DBManager()
 
 class DataStoreManager:
     def __init__(self):
-        if not hasattr(self, 'data_tuple'):
-            self.day_data_tuple = self.make_day_data_tuple()
-            self.list_data_tuple = self.make_list_data_tuple()
-        else:
-            print('Data_tuple already exists')
-            pass
+        self.day_data_tuple = self.make_day_data_tuple()
+        self.list_data_tuple = self.make_list_data_tuple()
     
     def make_day_data_tuple(self):
-        self.day_data_tuple = db_manager.get_day_data_tuple()   # Tuple list stored as a variable - than I can take the data for treeviews 
-                                                                # and check them
+        self.day_data_tuple = db_manager.get_day_data_tuple()   # Tuple for day data on MainScreen
         return self.day_data_tuple
-        # element [2]
-        # time [7]
-        # delegated [9]
-        # category [15]
 
-    def make_list_data_tuple(self):
+    def make_list_data_tuple(self): # Tuple for ListWindow
         self.list_data_tuple = db_manager.get_list_data_tuple()
         return self.list_data_tuple
 
-    def insert_day_data_to_treeview(self, treeview, category): # Inserting data to treeviews on MAIN SCREEN
+    def insert_day_data_to_treeview(self, treeview, category): # Inserting data to treeviews on MainScreen
         treeview.delete(*treeview.get_children())
         try:
             for data_row in self.day_data_tuple:
@@ -43,7 +34,7 @@ class DataStoreManager:
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
 
-    def insert_list_data_to_treeview(self, treeview, list_category): # Inserting data to treeviews in LIST WINDOW
+    def insert_list_data_to_treeview(self, treeview, list_category): # Inserting data to treeviews in ListWindow
         treeview.delete(*treeview.get_children())
         try:
             for data_row in self.list_data_tuple:
@@ -92,6 +83,9 @@ class DataStoreManager:
         for data_row in self.day_data_tuple:
             if element_id in data_row:
                 return data_row
+        for data_row in self.list_data_tuple:
+            if element_id in data_row:
+                return data_row
 
     def insert_values_to_task_form(self, element_id, win, row1, row2, row3, row4, row5, row6, row7, row8, row9):
         data_row = self.check_elementid_in_tuple(element_id)
@@ -133,7 +127,7 @@ class DataStoreManager:
             row9.insert(0, result_keywords)
 
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR in DDM: {e}")
+            messagebox.showerror("ERROR", f"ERROR in DSM: {e}")
 
     def insert_values_to_event_form(self, element_id, win, row1, row2, row3, row4, row5, row6, row7):
         data_row = self.check_elementid_in_tuple(element_id)
@@ -191,6 +185,38 @@ class DataStoreManager:
         
         chosen_date = data_row[3]
         row4.insert(0, chosen_date)
+
+    def insert_values_to_idea_form(self, element_id, win, row1, row2, row3):
+        data_row = self.check_elementid_in_tuple(element_id)
+        print(data_row)
+
+        idea_id_label = tk.Label(
+            win,
+            text = element_id,
+            font = ("Open Sans", "10"),
+            background = "#212121",
+            foreground = "#FFFFFF"
+        )
+        idea_id_label.place(x = 480, y = 5)
+
+        result_idea = data_row[2]
+        row1.insert(0, result_idea)
+
+        result_keywords = data_row[14]
+        row2.insert(0, result_keywords)
+
+        result_remark = data_row[13]
+        row3.insert(0, result_remark)
+
+        result_date = data_row[3]
+        date_label = tk.Label(
+            win,
+            text = result_date,
+            font = ('Montserrat', '15'),
+            background = "#212121",
+            foreground = "#FFFFFF"
+        )
+        date_label.place(x = 480, y = 160)
 
     def get_element_id_from_day_data_tuple(self, element_name):
         for data_row in self.day_data_tuple:

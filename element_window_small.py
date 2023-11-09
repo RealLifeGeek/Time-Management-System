@@ -18,7 +18,7 @@ class element_window_small: # Ahoc Task, Idea
     def __init__(self, parent, title, element_id):
 
         self.window = tk.Toplevel(parent)
-        self.window.geometry("600x240")
+        self.window.geometry("600x240+100+200")
         self.window.configure(bg="#212121")
         self.window.title(title)
 
@@ -37,13 +37,14 @@ class element_window_small: # Ahoc Task, Idea
         self.element_id = element_id
         self.title = title
 
+    def insert_values(self):
         if self.title == 'Idea View':
             win = self.window
             row1 = self.element_description_row 
             row2 = self.field1_row 
             row3 = self.field2_row
 
-            db_manager.insert_values_to_idea_form(
+            data_store_manager.insert_values_to_idea_form(
                 self.element_id, win, row1, row2, row3
             )
 
@@ -67,48 +68,42 @@ class element_window_small: # Ahoc Task, Idea
         data.category = 'idea'      
 
     def save_or_edit_task(self):
-        answer = messagebox.askokcancel("SAVE", "SAVE changes?")
-        if answer:
-            try:
-                self.get_task_data()
-                db_manager.save_to_db(data)
+        try:
+            self.get_task_data()
+            db_manager.save_to_db(data)
 
-                if len(self.project_row.get()) != 0:
-                    project_name = self.project_row.get()
-                    if not db_manager.project_name_already_exist(project_name):
-                        data.element_id = db_manager.generate_element_id('PR')
-                        data.element = self.project_row.get()
-                        data.date = self.date_string
-                        data.deadline = self.date_string
-                        data.keywords = self.keywords_row.get()
-                        data.category = 'project'
-                        data.done = 'No'
+            if len(self.project_row.get()) != 0:
+                project_name = self.project_row.get()
+                if not db_manager.project_name_already_exist(project_name):
+                    data.element_id = db_manager.generate_element_id('PR')
+                    data.element = self.project_row.get()
+                    data.date = self.date_string
+                    data.deadline = self.date_string
+                    data.keywords = self.keywords_row.get()
+                    data.category = 'project'
+                    data.done = 'No'
 
-                        db_manager.save_to_db(data)
-                else:
-                    pass
-                data_store_manager.make_day_data_tuple()
-                self.window.destroy()
-            except Exception as e:
-                messagebox.showerror("ERROR", f"ERROR: {e}")
-                self.window.destroy()
-        else:
-            pass
+                    db_manager.save_to_db(data)
+            else:
+                pass
+            data_store_manager.make_day_data_tuple()
+            self.window.destroy()
+        except Exception as e:
+            messagebox.showerror("ERROR", f"ERROR: {e}")
+            self.window.destroy()
 
     def save_or_edit_idea(self):
-        answer = messagebox.askokcancel("SAVE", "SAVE changes?")
-        if answer:
-            try:
-                self.get_idea_data()    
-                if db_manager.element_id_already_exists(self.element_id):
-                    db_manager.update_db_fields(data)
-                else:
-                    db_manager.save_to_db(data)
-                data_store_manager.make_day_data_tuple()
-                self.window.destroy()
-            except Exception as e:
-                messagebox.showerror("ERROR", f"ERROR: {e}")
-                self.window.destroy()
+        try:
+            self.get_idea_data()    
+            if db_manager.element_id_already_exists(self.element_id):
+                db_manager.update_db_fields(data)
+            else:
+                db_manager.save_to_db(data)
+            data_store_manager.make_day_data_tuple()
+            self.window.destroy()
+        except Exception as e:
+            messagebox.showerror("ERROR", f"ERROR: {e}")
+            self.window.destroy()
     
     def exit(self):
         self.window.destroy()
