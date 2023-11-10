@@ -161,14 +161,14 @@ class element_window_extended: # task, remark, event
         )
         self.header_label.place(relx = 0.5, y = 15, anchor = 'center')
 
-        self.task_id_label = tk.Label(
+        self.element_id_label = tk.Label(
             self.window,
-            text = element_id,
+            text = self.element_id,
             font = ("Open Sans", "10"),
             background = "#212121",
             foreground = "#FFFFFF"
         )
-        self.task_id_label.place(x = 480, y = 5)
+        self.element_id_label.place(x = 480, y = 5)
 
         self.top_frame = tk.Frame(
             self.window,
