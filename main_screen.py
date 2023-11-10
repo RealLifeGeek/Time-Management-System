@@ -15,25 +15,6 @@ from DBManager import DBManager
 from DataFormObject import DataForm
 from DataStoreManager import *
 
-#from move_to import move_task_to
-#from new_task import new_task
-#from adhoc_task import adhoc_task
-#from catch_idea import catch_idea
-#from add_remark import add_remark
-#from add_event import add_event
-#from tasks_list_database import tasks_list
-#from delegated_tasks_list_database import delegated_tasks_list
-#from ideas_list_database import ideas_list
-#from deadlines_reminder import remind_my_deadlines, remind_deadlines_delegated
-#from catchbox_reminder import remind_full_catchbox
-#from birthdays import birthday_list
-#from birthday_reminder import remind_birthdays
-#from projects_list_database import projects_list
-#from check_undone_tasks import check_undone_tasks, check_undone_delegated_tasks, check_udnone_projects
-#from events_database import events_list
-#from remarks_database import remarks_list
-#from maybe_sometimes_list import maybe_sometimes_list
-
 db_manager.create_db()
 
 current_date = datetime.datetime.now()
@@ -126,7 +107,6 @@ def do_task_tomorrow():
             messagebox.showwarning("ERROR", "Select an element.")
     except Exception as e:
         messagebox.showerror("ERROR", f"ERROR: {e}")
-
 def refresh_main_screen():
     data_store_manager.make_day_data_tuple()
     data_store_manager.insert_day_data_to_treeview(treeview, 'task')
@@ -913,6 +893,7 @@ if __name__ == "__main__":
     add_event_button.place(x = 116, y = 5)
 
     check_connection()
+    data_store_manager.make_day_data_tuple()
     progress_bar_of_day()
     show_number_of_day_element('task')
     show_number_of_day_element('remark')

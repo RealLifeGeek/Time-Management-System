@@ -115,6 +115,40 @@ class ListWindow:
                 pass
         else:
             messagebox.showwarning("ERROR", "Select an element")
+    
+    def find(self):
+        if len(self.find_row.get()) != 0:
+            searched_item = self.find_row.get()
+            data_store_manager.find_element_in_list_tuple(self.treeview, searched_item, self.title)
+        else:
+            messagebox.showwarning("ERROR", "Find Field is Empty!")
+    
+    def cancel_find(self):
+        self.find_row.delete(0, 'end')
+        data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
+
+    def change_to_task(self):
+        try:
+            if self.title == 'My Tasks' or self.title == 'Delegated Tasks':
+                messagebox.showwarning("ERROR", "Element is aleready task.")
+            else:
+                selection = self.treeview.selection()
+                if selection:
+                    if self.title == 'My Tasks' or self.title == 'Delegated Tasks' or self.title == 'Projects':
+                        element_name = self.treeview.item(selection, 'values')[0]
+                    else:
+                        element_name = self.treeview.item(selection, 'values')[1]
+                    element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+                    data.element_id = element_id
+                    data.element = element_name
+                    data.category = 'task'
+                    db_manager.update_db_fields(data)
+                    data_store_manager.make_list_data_tuple()
+                    data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
+                else:
+                    messagebox.showwarning("ERROR", "Select an element.")
+        except Exception as e:
+            messagebox.showerror("ERROR", f"ERROR: {e}")
 
     def create_window(self):
         self.header_label = tk.Label(
@@ -249,7 +283,7 @@ class ListWindow:
         )
         find_label.place(x = 15, y = 380)
 
-        find_row = tk.Entry(
+        self.find_row = tk.Entry(
             self.window,
             font = ("Open Sans", "11", "bold"),
             width = 30,
@@ -257,14 +291,14 @@ class ListWindow:
             background = "#000000",
             foreground = "#FFFFFF"
         )
-        find_row.place(x = 65, y = 382)
+        self.find_row.place(x = 65, y = 382)
 
         find_button = tk.Button(
             self.window,
             text = "FIND",
             font = ('Arial', '11', 'bold'),
             width = 10,
-            command = None,
+            command = self.find,
             background = '#4F0082',
             foreground = '#FFFFFF'
         )
@@ -275,7 +309,7 @@ class ListWindow:
             text = "CANCEL FIND",
             font = ('Arial', '11', 'bold'),
             width = 12,
-            command = None,
+            command = self.cancel_find,
             background = '#A2005D',
             foreground = '#FFFFFF'
         )
@@ -315,7 +349,7 @@ class ListWindow:
                 text = "TASK",
                 font = ('Arial', '9', 'bold'),
                 width = 11,
-                command = None,
+                command = self.change_to_task,
                 background = '#004C01',
                 foreground = '#FFFFFF'
             )
