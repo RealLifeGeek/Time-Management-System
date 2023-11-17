@@ -1,8 +1,10 @@
 from tkinter import messagebox
 import tkinter as tk
 from DBManager import *
+from DataFormObject import *
 
 db_manager = DBManager()
+data = DataForm()
 
 class DataStoreManager:
     def __init__(self):
@@ -44,6 +46,9 @@ class DataStoreManager:
                 elif list_category == 'Delegated Tasks':
                     if data_row [15] == 'task' and data_row[9] != "":
                         treeview.insert('', 'end', values=(data_row[2], data_row[3], data_row[4], data_row[9]))
+                elif list_category == 'Projects':
+                    if data_row [15] == 'project':
+                        treeview.insert('', 'end', values=(data_row[2], data_row[3], data_row[4], data_row[9]))
                 elif list_category == 'People Cards':
                     if data_row[15] == 'personal card':
                         treeview.insert('', 'end', values=(data_row[12], data_row[2], data_row[3], data_row[4]))
@@ -78,17 +83,28 @@ class DataStoreManager:
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
 
-
     def check_elementid_in_tuple(self, element_id):
-        day_data_tuple = self.make_day_data_tuple()
-        list_data_tuple = self.make_list_data_tuple()
-        for day_data_row in day_data_tuple:
+        if self.day_data_tuple == () and self.list_data_tuple == ():
+            print('Data_tuple empty')
+            self.day_data_tuple = self.make_day_data_tuple()
+            self.list_data_tuple = self.make_list_data_tuple()
+        else:
+            print('Data tuple exists')
+        for day_data_row in self.day_data_tuple:
             if element_id in day_data_row:
                 return day_data_row
-        for list_data_row in list_data_tuple:
+        for list_data_row in self.list_data_tuple:
             if element_id in list_data_row:
                 print(list_data_row)
                 return list_data_row
+            
+    def get_data_row_from_list_data_tuple(self, element_id):
+        for data_row in self.list_data_tuple:
+            if element_id in data_row:
+                print(data_row)
+                return data_row
+            else:
+                pass
 
     def insert_values_to_task_form(self, element_id, win, row1, row2, row3, row4, row5, row6, row7, row8, row9):
         data_row = self.check_elementid_in_tuple(element_id)
@@ -149,9 +165,17 @@ class DataStoreManager:
         row1.insert(0, result_event)
 
         chosen_date = data_row[3]
+        if data_row[3] == None:
+            chosen_date = data_row[4]
+            if data_row[4] == None:
+                chosen_date = ""
         row4.insert(0, chosen_date)
 
         chosen_deadline = data_row[4]
+        if data_row[4] == None:
+            chosen_date = data_row[3]
+            if data_row[3] == None:
+                chosen_date = ""
         row5.insert(0, chosen_deadline)
         
         result_field1 = data_row[5]
@@ -188,6 +212,12 @@ class DataStoreManager:
         row3.insert(0, result_field2)
         
         chosen_date = data_row[3]
+        if data_row[3] == None:
+            chosen_date = data_row[4]
+            if data_row[4] == None:
+                chosen_date = ""
+            else:
+                pass
         row4.insert(0, chosen_date)
 
     def insert_values_to_idea_form(self, element_id, win, row1, row2, row3):
@@ -205,13 +235,17 @@ class DataStoreManager:
         result_idea = data_row[2]
         row1.insert(0, result_idea)
 
-        result_keywords = data_row[14]
-        row2.insert(0, result_keywords)
+        result_field1 = data_row[5]
+        row2.insert(0, result_field1)
 
-        result_remark = data_row[13]
-        row3.insert(0, result_remark)
+        result_field2 = data_row[6]
+        row3.insert(0, result_field2)
 
         result_date = data_row[3]
+        if data_row[3] == None:
+            result_date = data_row[4]
+            if data_row[4] == None:
+                result_date = ""
         date_label = tk.Label(
             win,
             text = result_date,

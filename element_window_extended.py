@@ -115,6 +115,7 @@ class element_window_extended: # task, remark, event
             else:
                 pass
             data_store_manager.make_day_data_tuple()
+            data_store_manager.make_list_data_tuple()
             self.window.destroy()
         except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
@@ -131,6 +132,7 @@ class element_window_extended: # task, remark, event
                 db_manager.save_to_db(data)
             self.window.destroy()
             data_store_manager.make_day_data_tuple()
+            data_store_manager.make_list_data_tuple()
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
             self.window.destroy()
@@ -144,6 +146,7 @@ class element_window_extended: # task, remark, event
                 db_manager.save_to_db(data)
             self.window.destroy()
             data_store_manager.make_day_data_tuple()
+            data_store_manager.make_list_data_tuple()
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
             self.window.destroy()
@@ -430,7 +433,7 @@ class element_window_extended: # task, remark, event
         )
         self.exit_button.place(x = 370, y = 360)
 
-        if self.title == 'Task' or self.title == 'Task View':
+        if self.title == 'Task' or self.title == 'Task View' or self.title == 'Maybe/Sometimes View':
             self.bottom_frame = tk.Frame(
                 self.window,
                 width = 305,
@@ -526,7 +529,7 @@ class element_window_extended: # task, remark, event
         else:
             pass
         
-        if self.title == 'Task' or self.title == 'Task View':
+        if self.title == 'Task' or self.title == 'Task View' or self.title == 'Maybe/Sometimes View':
             self.very_bottom_frame = tk.Frame(
                 self.window,
                 width = 305,
@@ -576,7 +579,7 @@ class element_window_extended: # task, remark, event
             pass
 
     def insert_values(self):
-        if self.title == 'Task View':
+        if self.title == 'Task View' or self.title == 'Maybe/Sometimes View':
             win = self.window
             row1 = self.element_description_row 
             row2 = self.date_row

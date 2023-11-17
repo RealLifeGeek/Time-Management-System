@@ -50,6 +50,9 @@ class ListWindow:
                 new_title = 'Remark View'
             elif self.title == 'Events':
                 new_title = 'Event View'
+            elif self.title == 'Maybe/Sometimes':
+                new_title = 'Maybe/Sometimes View'
+                new_title == 'Task View'
             else:
                 pass
             element_window = element_window_extended(
@@ -139,9 +142,25 @@ class ListWindow:
                     else:
                         element_name = self.treeview.item(selection, 'values')[1]
                     element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+                    data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+
                     data.element_id = element_id
                     data.element = element_name
+                    data.date = data_row[3]
+                    data.deadline = data_row[4]
+                    data.field1 = data_row[5]
+                    data.field2 = data_row[6]
+                    data.field3 = data_row[7]
+                    data.project = data_row[8]
+                    data.delegated = data_row[9]
+                    data.cooperating = data_row[10]
+                    data.field4 = data_row[11]
+                    data.field5 = data_row[12]
+                    data.remarks = data_row[13]
+                    data.keywords = data_row[14]
                     data.category = 'task'
+                    data.done = data_row[16]  
+
                     db_manager.update_db_fields(data)
                     data_store_manager.make_list_data_tuple()
                     data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
@@ -149,6 +168,237 @@ class ListWindow:
                     messagebox.showwarning("ERROR", "Select an element.")
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
+
+    def change_to_remark(self):
+        try:
+            if self.title == 'Remarks':
+                messagebox.showwarning("ERROR", "Element is aleready a remark.")
+            else:
+                selection = self.treeview.selection()
+                if selection:
+                    if self.title == 'My Tasks' or self.title == 'Delegated Tasks' or self.title == 'Projects':
+                        element_name = self.treeview.item(selection, 'values')[0]
+                    else:
+                        element_name = self.treeview.item(selection, 'values')[1]
+                    element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+                    data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+                
+                    data.element_id = element_id
+                    data.element = element_name
+                    data.date = data_row[3]
+                    data.deadline = data_row[4]
+                    data.field1 = data_row[5]
+                    data.field2 = data_row[6]
+                    data.field3 = data_row[7]
+                    data.project = data_row[8]
+                    data.delegated = data_row[9]
+                    data.cooperating = data_row[10]
+                    data.field4 = data_row[11]
+                    data.field5 = data_row[12]
+                    data.remarks = data_row[13]
+                    data.keywords = data_row[14]
+                    data.category = 'remark'
+                    data.done = data_row[16]  
+
+                    if data.date == None or data.date == "":
+                        data.date = data.deadline
+                        print('Date is ' + str(data.date))
+                    if data.deadline == None or data.date == "":
+                        data.deadline = data.date
+                        print('Deadline is ' + data.deadline)
+                    else:
+                        print('Both date and deadline in remark have its value!')
+
+                    db_manager.update_db_fields(data)
+                    data_store_manager.make_list_data_tuple()
+                    data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
+                else:
+                    messagebox.showwarning("ERROR", "Select an element.")
+        except Exception as e:
+            messagebox.showerror("ERROR", f"ERROR: {e}")
+
+    def change_to_event(self):
+        try:
+            if self.title == 'Events':
+                messagebox.showwarning("ERROR", "Element is aleready an event.")
+            else:
+                selection = self.treeview.selection()
+                if selection:
+                    if self.title == 'My Tasks' or self.title == 'Delegated Tasks' or self.title == 'Projects':
+                        element_name = self.treeview.item(selection, 'values')[0]
+                    else:
+                        element_name = self.treeview.item(selection, 'values')[1]
+                    element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+                    data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+                
+                    data.element_id = element_id
+                    data.element = element_name
+                    data.date = data_row[3]
+                    data.deadline = data_row[4]
+                    data.field1 = data_row[5]
+                    data.field2 = data_row[6]
+                    data.field3 = data_row[7]
+                    data.project = data_row[8]
+                    data.delegated = data_row[9]
+                    data.cooperating = data_row[10]
+                    data.field4 = data_row[11]
+                    data.field5 = data_row[12]
+                    data.remarks = data_row[13]
+                    data.keywords = data_row[14]
+                    data.category = 'event'
+                    data.done = data_row[16]
+
+                    if data.date == None or data.date == "":
+                        data.date = data.deadline
+                        print('Date is ' + str(data.date))
+                    if data.deadline == None or data.deadline == "":
+                        data.deadline = data.date
+                        print('Deadline is ' + data.deadline)
+                    else:
+                        print('Both date and deadline have its value!')
+                    db_manager.update_db_fields(data)
+                    data_store_manager.make_list_data_tuple()
+                    data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
+                else:
+                    messagebox.showwarning("ERROR", "Select an element.")
+        except Exception as e:
+            messagebox.showerror("ERROR", f"ERROR: {e}")
+
+    def change_to_idea(self):
+        try:
+            if self.title == 'Ideas':
+                messagebox.showwarning("ERROR", "Element is aleready an idea.")
+            else:
+                selection = self.treeview.selection()
+                if selection:
+                    if self.title == 'My Tasks' or self.title == 'Delegated Tasks' or self.title == 'Projects':
+                        element_name = self.treeview.item(selection, 'values')[0]
+                    else:
+                        element_name = self.treeview.item(selection, 'values')[1]
+                    element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+                    data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+                
+                    data.element_id = element_id
+                    data.element = element_name
+                    data.date = data_row[3]
+                    data.deadline = data_row[4]
+                    data.field1 = data_row[5]
+                    data.field2 = data_row[6]
+                    data.field3 = data_row[7]
+                    data.project = data_row[8]
+                    data.delegated = data_row[9]
+                    data.cooperating = data_row[10]
+                    data.field4 = data_row[11]
+                    data.field5 = data_row[12]
+                    data.remarks = data_row[13]
+                    data.keywords = data_row[14]
+                    data.category = 'idea'
+                    data.done = data_row[16]
+
+                    if data.date == None or data.date == "":
+                        data.date = data.deadline
+                        print('Date is ' + str(data.date))
+                    if data.deadline == None or data.deadline == "":
+                        data.deadline = data.date
+                        print('Deadline is ' + data.deadline)
+                    else:
+                        print('Both date and deadline have its value!')
+                    db_manager.update_db_fields(data)
+                    data_store_manager.make_list_data_tuple()
+                    data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
+                else:
+                    messagebox.showwarning("ERROR", "Select an element.")
+        except Exception as e:
+            messagebox.showerror("ERROR", f"ERROR: {e}")
+
+    def change_to_maybe_sometimes(self):
+        try:
+            if self.title == 'Maybe/Sometimes':
+                messagebox.showwarning("ERROR", "Element is aleready an idea.")
+            else:
+                selection = self.treeview.selection()
+                if selection:
+                    if self.title == 'My Tasks' or self.title == 'Delegated Tasks' or self.title == 'Projects':
+                        element_name = self.treeview.item(selection, 'values')[0]
+                    else:
+                        element_name = self.treeview.item(selection, 'values')[1]
+                    element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+                    data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+                
+                    data.element_id = element_id
+                    data.element = element_name
+                    data.date = data_row[3]
+                    data.deadline = data_row[4]
+                    data.field1 = data_row[5]
+                    data.field2 = data_row[6]
+                    data.field3 = data_row[7]
+                    data.project = data_row[8]
+                    data.delegated = data_row[9]
+                    data.cooperating = data_row[10]
+                    data.field4 = data_row[11]
+                    data.field5 = data_row[12]
+                    data.remarks = data_row[13]
+                    data.keywords = data_row[14]
+                    data.category = 'maybe/sometimes'
+
+                    if data.date == None or data.date == "":
+                        data.date = data.deadline
+                    if data.deadline == None or data.deadline == "":
+                        data.deadline = data.date
+                    else:
+                        pass
+                    db_manager.update_db_fields(data)
+                    data_store_manager.make_list_data_tuple()
+                    data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
+                else:
+                    messagebox.showwarning("ERROR", "Select an element.")
+        except Exception as e:
+            messagebox.showerror("ERROR", f"ERROR: {e}")
+
+    def change_to_project(self):
+        try:
+            if self.title == 'Projects':
+                messagebox.showwarning("ERROR", "Element is aleready an idea.")
+            else:
+                selection = self.treeview.selection()
+                if selection:
+                    if self.title == 'My Tasks' or self.title == 'Delegated Tasks' or self.title == 'Projects':
+                        element_name = self.treeview.item(selection, 'values')[0]
+                    else:
+                        element_name = self.treeview.item(selection, 'values')[1]
+                    element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+                    data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+                
+                    data.element_id = element_id
+                    data.element = element_name
+                    data.date = data_row[3]
+                    data.deadline = data_row[4]
+                    data.field1 = data_row[5]
+                    data.field2 = data_row[6]
+                    data.field3 = data_row[7]
+                    data.project = data_row[8]
+                    data.delegated = data_row[9]
+                    data.cooperating = data_row[10]
+                    data.field4 = data_row[11]
+                    data.field5 = data_row[12]
+                    data.remarks = data_row[13]
+                    data.keywords = data_row[14]
+                    data.category = 'project'
+
+                    if data.date == None or data.date == "":
+                        data.date = data.deadline
+                    if data.deadline == None or data.deadline == "":
+                        data.deadline = data.date
+                    else:
+                        pass
+                    db_manager.update_db_fields(data)
+                    data_store_manager.make_list_data_tuple()
+                    data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
+                else:
+                    messagebox.showwarning("ERROR", "Select an element.")
+        except Exception as e:
+            messagebox.showerror("ERROR", f"ERROR: {e}")                
+                  
 
     def create_window(self):
         self.header_label = tk.Label(
@@ -360,7 +610,7 @@ class ListWindow:
                 text = "REMARK",
                 font = ('Arial', '9', 'bold'),
                 width = 11,
-                command = None,
+                command = self.change_to_remark,
                 background = '#9E019A',
                 foreground = '#FFFFFF'
             )
@@ -371,7 +621,7 @@ class ListWindow:
                 text = "EVENT",
                 font = ('Arial', '9', 'bold'),
                 width = 11,
-                command = None,
+                command = self.change_to_event,
                 background = '#A8A803',
                 foreground = '#FFFFFF'
             )
@@ -382,7 +632,7 @@ class ListWindow:
                 text = "IDEA",
                 font = ('Arial', '9', 'bold'),
                 width = 11,
-                command = None,
+                command = self.change_to_idea,
                 background = '#4F0082',
                 foreground = '#FFFFFF'
             )
@@ -393,7 +643,7 @@ class ListWindow:
                 text = "PROJECT",
                 font = ('Arial', '9', 'bold'),
                 width = 11,
-                command = None,
+                command = self.change_to_project,
                 background = '#02266A',
                 foreground = '#FFFFFF'
             )
@@ -404,7 +654,7 @@ class ListWindow:
                 text = "Maybe/Sometimes",
                 font = ('Arial', '9', 'bold'),
                 width = 16,
-                command = None,
+                command = self.change_to_maybe_sometimes,
                 background = '#A94102',
                 foreground = '#FFFFFF'
             )
