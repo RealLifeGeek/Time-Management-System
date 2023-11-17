@@ -133,7 +133,7 @@ class DBManager:
         try:
             self.cursor.execute(f"SELECT * FROM {self.db} WHERE date=?", (date_string,))
             rows = self.cursor.fetchall()
-            print('Creating new data_tuple: DBManager')
+            print('Creating new day_data_tuple: DBManager')
             return rows
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
@@ -145,7 +145,7 @@ class DBManager:
         try:
             self.cursor.execute(f"SELECT * FROM {self.db}")
             rows = self.cursor.fetchall()
-            print('Creating new list_tuple: DBManager')
+            print('Creating new list_data_tuple: DBManager')
             return rows
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
