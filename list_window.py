@@ -25,7 +25,6 @@ class ListWindow:
         
         style = ttk.Style()
         style.theme_use('clam')
-        data_store_manager.make_list_data_tuple()
 
     def show_existing_element_window(self):
         selection = self.treeview.selection()
@@ -250,12 +249,10 @@ class ListWindow:
 
                     if data.date == None or data.date == "":
                         data.date = data.deadline
-                        print('Date is ' + str(data.date))
                     if data.deadline == None or data.deadline == "":
                         data.deadline = data.date
-                        print('Deadline is ' + data.deadline)
                     else:
-                        print('Both date and deadline have its value!')
+                        pass
                     db_manager.update_db_fields(data)
                     data_store_manager.make_list_data_tuple()
                     data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
@@ -295,14 +292,15 @@ class ListWindow:
                     data.category = 'idea'
                     data.done = data_row[16]
 
+                    print(data.field2)
+                    print(DataForm)
+
                     if data.date == None or data.date == "":
                         data.date = data.deadline
-                        print('Date is ' + str(data.date))
                     if data.deadline == None or data.deadline == "":
                         data.deadline = data.date
-                        print('Deadline is ' + data.deadline)
                     else:
-                        print('Both date and deadline have its value!')
+                        pass
                     db_manager.update_db_fields(data)
                     data_store_manager.make_list_data_tuple()
                     data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )

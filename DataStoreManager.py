@@ -24,7 +24,7 @@ class DataStoreManager:
         try:
             for data_row in self.day_data_tuple:
                 if category == 'task':
-                    if data_row [15] == 'task' and data_row[9] == "":
+                    if data_row [15] == 'task' and data_row[9] == "" and data_row[16] == 'No':
                         treeview.insert('', 'end', values=(data_row[2], data_row[7]))
                     else:
                         pass
@@ -84,24 +84,18 @@ class DataStoreManager:
             messagebox.showerror("ERROR", f"ERROR: {e}")
 
     def check_elementid_in_tuple(self, element_id):
-        if self.day_data_tuple == () and self.list_data_tuple == ():
-            print('Data_tuple empty')
-            self.day_data_tuple = self.make_day_data_tuple()
-            self.list_data_tuple = self.make_list_data_tuple()
-        else:
-            print('Data tuple exists')
+        self.day_data_tuple = self.make_day_data_tuple()
+        self.list_data_tuple = self.make_list_data_tuple()
         for day_data_row in self.day_data_tuple:
             if element_id in day_data_row:
                 return day_data_row
         for list_data_row in self.list_data_tuple:
             if element_id in list_data_row:
-                print(list_data_row)
                 return list_data_row
             
     def get_data_row_from_list_data_tuple(self, element_id):
         for data_row in self.list_data_tuple:
             if element_id in data_row:
-                print(data_row)
                 return data_row
             else:
                 pass

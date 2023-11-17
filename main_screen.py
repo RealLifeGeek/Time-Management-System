@@ -79,8 +79,26 @@ def task_done():
     if selection:
         element_name = treeview.item(selection, 'values')[0]        
         element_id = data_store_manager.get_element_id_from_day_data_tuple(element_name)
+        data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+        print(data_row)
+
         data.element_id = element_id
         data.element = element_name
+        data.date = data_row[3]
+        data.deadline = data_row[4]
+        data.field1 = data_row[5]
+        data.field2 = data_row[6]
+        data.field3 = data_row[7]
+        data.project = data_row[8]
+        data.delegated = data_row[9]
+        data.cooperating = data_row[10]
+        data.field4 = data_row[11]
+        data.field5 = data_row[12]
+        data.remarks = data_row[13]
+        data.keywords = data_row[14]
+        data.category = data_row[15]
+        data.done = 'DONE'
+
         db_manager.update_db_fields(data)
         data_store_manager.make_day_data_tuple()
         data_store_manager.insert_day_data_to_treeview(treeview, 'task')
@@ -109,6 +127,7 @@ def do_task_tomorrow():
         messagebox.showerror("ERROR", f"ERROR: {e}")
 def refresh_main_screen():
     data_store_manager.make_day_data_tuple()
+    data_store_manager.make_list_data_tuple()
     data_store_manager.insert_day_data_to_treeview(treeview, 'task')
     data_store_manager.insert_day_data_to_treeview(treeview_remarks, 'remark')
     data_store_manager.insert_day_data_to_treeview(treeview_events, 'event')
@@ -184,7 +203,7 @@ def delete_event_from_database():
 def progress_bar_of_day():
     try:
         number_tasks_done = db_manager.count_total_number_of_elements('task', '', 'DONE')
-        number_tasks_to_fulfill = db_manager.count_total_number_of_elements('task', 'None', 'No')
+        number_tasks_to_fulfill = db_manager.count_total_number_of_elements('task', '', 'No')
         total_number_tasks = number_tasks_done + number_tasks_to_fulfill
         if total_number_tasks != 0:
             task_value = 100/total_number_tasks
@@ -894,6 +913,7 @@ if __name__ == "__main__":
 
     check_connection()
     data_store_manager.make_day_data_tuple()
+    data_store_manager.make_list_data_tuple()
     progress_bar_of_day()
     show_number_of_day_element('task')
     show_number_of_day_element('remark')
