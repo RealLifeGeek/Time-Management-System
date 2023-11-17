@@ -178,8 +178,9 @@ class DBManager:
     def project_name_already_exist(self, project_name):
         self.open_db()
         try:
-            self.cursor.execute(f"SELECT element_ID FROM {self.db} WHERE project=?", (project_name,))
+            self.cursor.execute(f"SELECT element_ID FROM {self.db} WHERE project=? AND category = 'project'", (project_name,))
             rows = self.cursor.fetchone()
+            print('ROWS in db: ' + str(rows))
 
             if rows is not None:
                 return True

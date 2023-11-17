@@ -87,6 +87,7 @@ class element_window_small: # Ahoc Task, Idea
             else:
                 pass
             data_store_manager.make_day_data_tuple()
+            data_store_manager.make_list_data_tuple()
             self.window.destroy()
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
