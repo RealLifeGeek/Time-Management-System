@@ -128,24 +128,12 @@ class DBManager:
         finally:
             self.close_db()
 
-    def get_day_data_tuple(self):        # Day data for DataStoreManager - MainScreen
-        self.open_db()
-        try:
-            self.cursor.execute(f"SELECT * FROM {self.db} WHERE date=?", (date_string,))
-            rows = self.cursor.fetchall()
-            print('Creating new day_data_tuple: DBManager')
-            return rows
-        except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
-        finally:
-            self.close_db()
-
     def get_list_data_tuple(self):        # List data for DataStoreManager - ListWindow
         self.open_db()
         try:
             self.cursor.execute(f"SELECT * FROM {self.db}")
             rows = self.cursor.fetchall()
-            print('Creating new list_data_tuple: DBManager')
+            print('\n\nCreating new list_data_tuple: DBManager')
             return rows
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
@@ -188,23 +176,5 @@ class DBManager:
                 return False
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
-        finally:
-            self.close_db()
-
-    def count_total_number_of_elements(self, category, delegated, done):
-        self.open_db()
-        try:
-            if category == 'task' and delegated == '':
-                self.cursor.execute(f'SELECT element FROM {self.db} WHERE category = "task" AND delegated = "" AND done = ?', (done,))
-            elif category == 'task' and delegated != '':
-                self.cursor.execute(f'SELECT element FROM {self.db} WHERE category = "task" AND delegated != "" AND done = ?', (done,))
-            else:
-                self.cursor.execute(f'SELECT element FROM {self.db} WHERE category = ?', (category,))
-            rows = self.cursor.fetchall()
-            elements = [str(row[0]) for row in rows]
-            number_elements = int(len(elements))
-            return number_elements
-        except Exception as e:
-            messagebox.showwarning("ERROR", f"ERROR: {e}")
         finally:
             self.close_db()
