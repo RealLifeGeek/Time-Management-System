@@ -66,9 +66,12 @@ class element_window_extended: # task, remark, event
         data.keywords = self.keywords_row.get()
         data.category = 'task'
 
-        if data.date is not None and data.deadline is None:
+        if self.title == 'Maybe/Sometimes View':
+            data.category = 'maybe/sometimes'
+
+        if data.date is not None and data.deadline is None or data.deadline == '':
             data.deadline = data.date
-        elif data.date is None and data.deadline is not None:
+        if data.date is None or data.date == '' and data.deadline is not None:
             data.date = data.deadline
         else:
             pass
@@ -83,6 +86,13 @@ class element_window_extended: # task, remark, event
         data.field3 = self.field3_row.get()
         data.field4 = self.field4_row.get()
         data.category = 'event'
+
+        if data.date is not None and data.deadline is None or data.deadline == '':
+            data.deadline = data.date
+        if data.date is None or data.date == '' and data.deadline is not None:
+            data.date = data.deadline
+        else:
+            pass
 
     def get_remark_data(self):
         data.element_id = self.element_id
@@ -100,7 +110,7 @@ class element_window_extended: # task, remark, event
             else:
                 db_manager.save_to_db(data)
             if len(self.project_row.get()) != 0:
-                project_name = self.project_row.get()
+                project_name = data.project #self.project_row.get()
                 if not db_manager.project_name_already_exist(project_name):
                     data.element_id = db_manager.generate_element_id('PR')
                     data.element = project_name
@@ -114,7 +124,6 @@ class element_window_extended: # task, remark, event
                     db_manager.save_to_db(data)
             else:
                 pass
-            data_store_manager.make_day_data_tuple()
             data_store_manager.make_list_data_tuple()
             self.window.destroy()
         except Exception as e:
@@ -131,7 +140,6 @@ class element_window_extended: # task, remark, event
             else:
                 db_manager.save_to_db(data)
             self.window.destroy()
-            data_store_manager.make_day_data_tuple()
             data_store_manager.make_list_data_tuple()
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
@@ -145,7 +153,6 @@ class element_window_extended: # task, remark, event
             else:
                 db_manager.save_to_db(data)
             self.window.destroy()
-            data_store_manager.make_day_data_tuple()
             data_store_manager.make_list_data_tuple()
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")

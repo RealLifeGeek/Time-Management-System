@@ -8,6 +8,7 @@ from DataFormObject import *
 from DataStoreManager import *
 from element_window_extended import *
 from element_window_small import *
+from ProjectWindow import *
 
 db_manager = DBManager()
 data_store_manager = DataStoreManager()
@@ -29,8 +30,9 @@ class ListWindow:
     def show_existing_element_window(self):
         selection = self.treeview.selection()
         if selection:
-            element_name = self.treeview.item(selection, 'values')[0]
-            element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+            element_id = self.treeview.item(selection, 'values')[0]
+            #print(self.title)
+            #print('ELEMENT ID is: ' + element_id)
         else:
             messagebox.showwarning("ERROR", f"Select an element")
 
@@ -41,7 +43,14 @@ class ListWindow:
             )
             idea_window.create_window()
             idea_window.insert_values()
-            
+
+        elif self.title == 'Projects':
+            project_window = ProjectWindow(
+                self.window, element_id
+            )
+            project_window.create_window()
+            project_window.insert_values()
+
         else:
             if self.title == 'My Tasks' or self.title == 'Delegated Tasks':
                 new_title = 'Task View'
@@ -51,7 +60,7 @@ class ListWindow:
                 new_title = 'Event View'
             elif self.title == 'Maybe/Sometimes':
                 new_title = 'Maybe/Sometimes View'
-                new_title == 'Task View'
+                new_title == 'Task View' 
             else:
                 pass
             element_window = element_window_extended(
@@ -77,7 +86,10 @@ class ListWindow:
             )
             event_window.create_window()
         elif self.title == 'Projects':
-            pass
+            project_window = ProjectWindow(
+                self.window, None
+            )
+            project_window.create_window()
         elif self.title == 'People Cards':
             pass
         elif self.title == 'Ideas':
@@ -136,15 +148,11 @@ class ListWindow:
             else:
                 selection = self.treeview.selection()
                 if selection:
-                    if self.title == 'My Tasks' or self.title == 'Delegated Tasks' or self.title == 'Projects':
-                        element_name = self.treeview.item(selection, 'values')[0]
-                    else:
-                        element_name = self.treeview.item(selection, 'values')[1]
-                    element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+                    element_id = self.treeview.item(selection, 'values')[0]
                     data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
 
                     data.element_id = element_id
-                    data.element = element_name
+                    data.element = data_row[2]
                     data.date = data_row[3]
                     data.deadline = data_row[4]
                     data.field1 = data_row[5]
@@ -175,15 +183,11 @@ class ListWindow:
             else:
                 selection = self.treeview.selection()
                 if selection:
-                    if self.title == 'My Tasks' or self.title == 'Delegated Tasks' or self.title == 'Projects':
-                        element_name = self.treeview.item(selection, 'values')[0]
-                    else:
-                        element_name = self.treeview.item(selection, 'values')[1]
-                    element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+                    element_id = self.treeview.item(selection, 'values')[0]
                     data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
                 
                     data.element_id = element_id
-                    data.element = element_name
+                    data.element = data_row[2]
                     data.date = data_row[3]
                     data.deadline = data_row[4]
                     data.field1 = data_row[5]
@@ -201,12 +205,10 @@ class ListWindow:
 
                     if data.date == None or data.date == "":
                         data.date = data.deadline
-                        print('Date is ' + str(data.date))
                     if data.deadline == None or data.date == "":
                         data.deadline = data.date
-                        print('Deadline is ' + data.deadline)
                     else:
-                        print('Both date and deadline in remark have its value!')
+                        pass
 
                     db_manager.update_db_fields(data)
                     data_store_manager.make_list_data_tuple()
@@ -223,15 +225,11 @@ class ListWindow:
             else:
                 selection = self.treeview.selection()
                 if selection:
-                    if self.title == 'My Tasks' or self.title == 'Delegated Tasks' or self.title == 'Projects':
-                        element_name = self.treeview.item(selection, 'values')[0]
-                    else:
-                        element_name = self.treeview.item(selection, 'values')[1]
-                    element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+                    element_id = self.treeview.item(selection, 'values')[0]
                     data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
                 
                     data.element_id = element_id
-                    data.element = element_name
+                    data.element = data_row[2]
                     data.date = data_row[3]
                     data.deadline = data_row[4]
                     data.field1 = data_row[5]
@@ -268,15 +266,11 @@ class ListWindow:
             else:
                 selection = self.treeview.selection()
                 if selection:
-                    if self.title == 'My Tasks' or self.title == 'Delegated Tasks' or self.title == 'Projects':
-                        element_name = self.treeview.item(selection, 'values')[0]
-                    else:
-                        element_name = self.treeview.item(selection, 'values')[1]
-                    element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+                    element_id = self.treeview.item(selection, 'values')[0]
                     data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
                 
                     data.element_id = element_id
-                    data.element = element_name
+                    data.element = data_row[2]
                     data.date = data_row[3]
                     data.deadline = data_row[4]
                     data.field1 = data_row[5]
@@ -316,15 +310,11 @@ class ListWindow:
             else:
                 selection = self.treeview.selection()
                 if selection:
-                    if self.title == 'My Tasks' or self.title == 'Delegated Tasks' or self.title == 'Projects':
-                        element_name = self.treeview.item(selection, 'values')[0]
-                    else:
-                        element_name = self.treeview.item(selection, 'values')[1]
-                    element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+                    element_id = self.treeview.item(selection, 'values')[0]
                     data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
                 
                     data.element_id = element_id
-                    data.element = element_name
+                    data.element = data_row[2]
                     data.date = data_row[3]
                     data.deadline = data_row[4]
                     data.field1 = data_row[5]
@@ -360,15 +350,11 @@ class ListWindow:
             else:
                 selection = self.treeview.selection()
                 if selection:
-                    if self.title == 'My Tasks' or self.title == 'Delegated Tasks' or self.title == 'Projects':
-                        element_name = self.treeview.item(selection, 'values')[0]
-                    else:
-                        element_name = self.treeview.item(selection, 'values')[1]
-                    element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+                    element_id = self.treeview.item(selection, 'values')[0]
                     data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
                 
                     data.element_id = element_id
-                    data.element = element_name
+                    data.element = data_row[2]
                     data.date = data_row[3]
                     data.deadline = data_row[4]
                     data.field1 = data_row[5]
@@ -409,68 +395,76 @@ class ListWindow:
         self.header_label.place(relx = 0.5, y = 30, anchor = 'center')
 
         if self.title == 'My Tasks' or self.title == 'Delegated Tasks' or self.title == 'Projects':
-            self.treeview = ttk.Treeview(self.window, columns=('#1', '#2', '#3', '#4'), height = 13)
+            self.treeview = ttk.Treeview(self.window, columns=('#1', '#2', '#3', '#4', '#5'), height = 13)
 
             self.treeview.heading('#0', text='ID')
             self.treeview.column('#0', width=0, stretch = False)
-            self.treeview.heading('#1', text='Element Name')
-            self.treeview.column('#1', width=210)
-            self.treeview.heading('#2', text = 'Date')
-            self.treeview.column('#2', width=120)
-            self.treeview.heading('#3', text = 'Deadline')
+            self.treeview.heading('#1', text='Element ID')
+            self.treeview.column('#1', width=0, stretch = False)
+            self.treeview.heading('#2', text='Element Name')
+            self.treeview.column('#2', width=210)
+            self.treeview.heading('#3', text = 'Date')
             self.treeview.column('#3', width=120)
-            self.treeview.heading('#4', text = 'Delegated')
-            self.treeview.column('#4', width=150)
+            self.treeview.heading('#4', text = 'Deadline')
+            self.treeview.column('#4', width=120)
+            self.treeview.heading('#5', text = 'Delegated')
+            self.treeview.column('#5', width=150)
             
             self.treeview.place (x = 15, y = 75)
 
         elif self.title == 'People Cards':
             self.window.geometry('800x450+100+100')
 
-            self.treeview = ttk.Treeview(self.window, columns=('#1', '#2', '#3', '#4'), height = 13)
+            self.treeview = ttk.Treeview(self.window, columns=('#1', '#2', '#3', '#4', '#5'), height = 13)
 
             self.treeview.heading('#0', text='ID')
             self.treeview.column('#0', width=0, stretch = False)
-            self.treeview.heading('#1', text='Title before')
-            self.treeview.column('#1', width=120)
-            self.treeview.heading('#2', text='Name')
-            self.treeview.column('#2', width=210)
-            self.treeview.heading('#3', text = 'Birthday')
-            self.treeview.column('#3', width=150)
-            self.treeview.heading('#4', text = 'Year of Birth')
-            self.treeview.column('#4', width=120)
+            self.treeview.heading('#1', text='Element ID')
+            self.treeview.column('#1', width=0, stretch = False)
+            self.treeview.heading('#2', text='Title before')
+            self.treeview.column('#2', width=120)
+            self.treeview.heading('#3', text='Name')
+            self.treeview.column('#3', width=210)
+            self.treeview.heading('#4', text = 'Birthday')
+            self.treeview.column('#4', width=150)
+            self.treeview.heading('#5', text = 'Year of Birth')
+            self.treeview.column('#5', width=120)
 
             self.treeview.place (x = 15, y = 75)
         
         elif self.title == 'Events':
-            self.treeview = ttk.Treeview(self.window, columns=('#1', '#2', '#3', '#4'), height = 13)
+            self.treeview = ttk.Treeview(self.window, columns=('#1', '#2', '#3', '#4', '#5'), height = 13)
 
             self.treeview.heading('#0', text='ID')
             self.treeview.column('#0', width=0, stretch = False)
             self.treeview.heading('#1', text='Element ID')
-            self.treeview.column('#1', width=150)
-            self.treeview.heading('#2', text='Event')
-            self.treeview.column('#2', width=210)
-            self.treeview.heading('#3', text = 'Start Date')
-            self.treeview.column('#3', width=120)
-            self.treeview.heading('#4', text = 'End Date')
+            self.treeview.column('#1', width=0, stretch = False)
+            self.treeview.heading('#2', text='Element ID')
+            self.treeview.column('#2', width=150)
+            self.treeview.heading('#3', text='Event')
+            self.treeview.column('#3', width=210)
+            self.treeview.heading('#4', text = 'Start Date')
             self.treeview.column('#4', width=120)
+            self.treeview.heading('#5', text = 'End Date')
+            self.treeview.column('#5', width=120)
 
             self.treeview.place (x = 15, y = 75)
 
         else: #self.title == 'Remarks' or self.title == 'Ideas' or self.title == 'Maybe/Sometimes'
-            self.treeview = ttk.Treeview(self.window, columns=('#1', '#2', '#3', '#4'), height = 13)
+            self.treeview = ttk.Treeview(self.window, columns=('#1', '#2', '#3', '#4', '#5'), height = 13)
 
             self.treeview.heading('#0', text='ID')
             self.treeview.column('#0', width=0, stretch = False)
             self.treeview.heading('#1', text='Element ID')
-            self.treeview.column('#1', width=150)
-            self.treeview.heading('#2', text='Element Name')
-            self.treeview.column('#2', width=210)
-            self.treeview.heading('#3', text = 'Date')
-            self.treeview.column('#3', width=120)
-            self.treeview.heading('#4', text = 'Field 1')
-            self.treeview.column('#4', width=120)            
+            self.treeview.column('#1', width=0, stretch = False)
+            self.treeview.heading('#2', text='Element ID')
+            self.treeview.column('#2', width=150)
+            self.treeview.heading('#3', text='Element Name')
+            self.treeview.column('#3', width=210)
+            self.treeview.heading('#4', text = 'Date')
+            self.treeview.column('#4', width=120)
+            self.treeview.heading('#5', text = 'Field 1')
+            self.treeview.column('#5', width=120)            
 
             self.treeview.place (x = 15, y = 75)
 

@@ -30,7 +30,7 @@ class element_window_small: # Ahoc Task, Idea
         else:
             pass
         
-        current_date = datetime.datetime.now()
+        current_date = datetime.now()
         date_string = current_date.strftime("%d/%m/%Y")
 
         self.date_string = date_string
@@ -86,7 +86,6 @@ class element_window_small: # Ahoc Task, Idea
                     db_manager.save_to_db(data)
             else:
                 pass
-            data_store_manager.make_day_data_tuple()
             data_store_manager.make_list_data_tuple()
             self.window.destroy()
         except Exception as e:
@@ -100,7 +99,6 @@ class element_window_small: # Ahoc Task, Idea
                 db_manager.update_db_fields(data)
             else:
                 db_manager.save_to_db(data)
-            data_store_manager.make_day_data_tuple()
             data_store_manager.make_list_data_tuple()
             self.window.destroy()
         except Exception as e:

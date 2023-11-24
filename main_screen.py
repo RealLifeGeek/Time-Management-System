@@ -2,11 +2,10 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import *
 import sys
-import datetime
-from tkinter import messagebox
-from datetime import datetime
-import datetime
 import time
+import datetime
+from datetime import datetime, timedelta
+from tkinter import messagebox
 from functions import check_internet
 from element_window_extended import *
 from element_window_small import *
@@ -17,14 +16,10 @@ from DataStoreManager import *
 
 db_manager.create_db()
 
-current_date = datetime.datetime.now()
+current_date = datetime.now()
 date_string = current_date.strftime("%d/%m/%Y")
-tomorrow = datetime.datetime.today() + datetime.timedelta(days=1)
+tomorrow = datetime.today() + timedelta(days=1)
 tomorrow_date = tomorrow.strftime('%d/%m/%Y')
-chosen_date = None
-chosen_deadline = None
-element_id = None
-project_name = None
 db = 'data'
 db_manager = DBManager()
 data = DataForm()
@@ -61,10 +56,10 @@ def show_number_of_day_element(category):
             foreground = fg_color
         )
         number_of_elements_label.place(x = XX, y = YY)
-        progress_bar_of_day()
+        #progress_bar_of_day()
 
-def show_total_number_of_elements(category, delegated, done, frame, XX, YY):
-    number_elements = db_manager.count_total_number_of_elements(category, delegated, done)
+def show_total_number_of_elements(category, delegated, done, ProgressBar_bool, frame, XX, YY):
+    number_elements = data_store_manager.count_total_number_of_elements(category, delegated, done, ProgressBar_bool)
     number_elements_label = tk.Label(
         frame,
         text = f"{number_elements}   ",
@@ -77,13 +72,11 @@ def show_total_number_of_elements(category, delegated, done, frame, XX, YY):
 def task_done():
     selection = treeview.selection()
     if selection:
-        element_name = treeview.item(selection, 'values')[0]        
-        element_id = data_store_manager.get_element_id_from_day_data_tuple(element_name)
+        element_id = treeview.item(selection, 'values')[0]
         data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
-        print(data_row)
 
         data.element_id = element_id
-        data.element = element_name
+        data.element = data_row[2]
         data.date = data_row[3]
         data.deadline = data_row[4]
         data.field1 = data_row[5]
@@ -100,7 +93,7 @@ def task_done():
         data.done = 'DONE'
 
         db_manager.update_db_fields(data)
-        data_store_manager.make_day_data_tuple()
+        data_store_manager.make_list_data_tuple()
         data_store_manager.insert_day_data_to_treeview(treeview, 'task')
         show_number_of_day_element('task')
     else:
@@ -112,12 +105,29 @@ def do_task_tomorrow():
         if selection:
             element_name = treeview.item(selection, 'values')[0]
             element_id = data_store_manager.get_element_id_from_day_data_tuple(element_name)
+            data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+
             data.element_id = element_id
             data.element = element_name
             data.date = tomorrow_date
+            data.deadline = data_row[4]
+            data.field1 = data_row[5]
+            data.field2 = data_row[6]
+            data.field3 = data_row[7]
+            data.project = data_row[8]
+            data.delegated = data_row[9]
+            data.cooperating = data_row[10]
+            data.field4 = data_row[11]
+            data.field5 = data_row[12]
+            data.remarks = data_row[13]
+            data.keywords = data_row[14]
+            data.category = data_row[15]
+            data.done = data_row[16]
+
             db_manager.update_db_fields(data)
             messagebox.showinfo("Info", "Task moved to tomorrow.")
-            data_store_manager.make_day_data_tuple()
+            data_store_manager.make_list_data_tuple()
+            #data_store_manager.make_day_data_tuple()
             data_store_manager.insert_day_data_to_treeview(treeview, 'task')
             show_number_of_day_element('task')
             progress_bar_of_day()
@@ -126,22 +136,23 @@ def do_task_tomorrow():
     except Exception as e:
         messagebox.showerror("ERROR", f"ERROR: {e}")
 def refresh_main_screen():
-    data_store_manager.make_day_data_tuple()
     data_store_manager.make_list_data_tuple()
+    #data_store_manager.make_day_data_tuple()
     data_store_manager.insert_day_data_to_treeview(treeview, 'task')
     data_store_manager.insert_day_data_to_treeview(treeview_remarks, 'remark')
     data_store_manager.insert_day_data_to_treeview(treeview_events, 'event')
     show_number_of_day_element('task')
     show_number_of_day_element('remark')
     show_number_of_day_element('event')
+    progress_bar_of_day()
     #remind_my_deadlines()
     #remind_deadlines_delegated()
-    show_total_number_of_elements('task', '', 'No', right_frame, 200, 162)
-    show_total_number_of_elements('task', 'Yes', 'No', right_frame, 200, 202)
-    show_total_number_of_elements('project', 'None', 'No', right_frame, 200, 242)
-    show_total_number_of_elements('idea', 'None', 'No', right_frame, 200, 282)
-    show_total_number_of_elements('maybe/sometimes', '', 'No', right_frame, 200, 402)
-    show_total_number_of_elements('people', 'None', 'No', right_frame, 200, 442)
+    show_total_number_of_elements('task', '', 'No', 'No', right_frame, 200, 162)
+    show_total_number_of_elements('task', 'Yes', 'No', 'No', right_frame, 200, 202)
+    show_total_number_of_elements('project', 'None', 'No', 'No', right_frame, 200, 242)
+    show_total_number_of_elements('idea', 'None', 'No', 'No', right_frame, 200, 282)
+    show_total_number_of_elements('maybe/sometimes', '', 'No', 'No', right_frame, 200, 322)
+    show_total_number_of_elements('people', 'None', 'No', 'No', right_frame, 200, 362)
     #check_undone_tasks()
     #check_undone_delegated_tasks()
     #check_udnone_projects()
@@ -152,13 +163,12 @@ def refresh_main_screen():
 def delete_task_from_database():
     selection = treeview.selection()
     if selection:
-        element_name = treeview.item(selection, 'values')[0]
-        element_id = data_store_manager.get_element_id_from_day_data_tuple(element_name)
+        element_id = treeview.item(selection, 'values')[0]
         db_manager.set_element_id(element_id)
         answer = messagebox.askyesno("DELETE", "DELETE from database?")
         if answer:
             db_manager.delete_from_db()
-            data_store_manager.make_day_data_tuple()
+            data_store_manager.make_list_data_tuple()
             data_store_manager.insert_day_data_to_treeview(treeview, 'task')
             show_number_of_day_element('task')
         else:
@@ -175,7 +185,8 @@ def delete_remark_from_database():
         answer = messagebox.askyesno("DELETE", "DELETE from database?")
         if answer:
             db_manager.delete_from_db()
-            data_store_manager.make_day_data_tuple()
+            data_store_manager.make_list_data_tuple()
+            #data_store_manager.make_day_data_tuple()
             data_store_manager.insert_day_data_to_treeview(treeview_remarks, 'remark')
             show_number_of_day_element('remark')
         else:
@@ -192,7 +203,8 @@ def delete_event_from_database():
         answer = messagebox.askokcancel("DELETE", "DELETE from database?")
         if answer:
             db_manager.delete_from_db()
-            data_store_manager.make_day_data_tuple()
+            data_store_manager.make_list_data_tuple()
+            #data_store_manager.make_day_data_tuple()
             data_store_manager.insert_day_data_to_treeview(treeview_events, 'event')
             show_number_of_day_element('event')
         else:
@@ -202,8 +214,8 @@ def delete_event_from_database():
 
 def progress_bar_of_day():
     try:
-        number_tasks_done = db_manager.count_total_number_of_elements('task', '', 'DONE')
-        number_tasks_to_fulfill = db_manager.count_total_number_of_elements('task', '', 'No')
+        number_tasks_done = data_store_manager.count_total_number_of_elements('task', '', 'DONE', 'Yes')
+        number_tasks_to_fulfill = data_store_manager.count_total_number_of_elements('task', '', 'No', 'Yes')
         total_number_tasks = number_tasks_done + number_tasks_to_fulfill
         if total_number_tasks != 0:
             task_value = 100/total_number_tasks
@@ -252,8 +264,9 @@ def show_new_task_window():
 def show_existing_task_window():
     selection = treeview.selection()
     if selection:
-        element_name = treeview.item(selection, 'values')[0]
-        element_id = data_store_manager.get_element_id_from_day_data_tuple(element_name)
+        #element_name = treeview.item(selection, 'values')[0]
+        element_id = treeview.item(selection, 'values')[0]
+        #data_store_manager.get_element_id_from_day_data_tuple(element_name)
     else:
         messagebox.showwarning("ERROR", f"Select an element")
     task_window = element_window_extended(
@@ -271,8 +284,9 @@ def show_new_event_window():
 def show_existing_event_window():
     selection = treeview_events.selection()
     if selection:
-        element_name = treeview_events.item(selection, 'values')[0]
-        element_id = data_store_manager.get_element_id_from_day_data_tuple(element_name)
+        #element_name = treeview_events.item(selection, 'values')[0]
+        element_id = treeview_events.item(selection, 'values')[0]
+        #data_store_manager.get_element_id_from_day_data_tuple(element_name)
     else:
         messagebox.showwarning("ERROR", f"Select an element")
     event_window = element_window_extended(
@@ -290,8 +304,9 @@ def show_new_remark_window():
 def show_existing_remark_window():
     selection = treeview_remarks.selection()
     if selection:
-        element_name = treeview_remarks.item(selection, 'values')[0]
-        element_id = data_store_manager.get_element_id_from_day_data_tuple(element_name)
+        #element_name = 
+        element_id = treeview_remarks.item(selection, 'values')[0]
+        #element_id = data_store_manager.get_element_id_from_day_data_tuple(element_name)
     else:
         messagebox.showwarning("ERROR", f"Select an element")
     remark_window = element_window_extended(
@@ -461,7 +476,7 @@ if __name__ == "__main__":
         background = '#00248B',
         foreground = '#FFFFFF'
     )
-    calendar_button.place(x = 16, y = 320)
+    calendar_button.place(x = 16, y = 400)
 
     revision_button = tk.Button(
         right_frame,
@@ -472,7 +487,7 @@ if __name__ == "__main__":
         background = '#00248B',
         foreground = '#FFFFFF'
     )
-    revision_button.place(x = 16, y = 360)
+    revision_button.place(x = 16, y = 440)
 
     maybe_list_button = tk.Button(
         right_frame,
@@ -483,7 +498,7 @@ if __name__ == "__main__":
         background = '#00248B',
         foreground = '#FFFFFF'
     )
-    maybe_list_button.place(x = 16, y = 400)
+    maybe_list_button.place(x = 16, y = 320)
 
     people_cards_button = tk.Button(
         right_frame,
@@ -494,7 +509,7 @@ if __name__ == "__main__":
         background = '#00248B',
         foreground = '#FFFFFF'
     )
-    people_cards_button.place(x = 16, y = 440)
+    people_cards_button.place(x = 16, y = 360)
 
     exit_button = tk.Button(
         right_frame,
@@ -699,13 +714,15 @@ if __name__ == "__main__":
     task_treeview_label.place(x = 10, y = 6)
 
     treeview = ttk.Treeview(
-        middle_frame_left, columns=('Task', 'Time'), height = 8)
+        middle_frame_left, columns=('#1', '#2', '#3'), height = 8)
     treeview.heading('#0', text='ID')
     treeview.column('#0', width=0, stretch = False)
-    treeview.heading('Task', text='Task')
-    treeview.column('Task', width=350)
-    treeview.heading('Time', text='Time')
-    treeview.column('Time', width=100)
+    treeview.heading('#1', text='Element ID')
+    treeview.column('#1', width=0, stretch = False)
+    treeview.heading('#2', text='Task')
+    treeview.column('#2', width=350)
+    treeview.heading('#3', text='Time')
+    treeview.column('#3', width=100)
     treeview.place (x = 15, y = 35)
     
     bottom_frame_left = tk.Frame(
@@ -726,12 +743,14 @@ if __name__ == "__main__":
     remark_treeview_label.place(x = 10, y = 6)
 
     treeview_remarks = ttk.Treeview(
-        bottom_frame_left, columns=('#1'), height = 4)
+        bottom_frame_left, columns=('#1','#2'), height = 4)
 
     treeview_remarks.heading('#0', text='ID')
     treeview_remarks.column('#0', width=0, stretch = False)
-    treeview_remarks.heading('#1', text='Remark')
-    treeview_remarks.column('#1', width=210)
+    treeview_remarks.heading('#1', text='Element ID')
+    treeview_remarks.column('#1', width=0, stretch = False)
+    treeview_remarks.heading('#2', text='Remark')
+    treeview_remarks.column('#2', width=210)
     treeview_remarks.place (x = 10, y = 35)
 
     view_database_button_img = PhotoImage(
@@ -790,12 +809,14 @@ if __name__ == "__main__":
     event_treeview_label.place(x = 10, y = 6)
 
     treeview_events = ttk.Treeview(
-        bottom_frame_right, columns=('#1'), height = 4)
+        bottom_frame_right, columns=('#1', '#2'), height = 4)
 
     treeview_events.heading('#0', text='ID')
     treeview_events.column('#0', width=0, stretch = False)
-    treeview_events.heading('#1', text='Event')
-    treeview_events.column('#1', width=210)
+    treeview_events.heading('#1', text='Element ID')
+    treeview_events.column('#1',  width=0, stretch = False)
+    treeview_events.heading('#2', text='Event')
+    treeview_events.column('#2', width=210)
     treeview_events.place (x = 10, y = 35)
 
     event_database_button = tk.Button(
@@ -912,8 +933,8 @@ if __name__ == "__main__":
     add_event_button.place(x = 116, y = 5)
 
     check_connection()
-    data_store_manager.make_day_data_tuple()
     data_store_manager.make_list_data_tuple()
+    #data_store_manager.make_day_data_tuple()
     progress_bar_of_day()
     show_number_of_day_element('task')
     show_number_of_day_element('remark')
@@ -923,12 +944,12 @@ if __name__ == "__main__":
     data_store_manager.insert_day_data_to_treeview(treeview_events, 'event')
     #remind_my_deadlines()
     #remind_deadlines_delegated()
-    show_total_number_of_elements('task', '', 'No', right_frame, 200, 162)
-    show_total_number_of_elements('task', 'Yes', 'No', right_frame, 200, 202)
-    show_total_number_of_elements('project', '', 'No', right_frame, 200, 242)
-    show_total_number_of_elements('idea', 'None', 'No', right_frame, 200, 282)
-    show_total_number_of_elements('maybe/sometimes', '', 'No', right_frame, 200, 402)
-    show_total_number_of_elements('people', 'None', 'No', right_frame, 200, 442)
+    show_total_number_of_elements('task', '', 'No', 'No', right_frame, 200, 162)
+    show_total_number_of_elements('task', 'Yes', 'No', 'No', right_frame, 200, 202)
+    show_total_number_of_elements('project', '', 'No', 'No', right_frame, 200, 242)
+    show_total_number_of_elements('idea', 'None', 'No', 'No', right_frame, 200, 282)
+    show_total_number_of_elements('maybe/sometimes', '', 'No', 'No', right_frame, 200, 322)
+    show_total_number_of_elements('people', 'None', 'No', 'No', right_frame, 200, 362)
     #check_undone_tasks()
     #check_undone_delegated_tasks()
     #check_udnone_projects()
