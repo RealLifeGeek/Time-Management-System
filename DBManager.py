@@ -133,7 +133,7 @@ class DBManager:
         try:
             self.cursor.execute(f"SELECT * FROM {self.db}")
             rows = self.cursor.fetchall()
-            print('\n\nCreating new list_data_tuple: DBManager')
+            #print('\n\nCreating new list_data_tuple: DBManager')
             return rows
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
@@ -155,22 +155,6 @@ class DBManager:
             result = self.cursor.fetchone()
 
             if result is not None:
-                return True
-            else:
-                return False
-        except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
-        finally:
-            self.close_db()
-
-    def project_name_already_exist(self, project_name):
-        self.open_db()
-        try:
-            self.cursor.execute(f"SELECT element_ID FROM {self.db} WHERE project=? AND category = 'project'", (project_name,))
-            rows = self.cursor.fetchone()
-            print('ROWS in db: ' + str(rows))
-
-            if rows is not None:
                 return True
             else:
                 return False

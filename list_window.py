@@ -9,6 +9,7 @@ from DataStoreManager import *
 from element_window_extended import *
 from element_window_small import *
 from ProjectWindow import *
+from PersonalCardWindow import *
 
 db_manager = DBManager()
 data_store_manager = DataStoreManager()
@@ -31,8 +32,6 @@ class ListWindow:
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]
-            #print(self.title)
-            #print('ELEMENT ID is: ' + element_id)
         else:
             messagebox.showwarning("ERROR", f"Select an element")
 
@@ -50,6 +49,12 @@ class ListWindow:
             )
             project_window.create_window()
             project_window.insert_values()
+
+        elif self.title == 'Personal Cards':
+            personal_card_window = PersonalCardWindow(
+                self.window, element_id
+            )
+            personal_card_window.create_window()
 
         else:
             if self.title == 'My Tasks' or self.title == 'Delegated Tasks':
@@ -90,8 +95,26 @@ class ListWindow:
                 self.window, None
             )
             project_window.create_window()
-        elif self.title == 'People Cards':
-            pass
+        elif self.title == 'Personal Cards':
+            personal_card_window = PersonalCardWindow(
+                self.window, None
+            )
+            personal_card_window.create_window()
+            personal_card_window.first_name_row.insert(0, 'FIRST NAME')
+            personal_card_window.last_name_row.insert(0, 'LAST NAME')
+            personal_card_window.title_before_row.insert(0, 'Title before name')
+            personal_card_window.title_after_row.insert(0, 'Title after name')
+            personal_card_window.day_date_row.insert(0, 'dd')
+            personal_card_window.month_date_row.insert(0, 'mm')
+            personal_card_window.year_date_row.insert(0, 'yyyy')
+            personal_card_window.company_row.insert(0, 'Company name')
+            personal_card_window.field1_row.insert(0, 'Field 1')
+            personal_card_window.field2_row.insert(0, 'Field 2')
+            personal_card_window.field3_row.insert(0, 'Field 3')
+            personal_card_window.email_row.insert(0, 'email_adress@default.com')
+            personal_card_window.phone_number_row.insert(0, 'Phone number')
+
+
         elif self.title == 'Ideas':
             idea_window = element_window_small(
             self.window, 'Idea', None
@@ -117,14 +140,26 @@ class ListWindow:
     def delete_from_database(self):
         selection = self.treeview.selection()
         if selection:
-            element_name = self.treeview.item(selection, 'values')[0]
-            element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+            element_id = self.treeview.item(selection, 'values')[0]
             db_manager.set_element_id(element_id)
             answer = messagebox.askyesno("DELETE", "DELETE from database?")
             if answer:
                 db_manager.delete_from_db()
+                if self.title == 'Projects':
+                    element_name = self.treeview.item(selection, 'values')[1]
+                    rows = data_store_manager.get_all_project_tasks_id_from_list_data_tuple(element_name)
+                    if rows is not None:
+                        for row in rows:
+                            db_manager.set_element_id(row)
+                            messagebox.showwarning("DELETE ASSOCIATED", f"Asscociated task {row} is to be deleted.")
+                            db_manager.delete_from_db()
+                    else:
+                        print('No related tasks to the project: ' + element_name)
+                
                 data_store_manager.make_list_data_tuple()
                 data_store_manager.insert_list_data_to_treeview(self.treeview, self.title)
+                    
+                
             else:
                 pass
         else:
@@ -412,7 +447,7 @@ class ListWindow:
             
             self.treeview.place (x = 15, y = 75)
 
-        elif self.title == 'People Cards':
+        elif self.title == 'Personal Cards':
             self.window.geometry('800x450+100+100')
 
             self.treeview = ttk.Treeview(self.window, columns=('#1', '#2', '#3', '#4', '#5'), height = 13)
@@ -557,7 +592,7 @@ class ListWindow:
         )
         cancel_find_button.place(x = 430, y = 377)
 
-        if self.title == 'People Cards':
+        if self.title == 'Personal Cards':
             pass
 
         else:
