@@ -73,15 +73,19 @@ class element_window_small: # Ahoc Task, Idea
             db_manager.save_to_db(data)
 
             if len(self.project_row.get()) != 0:
-                project_name = self.project_row.get()
-                if not db_manager.project_name_already_exist(project_name):
+                project_name = data.project
+                rows = data_store_manager.project_name_does_not_exist(project_name)
+                print(rows)
+                if rows == []:
                     data.element_id = db_manager.generate_element_id('PR')
-                    data.element = self.project_row.get()
-                    data.date = self.date_string
-                    data.deadline = self.date_string
+                    data.element = project_name
+                    data.date = data.date
+                    data.deadline = data.deadline
+                    data.project = ''
+                    data.delegated = self.delegated_row.get()
+                    data.cooperating = self.cooperating_row.get()
                     data.keywords = self.keywords_row.get()
                     data.category = 'project'
-                    data.done = 'No'
 
                     db_manager.save_to_db(data)
             else:

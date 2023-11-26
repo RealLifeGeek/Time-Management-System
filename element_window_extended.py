@@ -109,19 +109,25 @@ class element_window_extended: # task, remark, event
                 db_manager.update_db_fields(data)
             else:
                 db_manager.save_to_db(data)
+
             if len(self.project_row.get()) != 0:
-                project_name = data.project #self.project_row.get()
-                if not db_manager.project_name_already_exist(project_name):
+                project_name = data.project
+                rows = data_store_manager.project_name_does_not_exist(project_name)
+                print(rows)
+                if rows == True:
                     data.element_id = db_manager.generate_element_id('PR')
                     data.element = project_name
                     data.date = data.date
                     data.deadline = data.deadline
+                    data.project = ''
                     data.delegated = self.delegated_row.get()
                     data.cooperating = self.cooperating_row.get()
                     data.keywords = self.keywords_row.get()
                     data.category = 'project'
 
                     db_manager.save_to_db(data)
+                else:
+                    pass
             else:
                 pass
             data_store_manager.make_list_data_tuple()

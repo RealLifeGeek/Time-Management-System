@@ -56,7 +56,6 @@ def show_number_of_day_element(category):
             foreground = fg_color
         )
         number_of_elements_label.place(x = XX, y = YY)
-        #progress_bar_of_day()
 
 def show_total_number_of_elements(category, delegated, done, ProgressBar_bool, frame, XX, YY):
     number_elements = data_store_manager.count_total_number_of_elements(category, delegated, done, ProgressBar_bool)
@@ -97,7 +96,7 @@ def task_done():
         data_store_manager.insert_day_data_to_treeview(treeview, 'task')
         show_number_of_day_element('task')
     else:
-        messagebox.showwarning("Error", "No task selected. Please select a task to be done.")
+        messagebox.showwarning("Error", "Select an element")
 
 def do_task_tomorrow():
     try:
@@ -152,7 +151,7 @@ def refresh_main_screen():
     show_total_number_of_elements('project', 'None', 'No', 'No', right_frame, 200, 242)
     show_total_number_of_elements('idea', 'None', 'No', 'No', right_frame, 200, 282)
     show_total_number_of_elements('maybe/sometimes', '', 'No', 'No', right_frame, 200, 322)
-    show_total_number_of_elements('people', 'None', 'No', 'No', right_frame, 200, 362)
+    show_total_number_of_elements('personal card', 'None', 'No', 'No', right_frame, 200, 362)
     #check_undone_tasks()
     #check_undone_delegated_tasks()
     #check_udnone_projects()
@@ -359,16 +358,16 @@ def show_events_list_window():
     events_list_window = ListWindow(root, 'Events')
     events_list_window.create_window()
 
-def show_people_cards_list_window():
-    people_cards_list_window = ListWindow(root, 'People Cards')
-    people_cards_list_window.create_window()
+def show_personal_cards_list_window():
+    personal_cards_list_window = ListWindow(root, 'Personal Cards')
+    personal_cards_list_window.create_window()
 
 
 
 if __name__ == "__main__":
     root = tk.Tk()
     root.geometry ("800x600+200+50")
-    root.title("Time Management System 1.1: Main Screen")
+    root.title("Main Screen")
     root.resizable(0,0)
     root.configure(bg = "#212121")
 
@@ -500,16 +499,16 @@ if __name__ == "__main__":
     )
     maybe_list_button.place(x = 16, y = 320)
 
-    people_cards_button = tk.Button(
+    personal_cards_button = tk.Button(
         right_frame,
-        text = "PEOPLE CARDS",
+        text = "PERSONAL CARDS",
         font = ('Arial', '11'),
         width = 19,
-        command = show_people_cards_list_window,
+        command = show_personal_cards_list_window,
         background = '#00248B',
         foreground = '#FFFFFF'
     )
-    people_cards_button.place(x = 16, y = 360)
+    personal_cards_button.place(x = 16, y = 360)
 
     exit_button = tk.Button(
         right_frame,
@@ -949,7 +948,7 @@ if __name__ == "__main__":
     show_total_number_of_elements('project', '', 'No', 'No', right_frame, 200, 242)
     show_total_number_of_elements('idea', 'None', 'No', 'No', right_frame, 200, 282)
     show_total_number_of_elements('maybe/sometimes', '', 'No', 'No', right_frame, 200, 322)
-    show_total_number_of_elements('people', 'None', 'No', 'No', right_frame, 200, 362)
+    show_total_number_of_elements('personal card', 'None', 'No', 'No', right_frame, 200, 362)
     #check_undone_tasks()
     #check_undone_delegated_tasks()
     #check_udnone_projects()

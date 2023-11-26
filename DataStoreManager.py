@@ -32,7 +32,7 @@ class DataStoreManager:
                     self.day_data_tuple.append(data_row)
             else:
                 pass
-        print('Creating new day_data_tuple: DataStoreManager')
+        #print('Creating new day_data_tuple: DataStoreManager')
         return self.day_data_tuple
 
     def insert_day_data_to_treeview(self, treeview, category): # Inserting data to treeviews on MainScreen
@@ -72,7 +72,7 @@ class DataStoreManager:
                 elif list_category == 'Projects':
                     if data_row [15] == 'project' and data_row[16] == 'No':
                         treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9]))
-                elif list_category == 'People Cards':
+                elif list_category == 'Personal Cards':
                     if data_row[15] == 'personal card':
                         treeview.insert('', 'end', values=(data_row[1], data_row[12], data_row[2], data_row[3], data_row[4]))
                 elif list_category == 'Events':
@@ -91,6 +91,22 @@ class DataStoreManager:
                     pass
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
+
+    def insert_data_to_personal_card_treeview(self, treeview, category, name):
+        self.make_list_data_tuple()
+        treeview.delete(*treeview.get_children())
+        for data_row in self.list_data_tuple:
+            if category == 'task':
+                if data_row[15] == 'task' and data_row[9] == name and data_row[16] == 'No':
+                    treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4]))
+            elif category == 'project':
+                if data_row[15] == 'project' and data_row[9] == name and data_row[16] == 'No':
+                    treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[4]))
+            elif category == 'cooperating':
+                if data_row[15] == 'task' or data_row[15] == 'project' and data_row[10] and data_row[16] == 'No':
+                    treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4]))
+            else:
+                pass
 
     def count_number_of_day_element(self, category): # no need of today date_string, data_tuple is generated for today
         try:
@@ -129,9 +145,19 @@ class DataStoreManager:
                 elif category == 'task' and delegated != '':
                     if data_row[15] == 'task' and data_row[9] != '':
                         if done == 'No':
-                            rows.append(data_row[2])
+                            if data_row[16] == 'No':
+                                rows.append(data_row[2])
                         elif done == 'DONE':
-                            rows.append(data_row[2])
+                            if data_row[16] == 'DONE':
+                                rows.append(data_row[2])
+                elif category == 'project':
+                    if data_row[15] == 'project':
+                        if done == 'No':
+                            if data_row[16] == 'No':
+                                rows.append(data_row[2])
+                        elif done == 'DONE':
+                            if data_row[16] == 'DONE':
+                                rows.append(data_row[2])
                 else:
                     if data_row[15] == category:
                         rows.append(data_row[2])
@@ -366,6 +392,15 @@ class DataStoreManager:
                 return data_row[1]
             else:
                 pass
+
+    def get_all_project_tasks_id_from_list_data_tuple(self, element_name):
+        rows = []
+        for data_row in self.list_data_tuple:
+            if element_name in data_row[8]:
+                rows.append(data_row[1])
+            else:
+                pass
+        return rows
     
     def find_element_in_list_tuple(self, treeview, searched_item, list_category):
         treeview.delete(*treeview.get_children())
@@ -377,27 +412,44 @@ class DataStoreManager:
                 for item in item_pieces:
                     if searched_item_str.lower() in item:
                         if list_category == 'My Tasks':
-                            if data_row [15] == 'task' and data_row[9] == "":
-                                treeview.insert('', 'end', values=(data_row[2], data_row[3], data_row[4], data_row[9]))
+                            if data_row [15] == 'task' and data_row[9] == "" and data_row[16] != 'DONE':
+                                treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9]))
                         elif list_category == 'Delegated Tasks':
-                            if data_row [15] == 'task' and data_row[9] != "":
-                                treeview.insert('', 'end', values=(data_row[2], data_row[3], data_row[4], data_row[9]))
-                        elif list_category == 'People Cards':
+                            if data_row [15] == 'task' and data_row[9] != "" and data_row[16] != 'DONE':
+                                treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9]))
+                        elif list_category == 'Personal Cards':
                             if data_row[15] == 'personal card':
-                                treeview.insert('', 'end', values=(data_row[12], data_row[2], data_row[3], data_row[4]))
+                                treeview.insert('', 'end', values=(data_row[1], data_row[12], data_row[2], data_row[3], data_row[4]))
                         elif list_category == 'Events':
                             if data_row[15] == 'event':
-                                treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4]))
+                                treeview.insert('', 'end', values=(data_row[1], data_row[1], data_row[2], data_row[3], data_row[4]))
                         elif list_category == 'Remarks':
                             if data_row[15] == 'remark':
-                                treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[5]))
+                                treeview.insert('', 'end', values=(data_row[1], data_row[1], data_row[2], data_row[3], data_row[5]))
                         elif list_category == 'Ideas':
                             if data_row[15] == 'idea':
-                                treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[5]))
+                                treeview.insert('', 'end', values=(data_row[1], data_row[1], data_row[2], data_row[3], data_row[5]))
                         elif list_category == 'Maybe/Sometimes':
                             if data_row[15] == 'maybe/sometimes':
-                                treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[5]))
+                                treeview.insert('', 'end', values=(data_row[1], data_row[1], data_row[2], data_row[3], data_row[5]))
+                        elif list_category == 'Projects':
+                            if data_row[15] == 'project' and data_row[16] != 'DONE':
+                                treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9]))
                         else:
                             pass
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
+
+    def project_name_does_not_exist(self, project_name):
+        self.make_list_data_tuple
+        rows = []
+        for data_row in self.list_data_tuple:
+            if data_row[8] == project_name:
+                rows.append(data_row[1])
+                print(data_row)
+            else:
+                pass
+        if rows == []:
+            return True
+        else:
+            return False

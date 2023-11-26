@@ -22,7 +22,7 @@ class ProjectWindow:
     def __init__(self, parent, element_id):
         self.window = tk.Toplevel(parent)
         self.window.geometry('800x600')
-        self.window.title('Time Management System 1.1.: NEW PROJECT')
+        self.window.title('Time Management System 1.1.: PROJECT')
         self.window.option_add('*Dialog.msg.title.bg', '#000000')
         self.window.configure(bg = "#9C9C9C")
         self.window.resizable(0,0)
@@ -55,6 +55,7 @@ class ProjectWindow:
         self.window.after(10000, self.check_project_name)
 
     def insert_values_to_treeview(self):
+        data_store_manager.make_list_data_tuple()
         data_store_manager.insert_data_to_project_treeview(self.treeview, self.project_name)
         self.window.after(10000, self.insert_values_to_treeview)
 
@@ -128,6 +129,47 @@ class ProjectWindow:
         except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
                 self.window.destroy()
+    
+    def project_done(self):
+        if db_manager.element_id_already_exists(self.element_id):
+            self.get_project_data()
+            if data.done == 'DONE':
+                messagebox.showwarning("ALREADY DONE", "This project is already done")
+            else:
+                data.done = 'DONE'
+                db_manager.update_db_fields(data)
+                print('Project_name for related tasks is: ' + self.project_name)
+                rows = data_store_manager.get_all_project_tasks_id_from_list_data_tuple(self.project_name)
+                if rows is not None:
+                    for row in rows:
+                        messagebox.showwarning("DONE ASSOCIATED", f"Asscociated task {row} is to be done")
+                        db_manager.set_element_id(row)
+                        data_row = data_store_manager.get_data_row_from_list_data_tuple(row)
+
+                        data.element_id = row
+                        data.element = data_row[2]
+                        data.date = data_row[3]
+                        data.deadline = data_row[4]
+                        data.field1 = data_row[5]
+                        data.field2 = data_row[6]
+                        data.field3 = data_row[7]
+                        data.project = data_row[8]
+                        data.delegated = data_row[9]
+                        data.cooperating = data_row[10]
+                        data.field4 = data_row[11]
+                        data.field5 = data_row[12]
+                        data.remarks = data_row[13]
+                        data.keywords = data_row[14]
+                        data.category = data_row[15]
+                        data.done = 'DONE'
+
+                        db_manager.update_db_fields(data)
+                else:
+                    print('No related tasks to the project: ' + self.project_name)
+            data_store_manager.make_list_data_tuple()
+            self.exit()
+        else:
+            messagebox.showerror("ERROR", "Unable to finish non-existing project")
 
     def show_new_task_window(self):
         task_window = element_window_extended(
@@ -175,6 +217,7 @@ class ProjectWindow:
                 db_manager.delete_from_db()
                 data_store_manager.make_list_data_tuple()
                 data_store_manager.insert_data_to_project_treeview(self.treeview, self.project_name)
+                #self.exit()
             else:
                 pass
         else:
@@ -338,7 +381,6 @@ class ProjectWindow:
             foreground = "#FFFFFF"
         )
         self.project_name_row.place(x = 170, y = 10)
-        #self.project_name_row.insert(0, "NEW PROJECT")
 
         keywords_label = tk.Label(
             bottom_frame,
@@ -417,6 +459,18 @@ class ProjectWindow:
             foreground = "#FF0000"
         )
         self.deadline_row.place(x = 170, y = 140)
+
+
+        project_done_button = tk.Button(
+            self.window,
+            text = "PROJECT DONE",
+            font = ('Arial', '15', 'bold'),
+            width = 15,
+            command = self.project_done,
+            background = '#029F00',
+            foreground = '#FFFFFF'
+        )
+        project_done_button.place(x = 15, y = 530)
 
         save_button = tk.Button(
             self.window,
