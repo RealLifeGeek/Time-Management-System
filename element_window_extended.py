@@ -119,7 +119,7 @@ class element_window_extended: # task, remark, event
                     data.element = project_name
                     data.date = data.date
                     data.deadline = data.deadline
-                    data.project = ''
+                    data.project = project_name
                     data.delegated = self.delegated_row.get()
                     data.cooperating = self.cooperating_row.get()
                     data.keywords = self.keywords_row.get()

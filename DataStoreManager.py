@@ -74,7 +74,7 @@ class DataStoreManager:
                         treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9]))
                 elif list_category == 'Personal Cards':
                     if data_row[15] == 'personal card':
-                        treeview.insert('', 'end', values=(data_row[1], data_row[12], data_row[2], data_row[3], data_row[4]))
+                        treeview.insert('', 'end', values=(data_row[1], data_row[11], data_row[2], data_row[3], data_row[4]))
                 elif list_category == 'Events':
                     if data_row[15] == 'event':
                         treeview.insert('', 'end', values=(data_row[1], data_row[1], data_row[2], data_row[3], data_row[4]))
@@ -95,18 +95,23 @@ class DataStoreManager:
     def insert_data_to_personal_card_treeview(self, treeview, category, name):
         self.make_list_data_tuple()
         treeview.delete(*treeview.get_children())
-        for data_row in self.list_data_tuple:
-            if category == 'task':
-                if data_row[15] == 'task' and data_row[9] == name and data_row[16] == 'No':
-                    treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4]))
-            elif category == 'project':
-                if data_row[15] == 'project' and data_row[9] == name and data_row[16] == 'No':
-                    treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[4]))
-            elif category == 'cooperating':
-                if data_row[15] == 'task' or data_row[15] == 'project' and data_row[10] and data_row[16] == 'No':
-                    treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4]))
-            else:
-                pass
+        if name != '':
+            for data_row in self.list_data_tuple:
+                if category == 'task':
+                    if data_row[15] == 'task' and data_row[9] == name and data_row[16] == 'No':
+                        treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4]))
+                elif category == 'project':
+                    if data_row[15] == 'project' and data_row[9] == name and data_row[16] == 'No':
+                        treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[4]))
+                elif category == 'cooperating':
+                    if data_row[15] == 'task' and data_row[10] == name and data_row[16] == 'No':
+                        treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4]))
+                    if data_row[15] == 'project' and data_row[10] == name and data_row[16] == 'No':
+                        treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4]))
+                else:
+                    pass
+        else:
+            pass
 
     def count_number_of_day_element(self, category): # no need of today date_string, data_tuple is generated for today
         try:
@@ -378,6 +383,53 @@ class DataStoreManager:
 
         result_keywords = data_row[14]
         row5.insert(0, result_keywords)
+
+    def insert_values_to_personal_card_form(self, element_id, win, row1, row2, row3, row4, row5, row6, row7,
+                                            row8, row9, row10, row11):
+        data_row = self.check_elementid_in_tuple(element_id)
+
+        element_id_label = tk.Label(
+            win,
+            text = element_id,
+            font = ("Open Sans", "10"),
+            background = "#D9D0AF",
+            foreground = "#FFFFFF"
+        )
+        element_id_label.place(x = 680, y = 5)
+
+        name = data_row[2]
+        row1.insert(0, name)
+
+        date_of_birth = data_row[3]
+        row2.insert(0, date_of_birth)           
+
+        year_of_birth = data_row[4]
+        row3.insert(0, year_of_birth)
+
+        field1 = data_row[5]
+        row4.insert(0, field1)
+
+        field2 = data_row[6]
+        row5.insert(0, field2)
+
+        field3 = data_row[7]
+        row6.insert(0, field3)
+
+        company = data_row[10]
+        row7.insert(0, company)
+
+        title_before = data_row[11]
+        row8.insert(0, title_before)
+
+        title_after = data_row[12]
+        row9.insert(0, title_after)
+
+        email = data_row[13]
+        row10.insert(0, email)
+
+        phone_number = data_row[14]
+        row11.insert(0, phone_number)
+
 
     def get_element_id_from_day_data_tuple(self, element_name):
         for data_row in self.day_data_tuple:

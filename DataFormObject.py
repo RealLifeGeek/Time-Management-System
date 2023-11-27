@@ -8,11 +8,11 @@ class DataForm:
         self.field1 = ""            # Not used in Task
         self.field2 = ""            # in task: Expected Result
         self.field3 = ""            # Time, Start Time
-        self.project = ""           # Not used in Remarks, Events, Project (For project category is used only element as name)
+        self.project = ""           # Not used in Remarks, Events; must be used for project (element == project) to ensure that create project fm task will work correctly
         self.delegated = ""         # Not used in Remarks, Events
-        self.cooperating = ""       # Not used in Remarks, Events
-        self.field4 = ""            # End time, for Personal Card == Company
-        self.field5 = ""            # Titles
+        self.cooperating = ""       # Not used in Remarks, Events; for Personal Card == Company
+        self.field4 = ""            # End time, for Personal Card == Title before name
+        self.field5 = ""            # for Personal Card == Title after name
         self.remarks = ""           # in Personal Cards == e-mail
         self.keywords = ""          # in Personal Cards == phone number
         self.category = ""
