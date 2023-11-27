@@ -55,6 +55,7 @@ class ListWindow:
                 self.window, element_id
             )
             personal_card_window.create_window()
+            personal_card_window.insert_values()
 
         else:
             if self.title == 'My Tasks' or self.title == 'Delegated Tasks':
@@ -100,12 +101,10 @@ class ListWindow:
                 self.window, None
             )
             personal_card_window.create_window()
-            personal_card_window.first_name_row.insert(0, 'FIRST NAME')
-            personal_card_window.last_name_row.insert(0, 'LAST NAME')
+            personal_card_window.name_row.insert(0, 'FIRST AND LAST NAME')
             personal_card_window.title_before_row.insert(0, 'Title before name')
             personal_card_window.title_after_row.insert(0, 'Title after name')
-            personal_card_window.day_date_row.insert(0, 'dd')
-            personal_card_window.month_date_row.insert(0, 'mm')
+            personal_card_window.day_month_row.insert(0, 'dd/mm')
             personal_card_window.year_date_row.insert(0, 'yyyy')
             personal_card_window.company_row.insert(0, 'Company name')
             personal_card_window.field1_row.insert(0, 'Field 1')

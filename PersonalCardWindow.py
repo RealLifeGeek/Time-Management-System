@@ -33,55 +33,22 @@ class PersonalCardWindow:
 
     def get_personal_data(self):
             data.element_id = self.element_id
-            if self.first_name_row.get() == 'FIRST NAME':
-                self.first_name_row.get() == ""
+            if self.name_row.get() == 'FIRST AND LAST NAME':
+                self.name_row.get() == "No name inserted"
+                messagebox.showerror("ERROR", "Insert name!")
             else:
                 pass
-            if self.last_name_row.get() == 'LAST NAME':
-                self.last_name_row.get() == ''
-            else:
-                pass
-            data.element = self.first_name_row.get() + ' ' + self.last_name_row.get()
-            if self.day_date_row.get() == 'dd' or self.month_date_row.get() == 'mm':
-                data.date = ''
-            else:
-                data.date = self.day_date_row.get() + '/' + self.month_date_row.get()
-            if self.year_date_row.get() == 'yyyy':
-                data.deadline = ''
-            else:
-                data.deadline = self.year_date_row.get()
-            if self.field1_row.get() == 'Field 1':
-                data.field1 = ''
-            else:
-                data.field1 = self.field1_row.get()
-            if self.field2_row.get() == 'Field 2':
-                data.field2 = ''
-            else:
-                data.field2 = self.field2_row.get()
-            if self.field3_row.get() == 'Field 3':
-                data.field3 = ''
-            else:
-                data.field3 = self.field3_row.get()
-            if self.company_row.get() == 'Company name':
-                data.cooperating = ''
-            else:
-                data.cooperating = self.company_row.get()
-            if self.title_before_row.get() == 'Title before name':
-                data.field4 = ''
-            else:
-                data.field4 = self.title_before_row.get()
-            if self.title_after_row.get() == 'Title after name':
-                data.field5 = ''
-            else:
-                data.field5 = self.title_after_row.get()
-            if self.email_row.get() == 'email_adress@default.com':
-                data.remarks = ''
-            else:
-                data.remarks = self.email_row.get()
-            if self.phone_number_row.get() == 'Phone number':
-                data.keywords = ''
-            else:
-                data.keywords = self.phone_number_row.get()
+            data.element = self.name_row.get()
+            data.date = self.day_month_row.get()
+            data.deadline = self.year_date_row.get()
+            data.field1 = self.field1_row.get()
+            data.field2 = self.field2_row.get()
+            data.field3 = self.field3_row.get()
+            data.cooperating = self.company_row.get()
+            data.field4 = self.title_before_row.get()
+            data.field5 = self.title_after_row.get()
+            data.remarks = self.email_row.get()
+            data.keywords = self.phone_number_row.get()
             data.category = 'personal card'
 
     def save_or_edit_card(self):   
@@ -102,11 +69,27 @@ class PersonalCardWindow:
     def exit(self):
         self.window.destroy()
 
+    def insert_values(self):
+        row1 = self.name_row
+        row2 = self.day_month_row
+        row3 = self.year_date_row
+        row4 = self.field1_row
+        row5 = self. field2_row
+        row6 = self.field3_row
+        row7 = self.company_row
+        row8 = self.title_before_row
+        row9 = self.title_after_row
+        row10 = self.email_row
+        row11 = self.phone_number_row
+
+        data_store_manager.insert_values_to_personal_card_form(self.element_id, self.window, row1, row2, row3, row4,
+                                                               row5, row6, row7, row8, row9, row10, row11)
+        self.insert_data_to_treeviews()
+
     def insert_data_to_treeviews(self):
-        name = self.first_name_row.get() + ' ' + self.last_name_row.get()
-        print('NAME is: ' + name)
+        name = self.name_row.get()
         data_store_manager.insert_data_to_personal_card_treeview(self.delegated_task_treeview, 'task', name)
-        data_store_manager.insert_data_to_personal_card_treeview(self.cooperating_on_treeview, 'coooperating', name)
+        data_store_manager.insert_data_to_personal_card_treeview(self.cooperating_on_treeview, 'cooperating', name)
         data_store_manager.insert_data_to_personal_card_treeview(self.delegated_projects_treeview, 'project', name)
         self.window.after(10000, self.insert_data_to_treeviews)
 
@@ -119,25 +102,25 @@ class PersonalCardWindow:
         )
         top_frame.place(x = 15, y = 0)
 
-        self.first_name_row = tk.Entry(
-            top_frame,
-            font = ("Open Sans", "18", "bold"),
-            width = 25,
-            insertbackground = "#FFFFFF",
+        element_id_label = tk.Label(
+            self.window,
+            text = self.element_id,
+            font = ("Open Sans", "10"),
             background = "#D9D0AF",
-            foreground = "#2D4A54"
+            foreground = "#FFFFFF"
         )
-        self.first_name_row.place(x = 230, y = 35)
+        element_id_label.place(x = 680, y = 5)
 
-        self.last_name_row = tk.Entry(
+        self.name_row = tk.Entry(
             top_frame,
             font = ("Open Sans", "18", "bold"),
-            width = 25,
+            width = 30,
             insertbackground = "#FFFFFF",
             background = "#D9D0AF",
             foreground = "#2D4A54"
         )
-        self.last_name_row.place(x = 260, y = 75)
+        self.name_row.place(x = 230, y = 55)
+
 
         left_frame = tk.Frame(
             self.window,
@@ -175,15 +158,15 @@ class PersonalCardWindow:
             foreground = "#FFFFFF")
         birthday_label.place(x = 10, y = 260)
 
-        self.day_date_row = tk.Entry(
+        self.day_month_row = tk.Entry(
             left_frame,
             font = ("Open Sans", "10"),
-            width = 4,
+            width = 8,
             insertbackground = "#FFFFFF",
             background = "#2D4A54",
             foreground = "#FFFFFF"
         )
-        self.day_date_row.place(x = 10, y = 290)
+        self.day_month_row.place(x = 10, y = 290)
 
         slash1_label = tk.Label(
             left_frame,
@@ -192,26 +175,7 @@ class PersonalCardWindow:
             background = "#2D4A54",
             foreground = "#FFFFFF"
         )
-        slash1_label.place(x = 45, y = 285)
-
-        self.month_date_row = tk.Entry(
-            left_frame,
-            font = ("Open Sans", "10"),
-            width = 4,
-            insertbackground = "#FFFFFF",
-            background = "#2D4A54",
-            foreground = "#FFFFFF"
-        )
-        self.month_date_row.place(x = 60, y = 290)
-
-        slash2_label = tk.Label(
-            left_frame,
-            text = "/",
-            font = ("Open Sans", "16", "bold"),
-            background = "#2D4A54",
-            foreground = "#FFFFFF"
-        )
-        slash2_label.place(x = 85, y = 285)
+        slash1_label.place(x = 70, y = 285)
 
         self.year_date_row = tk.Entry(
             left_frame,
@@ -221,7 +185,7 @@ class PersonalCardWindow:
             background = "#2D4A54",
             foreground = "#FFFFFF"
         )
-        self.year_date_row.place(x = 100, y = 290)
+        self.year_date_row.place(x = 85, y = 290)
 
         self.company_row = tk.Entry(
             left_frame,
