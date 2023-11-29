@@ -22,7 +22,7 @@ class ProjectWindow:
     def __init__(self, parent, element_id):
         self.window = tk.Toplevel(parent)
         self.window.geometry('800x600')
-        self.window.title('Time Management System 1.1.: PROJECT')
+        self.window.title('PROJECT')
         self.window.option_add('*Dialog.msg.title.bg', '#000000')
         self.window.configure(bg = "#9C9C9C")
         self.window.resizable(0,0)
@@ -41,10 +41,6 @@ class ProjectWindow:
         
         self.project_name = "Default_Project_StarLord01"
         self.element_id = element_id
-
-        #style = ttk.Style(add_new_project_win)
-        #style.theme_use("clam")
-        #style.configure("Treeview", background = "#D3D3D3", fieldbackground = "#D3D3D3", foreground = "#000000")
 
     def check_project_name(self):
         if len(self.project_name_row.get()) != 0:
