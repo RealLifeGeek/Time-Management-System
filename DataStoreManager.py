@@ -2,7 +2,7 @@ from tkinter import messagebox
 import tkinter as tk
 from DBManager import *
 from DataFormObject import *
-from datetime import datetime
+from datetime import datetime, timedelta
 
 db_manager = DBManager()
 data = DataForm()
@@ -58,6 +58,50 @@ class DataStoreManager:
                                                 data_row[4], data_row[9], data_row[10],))
             else:
                 pass
+    
+    def insert_data_to_notifications_treeview(self, treeview, category):
+        treeview.delete(*treeview.get_children())
+        if category == 'tasks' or category == 'delegated tasks' or category == 'projects':
+            for i in range(1,178):
+                previous_date = (current_date - timedelta(days=i)).strftime('%d/%m/%Y')
+                for data_row in self.list_data_tuple:
+                    if category == 'tasks':
+                        if data_row[15] == 'task' and data_row[9] == '' and data_row[3] == previous_date and data_row[16] == 'No':
+                            treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[4], data_row[9]))
+                    elif category == 'delegated tasks':
+                        if data_row[15] == 'task' and data_row[9] != '' and data_row[3] == previous_date and data_row[16] == 'No':
+                            treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[4], data_row[9]))
+                    elif category == 'projects':
+                        if data_row[15] == 'project' and data_row[3] == previous_date and data_row[16] == 'No':
+                            treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[4], data_row[9]))
+                else:
+                    pass
+        elif category == 'birthdays':
+            for i in range(0,7):
+                future_date = (current_date + timedelta(days=i)).strftime('%d/%m')
+                for data_row in self.list_data_tuple:
+                    if data_row[15] == 'personal card' and data_row[3] == future_date:
+                        treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4]))
+        
+        elif category == 'closing deadlines':
+            for i in range(0,6):
+                future_date = (current_date + timedelta(days=i)).strftime('%d/%m/%Y')
+                for data_row in self.list_data_tuple:
+                    if data_row[15] == 'task' and data_row[4] == future_date and data_row[16] == 'No':
+                        treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[4], data_row[9]))
+                    if data_row[15] == 'project' and data_row[4] == future_date and data_row[16] == 'No':
+                        treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[4], data_row[9]))
+                    else:
+                        pass
+        elif category == 'pending ideas':
+            for i in range (1,178):
+                previous_date = (current_date - timedelta(days=i)).strftime('%d/%m/%Y')
+                for data_row in self.list_data_tuple:
+                    if data_row[15] == 'idea' and data_row[3] == previous_date:
+                        treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[4], data_row[9]))
+        else:
+            print('Wrong category in function: insert_data_to_notifications_treeview.')
+    
 
     def insert_list_data_to_treeview(self, treeview, list_category): # Inserting data to treeviews in ListWindow
         treeview.delete(*treeview.get_children())
@@ -168,6 +212,68 @@ class DataStoreManager:
                         rows.append(data_row[2])
             number_elements = len(rows)
             return number_elements
+
+    def count_number_undone_elements(self, category, frame, XX, YY):
+        self.make_list_data_tuple()
+        results = []
+        results.clear()
+        for i in range(1,178):
+            previous_date = (current_date - timedelta(days=i)).strftime('%d/%m/%Y')
+            for data_row in self.list_data_tuple:
+                if category == 'tasks':
+                    if data_row[15] == 'task' and data_row[9] == '' and data_row[3] == previous_date and data_row[16] == 'No':
+                        results.append(data_row[1])
+                elif category == 'delegated tasks':
+                    if data_row[15] == 'task' and data_row[9] != '' and data_row[3] == previous_date and data_row[16] == 'No':
+                        results.append(data_row[1])
+                elif category == 'projects':
+                    if data_row[15] == 'project' and data_row[3] == previous_date and data_row[16] == 'No':
+                        results.append(data_row[1])
+                else:
+                    print('Wrong category given in function: count_number_undone_elements.')
+        number_elements = len(results)
+        return number_elements
+
+    def count_closing_deadlines(self, frame, XX, YY):
+        results = []
+        results.clear()
+        for i in range(0,6):
+            future_date = (current_date + timedelta(days=i)).strftime('%d/%m/%Y')
+            for data_row in self.list_data_tuple:
+                if data_row[15] == 'task' and data_row[4] == future_date and data_row[16] == 'No':
+                    results.append(data_row[1])
+                if data_row[15] == 'project' and data_row[4] == future_date and data_row[16] == 'No':
+                    results.append(data_row[1])
+                else:
+                    pass
+        number_elements = len(results)
+        return number_elements
+
+    def count_pending_ideas(self, frame, XX, YY):
+        results = []
+        results.clear()
+        for i in range(1,178):
+            previous_date = (current_date - timedelta(days=i)).strftime('%d/%m/%Y')
+            for data_row in self.list_data_tuple:
+                if data_row[15] == 'idea' and data_row[3] == previous_date:
+                    results.append(data_row[1])
+                else:
+                    pass
+        number_elements = len(results)
+        return number_elements
+
+    def count_birthday(self):
+        results = []
+        results.clear()
+        for i in range(0,7):
+            future_date = (current_date + timedelta(days=i)).strftime('%d/%m')
+            for data_row in self.list_data_tuple:
+                if data_row[15] == 'personal card' and data_row[3] == future_date:
+                    results.append(data_row[1])
+                else:
+                    pass
+        number_elements = len(results)
+        return number_elements
 
     def count_number_elements_for_project(self, project_name, done):
         rows = []

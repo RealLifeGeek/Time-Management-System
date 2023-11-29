@@ -13,6 +13,7 @@ from list_window import *
 from DBManager import DBManager
 from DataFormObject import DataForm
 from DataStoreManager import *
+from NotificationWindow import *
 
 db_manager.create_db()
 
@@ -136,7 +137,6 @@ def do_task_tomorrow():
         messagebox.showerror("ERROR", f"ERROR: {e}")
 def refresh_main_screen():
     data_store_manager.make_list_data_tuple()
-    #data_store_manager.make_day_data_tuple()
     data_store_manager.insert_day_data_to_treeview(treeview, 'task')
     data_store_manager.insert_day_data_to_treeview(treeview_remarks, 'remark')
     data_store_manager.insert_day_data_to_treeview(treeview_events, 'event')
@@ -144,20 +144,13 @@ def refresh_main_screen():
     show_number_of_day_element('remark')
     show_number_of_day_element('event')
     progress_bar_of_day()
-    #remind_my_deadlines()
-    #remind_deadlines_delegated()
     show_total_number_of_elements('task', '', 'No', 'No', right_frame, 200, 162)
     show_total_number_of_elements('task', 'Yes', 'No', 'No', right_frame, 200, 202)
     show_total_number_of_elements('project', 'None', 'No', 'No', right_frame, 200, 242)
     show_total_number_of_elements('idea', 'None', 'No', 'No', right_frame, 200, 282)
     show_total_number_of_elements('maybe/sometimes', '', 'No', 'No', right_frame, 200, 322)
     show_total_number_of_elements('personal card', 'None', 'No', 'No', right_frame, 200, 362)
-    #check_undone_tasks()
-    #check_undone_delegated_tasks()
-    #check_udnone_projects()
-    #remind_full_catchbox()
-    #remind_birthdays()
-    #root.after(10000, refresh_main_screen)
+    check_notifications()
 
 def delete_task_from_database():
     selection = treeview.selection()
@@ -185,7 +178,6 @@ def delete_remark_from_database():
         if answer:
             db_manager.delete_from_db()
             data_store_manager.make_list_data_tuple()
-            #data_store_manager.make_day_data_tuple()
             data_store_manager.insert_day_data_to_treeview(treeview_remarks, 'remark')
             show_number_of_day_element('remark')
         else:
@@ -203,7 +195,6 @@ def delete_event_from_database():
         if answer:
             db_manager.delete_from_db()
             data_store_manager.make_list_data_tuple()
-            #data_store_manager.make_day_data_tuple()
             data_store_manager.insert_day_data_to_treeview(treeview_events, 'event')
             show_number_of_day_element('event')
         else:
@@ -254,6 +245,11 @@ def exit_tms():
     else:
         pass
 
+def show_notificaton_window():
+    notification_dot_label.place_forget()
+    notification_window = NotificationWindow(root)
+    notification_window.create_window()
+
 def show_new_task_window():
     task_window = element_window_extended(
         root, 'Task', None
@@ -263,9 +259,7 @@ def show_new_task_window():
 def show_existing_task_window():
     selection = treeview.selection()
     if selection:
-        #element_name = treeview.item(selection, 'values')[0]
         element_id = treeview.item(selection, 'values')[0]
-        #data_store_manager.get_element_id_from_day_data_tuple(element_name)
     else:
         messagebox.showwarning("ERROR", f"Select an element")
     task_window = element_window_extended(
@@ -283,9 +277,7 @@ def show_new_event_window():
 def show_existing_event_window():
     selection = treeview_events.selection()
     if selection:
-        #element_name = treeview_events.item(selection, 'values')[0]
         element_id = treeview_events.item(selection, 'values')[0]
-        #data_store_manager.get_element_id_from_day_data_tuple(element_name)
     else:
         messagebox.showwarning("ERROR", f"Select an element")
     event_window = element_window_extended(
@@ -303,9 +295,7 @@ def show_new_remark_window():
 def show_existing_remark_window():
     selection = treeview_remarks.selection()
     if selection:
-        #element_name = 
         element_id = treeview_remarks.item(selection, 'values')[0]
-        #element_id = data_store_manager.get_element_id_from_day_data_tuple(element_name)
     else:
         messagebox.showwarning("ERROR", f"Select an element")
     remark_window = element_window_extended(
@@ -362,11 +352,26 @@ def show_personal_cards_list_window():
     personal_cards_list_window = ListWindow(root, 'Personal Cards')
     personal_cards_list_window.create_window()
 
+def check_notifications():
+    number_undone_tasks = data_store_manager.count_number_undone_elements('tasks', None, None, None)
+    number_undone_delegated_tasks = data_store_manager.count_number_undone_elements('delegated tasks', None, None, None)
+    number_undone_projects = data_store_manager.count_number_undone_elements('projects', None, None, None)
+    number_closing_deadlines = data_store_manager.count_closing_deadlines(None, None, None)
+    number_birthdays = data_store_manager.count_birthday()
+    result_number = number_undone_tasks + number_undone_delegated_tasks + number_undone_projects + number_closing_deadlines + number_birthdays
+
+    if result_number != 0:
+        notification_dot_label.config(text="!")
+        notification_dot_label.place(x=135, y=15)
+        messagebox.showinfo('NOTIFICATION', 'Check notifications' )
+    else:
+        pass
+        notification_dot_label.place_forget()
 
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.geometry ("800x600+200+50")
+    root.geometry ("800x600+300+50")
     root.title("Main Screen")
     root.resizable(0,0)
     root.configure(bg = "#212121")
@@ -416,11 +421,20 @@ if __name__ == "__main__":
         image = small_empty_inbox_img,
         font = ('Arial', '8', 'bold'),
         width = 35,
-        command = None,
+        command = show_notificaton_window,
         background = '#DBDBDB',
         foreground = '#000000'
     )
     notification_button.place(x = 120, y = 10)
+
+    notification_dot_label = tk.Label(
+        right_frame,
+        text="!",
+        font=('Montserrat', '12', 'bold'),
+        background="#000000",
+        foreground="#F90017"
+    )
+    notification_dot_label.place(x=135, y=15)
 
     task_list_button = tk.Button(
         right_frame,
@@ -933,7 +947,6 @@ if __name__ == "__main__":
 
     check_connection()
     data_store_manager.make_list_data_tuple()
-    #data_store_manager.make_day_data_tuple()
     progress_bar_of_day()
     show_number_of_day_element('task')
     show_number_of_day_element('remark')
@@ -941,18 +954,11 @@ if __name__ == "__main__":
     data_store_manager.insert_day_data_to_treeview(treeview, 'task')
     data_store_manager.insert_day_data_to_treeview(treeview_remarks, 'remark')
     data_store_manager.insert_day_data_to_treeview(treeview_events, 'event')
-    #remind_my_deadlines()
-    #remind_deadlines_delegated()
     show_total_number_of_elements('task', '', 'No', 'No', right_frame, 200, 162)
     show_total_number_of_elements('task', 'Yes', 'No', 'No', right_frame, 200, 202)
     show_total_number_of_elements('project', '', 'No', 'No', right_frame, 200, 242)
     show_total_number_of_elements('idea', 'None', 'No', 'No', right_frame, 200, 282)
     show_total_number_of_elements('maybe/sometimes', '', 'No', 'No', right_frame, 200, 322)
     show_total_number_of_elements('personal card', 'None', 'No', 'No', right_frame, 200, 362)
-    #check_undone_tasks()
-    #check_undone_delegated_tasks()
-    #check_udnone_projects()
-    #remind_full_catchbox()
-    #remind_birthdays()
-    #root.after(10000, refresh_main_screen)
+    check_notifications()
     root.mainloop()
