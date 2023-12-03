@@ -14,6 +14,7 @@ from DBManager import DBManager
 from DataFormObject import DataForm
 from DataStoreManager import *
 from NotificationWindow import *
+from RevisionChoiceWindow import *
 
 db_manager.create_db()
 
@@ -352,13 +353,18 @@ def show_personal_cards_list_window():
     personal_cards_list_window = ListWindow(root, 'Personal Cards')
     personal_cards_list_window.create_window()
 
+def show_revision_choice_window():
+    revision_choice_window = RevisionChoiceWindow(root)
+    revision_choice_window.create_window()
+
 def check_notifications():
     number_undone_tasks = data_store_manager.count_number_undone_elements('tasks', None, None, None)
     number_undone_delegated_tasks = data_store_manager.count_number_undone_elements('delegated tasks', None, None, None)
     number_undone_projects = data_store_manager.count_number_undone_elements('projects', None, None, None)
     number_closing_deadlines = data_store_manager.count_closing_deadlines(None, None, None)
     number_birthdays = data_store_manager.count_birthday()
-    result_number = number_undone_tasks + number_undone_delegated_tasks + number_undone_projects + number_closing_deadlines + number_birthdays
+    number_pending_ideas = data_store_manager.count_pending_ideas(None, None, None)
+    result_number = number_undone_tasks + number_undone_delegated_tasks + number_undone_projects + number_closing_deadlines + number_birthdays + number_pending_ideas
 
     if result_number != 0:
         notification_dot_label.config(text="!")
@@ -496,7 +502,7 @@ if __name__ == "__main__":
         text = "REVISION",
         font = ('Arial', '11'),
         width = 19,
-        command = None,
+        command = show_revision_choice_window,
         background = '#00248B',
         foreground = '#FFFFFF'
     )
