@@ -57,7 +57,7 @@ class element_window_extended: # task, remark, event
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
         data.date = self.date_row.get()
-        data.deadline = self.deadline_row.get()     
+        data.deadline = self.deadline_row.get()
         data.field2 = self.field2_row.get()
         data.field3 = self.field3_row.get()
         data.project = self.project_row.get()
