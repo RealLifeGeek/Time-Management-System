@@ -199,6 +199,7 @@ class DataStoreManager:
                         elif done == 'DONE':
                             if data_row[16] == 'DONE':
                                 rows.append(data_row[2])
+                
                 elif category == 'project':
                     if data_row[15] == 'project':
                         if done == 'No':

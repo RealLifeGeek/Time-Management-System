@@ -147,6 +147,15 @@ class NotificationWindow:
             answer = messagebox.askyesno("DELETE", "DELETE from database?")
             if answer:
                 db_manager.delete_from_db()
+                if category == 'project':
+                    element_name = self.treeview.item(selection, 'values')[1]
+                    rows = data_store_manager.get_all_project_tasks_id_from_list_data_tuple(element_name)
+                    if rows is not None:
+                        for row in rows:
+                            db_manager.set_element_id(row)
+                            messagebox.showwarning("DELETE ASSOCIATED", f"Asscociated task {row} is to be deleted.")
+                            db_manager.delete_from_db()
+
                 data_store_manager.make_list_data_tuple()
                 data_store_manager.insert_data_to_notifications_treeview(self.treeview, str_category)
                 self.show_total_number_of_undone_elements('tasks', self.left_frame, 160, 112)

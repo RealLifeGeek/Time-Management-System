@@ -45,9 +45,9 @@ class ProjectWindow:
     def check_project_name(self):
         if len(self.project_name_row.get()) != 0:
             self.project_name = self.project_name_row.get()
+            self.header_label.config(text=self.project_name)
         else:
             self.project_name = "Default_Project_StarLord01"
-        self.header_label.config(text=self.project_name)
         self.window.after(10000, self.check_project_name)
 
     def insert_values_to_treeview(self):
@@ -83,7 +83,8 @@ class ProjectWindow:
     def get_project_data(self):
         data.element_id = self.element_id
         data.element = self.project_name_row.get()
-        data.deadline = self.deadline_row.get()     
+        data.deadline = self.deadline_row.get()
+        data.project = self.project_name_row.get() 
         data.delegated = self.responsible_person_row.get()
         data.cooperating = self.cooperating_with_row.get()
         data.keywords = self.keywords_row.get()
@@ -491,4 +492,5 @@ class ProjectWindow:
         exit_button.place(x = 680, y = 550)
 
         self.insert_values_to_treeview()
+        self.check_project_name()
         self.progress_bar_of_project()

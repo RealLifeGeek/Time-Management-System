@@ -5,7 +5,7 @@ class RevisionChoiceWindow:
 
     def __init__(self, parent):
         self.window = tk.Toplevel(parent)
-        self.window.geometry('170x130+600+300')
+        self.window.geometry('190x140+600+300')
         self.window.title('REVISION CHOICE')
         self.window.option_add('*Dialog.msg.title.bg', '#000000')
         self.window.configure(bg = "#AFAFAF")
@@ -42,18 +42,18 @@ class RevisionChoiceWindow:
             background = '#02266A',
             foreground = '#FFFFFF'
         )
-        day_revision_button.place(x=15, y=10)
+        day_revision_button.place(relx=0.5, y=30, anchor = 'center')
 
         week_revision_button = tk.Button(
             self.window,
             text = "WEEK REVISION",
-            font = ('Arial', '10', 'bold'),
+            font = ('Arial', '12', 'bold'),
             width = 16,
             command = self.show_week_revision_window,
-            background = '#02266A',
+            background = '#004C01',
             foreground = '#FFFFFF'
         )
-        week_revision_button.place(x=15, y=50)
+        week_revision_button.place(relx=0.5, y=70, anchor = 'center')
 
         month_revision_button = tk.Button(
             self.window,
@@ -64,4 +64,4 @@ class RevisionChoiceWindow:
             background = '#02266A',
             foreground = '#FFFFFF'
         )
-        month_revision_button.place(x=15, y=90)
+        month_revision_button.place(relx=0.5, y=110, anchor = 'center')
