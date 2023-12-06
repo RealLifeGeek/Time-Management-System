@@ -32,7 +32,7 @@ class NotificationWindow:
             text = f"{number_elements} ",
             font = ('Arial', '12', 'bold'),
             background = "#2D4A54",
-            foreground = "#FFFFFF"
+            foreground = "#06CA00"
         )
         number_elements_label.place(x = XX, y = YY)
         
@@ -46,7 +46,7 @@ class NotificationWindow:
             text = f"{number_elements} ",
             font = ('Arial', '12', 'bold'),
             background = "#2D4A54",
-            foreground = "#FFFFFF"
+            foreground = "#06CA00"
         )
         number_elements_label.place(x = XX, y = YY)
 
@@ -60,7 +60,7 @@ class NotificationWindow:
             text = f"{number_elements} ",
             font = ('Arial', '12', 'bold'),
             background = "#2D4A54",
-            foreground = "#FFFFFF"
+            foreground = "#06CA00"
         )
         number_elements_label.place(x = XX, y = YY)
 
@@ -142,7 +142,6 @@ class NotificationWindow:
                 str_category = 'delegated tasks'
             elif category == 'project':
                 str_category = 'projects'
-            print(str_category)
             db_manager.set_element_id(element_id)
             answer = messagebox.askyesno("DELETE", "DELETE from database?")
             if answer:

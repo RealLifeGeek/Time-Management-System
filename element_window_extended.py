@@ -56,35 +56,39 @@ class element_window_extended: # task, remark, event
     def get_task_data(self):
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
-        data.date = self.date_row.get()
-        data.deadline = self.deadline_row.get()
+        data.date = self.date_row.get() or self.deadline_row.get()
+        data.deadline = self.deadline_row.get() or self.date_row.get()
+        data.field1 = ""
         data.field2 = self.field2_row.get()
         data.field3 = self.field3_row.get()
         data.project = self.project_row.get()
         data.delegated = self.delegated_row.get()
         data.cooperating = self.cooperating_row.get()
+        data.field4 = ""
+        data.field5 = ""
+        data.remarks = self.keywords_row.get()
         data.keywords = self.keywords_row.get()
         data.category = 'task'
 
         if self.title == 'Maybe/Sometimes View':
             data.category = 'maybe/sometimes'
 
-        if data.date is not None and data.deadline is None or data.deadline == '':
-            data.deadline = data.date
-        if data.date is None or data.date == '' and data.deadline is not None:
-            data.date = data.deadline
-        else:
-            pass
     
     def get_event_data(self):
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
-        data.date = self.date_row.get()
-        data.deadline = self.deadline_row.get()
+        data.date = self.date_row.get() or self.deadline_row.get()
+        data.deadline = self.deadline_row.get() or self.date_row.get()
         data.field1 = self.field1_row.get()
         data.field2 = self.field2_row.get()
         data.field3 = self.field3_row.get()
+        data.project = ""
+        data.delegated = ""
+        data.cooperating = ""
         data.field4 = self.field4_row.get()
+        data.field5 = ""
+        data.remarks = ""
+        data.keywords = ""
         data.category = 'event'
 
         if data.date is not None and data.deadline is None or data.deadline == '':
@@ -98,8 +102,17 @@ class element_window_extended: # task, remark, event
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
         data.date = self.date_row.get()
+        data.deadline = self.date_row.get()
         data.field1 = self.field1_row.get()
         data.field2 = self.field2_row.get()
+        data.field3 = ""
+        data.project = ""
+        data.delegated = ""
+        data.cooperating = ""
+        data.field4 = ""
+        data.field5 = ""
+        data.remarks = ""
+        data.keywords = ""
         data.category = 'remark'
 
     def save_or_edit_task(self):
