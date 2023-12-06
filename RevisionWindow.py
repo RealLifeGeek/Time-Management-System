@@ -50,7 +50,7 @@ class RevisionWindow:
             for data_row in self.list_data_tuple:
                 if self.current_title == 'MY TASKS':
                     self.time_interval_label.configure(text = '(for today and tommorow)')
-                    if data_row[15] == 'task' and data_row[3] == current_date and data_row[9] == "" and data_row[10] == "" and data_row[16] == 'No':
+                    if data_row[15] == 'task' and data_row[3] == date_string and data_row[9] == "" and data_row[10] == "" and data_row[16] == 'No':
                         self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
                         self.rows.append(data_row[2])
                     elif data_row[15] == 'task' and data_row[3] == tomorrow_date and data_row[9] == "" and data_row[10] == "" and data_row[16] == 'No':
@@ -67,7 +67,7 @@ class RevisionWindow:
                 
                 elif self.current_title == 'DELEGATED TASKS':
                     self.time_interval_label.configure(text = '(in following 7 days)')
-                    if data_row[15] == 'task' and data_row[3] == current_date and data_row[9] != "" and data_row[16] == 'No':
+                    if data_row[15] == 'task' and data_row[3] == date_string and data_row[9] != "" and data_row[16] == 'No':
                         self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
                         self.rows.append(data_row[2])
                     elif data_row[15] == 'task' and data_row[3] == tomorrow_date and data_row[9] != "" and data_row[16] == 'No':
@@ -81,7 +81,7 @@ class RevisionWindow:
                 
                 elif self.current_title == 'SHARED TASKS':
                     self.time_interval_label.configure(text = '(in following 7 days)')
-                    if data_row[15] == 'task' and data_row[3] == current_date and data_row[9] == "" and data_row[10] != "" and data_row[16] == 'No':
+                    if data_row[15] == 'task' and data_row[3] == date_string and data_row[9] == "" and data_row[10] != "" and data_row[16] == 'No':
                         self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
                         self.rows.append(data_row[2])
                     elif data_row[15] == 'task' and data_row[3] == tomorrow_date and data_row[9] == "" and data_row[10] != "" and data_row[16] == 'No':

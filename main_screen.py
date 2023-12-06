@@ -15,6 +15,7 @@ from DataFormObject import DataForm
 from DataStoreManager import *
 from NotificationWindow import *
 from RevisionChoiceWindow import *
+from MyCalendar import *
 
 db_manager.create_db()
 
@@ -172,8 +173,7 @@ def delete_task_from_database():
 def delete_remark_from_database():
     selection = treeview_remarks.selection()
     if selection:
-        element_name = treeview_remarks.item(selection, 'values')[0]
-        element_id = data_store_manager.get_element_id_from_day_data_tuple(element_name)
+        element_id = treeview_remarks.item(selection, 'values')[0]
         db_manager.set_element_id(element_id)
         answer = messagebox.askyesno("DELETE", "DELETE from database?")
         if answer:
@@ -189,8 +189,7 @@ def delete_remark_from_database():
 def delete_event_from_database():
     selection = treeview_events.selection()
     if selection:
-        element_name = treeview_events.item(selection, 'values')[0]
-        element_id = data_store_manager.get_element_id_from_day_data_tuple(element_name)
+        element_id = treeview_events.item(selection, 'values')[0]
         db_manager.set_element_id(element_id)
         answer = messagebox.askokcancel("DELETE", "DELETE from database?")
         if answer:
@@ -357,6 +356,10 @@ def show_revision_choice_window():
     revision_choice_window = RevisionChoiceWindow(root)
     revision_choice_window.create_window()
 
+def show_calendar_window():
+    calendar_window = MyCalendar(root)
+    calendar_window.create_window()
+
 def check_notifications():
     number_undone_tasks = data_store_manager.count_number_undone_elements('tasks', None, None, None)
     number_undone_delegated_tasks = data_store_manager.count_number_undone_elements('delegated tasks', None, None, None)
@@ -491,7 +494,7 @@ if __name__ == "__main__":
         text = "CALENDAR",
         font = ('Arial', '11'),
         width = 19,
-        command = None,
+        command = show_calendar_window,
         background = '#00248B',
         foreground = '#FFFFFF'
     )

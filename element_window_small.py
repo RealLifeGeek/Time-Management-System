@@ -53,9 +53,15 @@ class element_window_small: # Ahoc Task, Idea
         data.element = self.element_description_row.get()
         data.date = self.date_string
         data.deadline = self.date_string
+        data.field1 = ""
         data.field2 = self.field2_row.get()
         data.field3 = self.field3_row.get()
         data.project = self.project_row.get()
+        data.delegated = ""
+        data.cooperating = ""
+        data.field4 = ""
+        data.field5 = ""
+        data.remarks = ""
         data.keywords = self.keywords_row.get()
         data.category = 'task'
 
@@ -63,8 +69,17 @@ class element_window_small: # Ahoc Task, Idea
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
         data.date = self.date_string
+        data.deadline = self.date_string
         data.field1 = self.field1_row.get()
         data.field2 = self.field2_row.get()
+        data.field3 = ""
+        data.project = ""
+        data.delegated = ""
+        data.cooperating = ""
+        data.field4 = ""
+        data.field5 = ""
+        data.remarks = ""
+        data.keywords = ""
         data.category = 'idea'      
 
     def save_or_edit_task(self):
