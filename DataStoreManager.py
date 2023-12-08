@@ -13,6 +13,7 @@ class DataStoreManager:
     def __init__(self):
         self.day_data_tuple = []
         self.list_data_tuple = []
+        self.data_check_list = []
     
     def make_list_data_tuple(self): # Tuple for ListWindow
         self.list_data_tuple = db_manager.get_list_data_tuple()
@@ -563,6 +564,7 @@ class DataStoreManager:
     
     def find_element_in_list_tuple(self, treeview, searched_item, list_category):
         treeview.delete(*treeview.get_children())
+        self.data_check_list.clear()
         try:
             for data_row in self.list_data_tuple:
                 searched_item_str = str(searched_item)
@@ -572,28 +574,45 @@ class DataStoreManager:
                     if searched_item_str.lower() in item:
                         if list_category == 'My Tasks':
                             if data_row [15] == 'task' and data_row[9] == "" and data_row[16] != 'DONE':
-                                treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9]))
+                                if data_row[1] not in self.data_check_list:
+                                        treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9]))
+                                        self.data_check_list.append(data_row[1])
+                                        print(self.data_check_list)
                         elif list_category == 'Delegated Tasks':
                             if data_row [15] == 'task' and data_row[9] != "" and data_row[16] != 'DONE':
-                                treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9]))
+                                if data_row[1] not in self.data_check_list:
+                                    treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9]))
+                                    self.data_check_list.append(data_row[1])
                         elif list_category == 'Personal Cards':
                             if data_row[15] == 'personal card':
-                                treeview.insert('', 'end', values=(data_row[1], data_row[12], data_row[2], data_row[3], data_row[4]))
+                                if data_row[1] not in self.data_check_list:
+                                    treeview.insert('', 'end', values=(data_row[1], data_row[12], data_row[2], data_row[3], data_row[4]))
+                                    self.data_check_list.append(data_row[1])
                         elif list_category == 'Events':
                             if data_row[15] == 'event':
-                                treeview.insert('', 'end', values=(data_row[1], data_row[1], data_row[2], data_row[3], data_row[4]))
+                                if data_row[1] not in self.data_check_list:
+                                    treeview.insert('', 'end', values=(data_row[1], data_row[1], data_row[2], data_row[3], data_row[4]))
+                                    self.data_check_list.append(data_row[1])
                         elif list_category == 'Remarks':
                             if data_row[15] == 'remark':
-                                treeview.insert('', 'end', values=(data_row[1], data_row[1], data_row[2], data_row[3], data_row[5]))
+                                if data_row[1] not in self.data_check_list:
+                                    treeview.insert('', 'end', values=(data_row[1], data_row[1], data_row[2], data_row[3], data_row[5]))
+                                    self.data_check_list.append(data_row[1])
                         elif list_category == 'Ideas':
                             if data_row[15] == 'idea':
-                                treeview.insert('', 'end', values=(data_row[1], data_row[1], data_row[2], data_row[3], data_row[5]))
+                                if data_row[1] not in self.data_check_list:
+                                    treeview.insert('', 'end', values=(data_row[1], data_row[1], data_row[2], data_row[3], data_row[5]))
+                                    self.data_check_list.append(data_row[1])
                         elif list_category == 'Maybe/Sometimes':
                             if data_row[15] == 'maybe/sometimes':
-                                treeview.insert('', 'end', values=(data_row[1], data_row[1], data_row[2], data_row[3], data_row[5]))
+                                if data_row[1] not in self.data_check_list:
+                                    treeview.insert('', 'end', values=(data_row[1], data_row[1], data_row[2], data_row[3], data_row[5]))
+                                    self.data_check_list.append(data_row[1])
                         elif list_category == 'Projects':
                             if data_row[15] == 'project' and data_row[16] != 'DONE':
-                                treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9]))
+                                if data_row[1] not in self.data_check_list:
+                                    treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9]))
+                                    self.data_check_list.append(data_row[1])
                         else:
                             pass
         except Exception as e:

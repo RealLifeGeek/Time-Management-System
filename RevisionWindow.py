@@ -51,71 +51,83 @@ class RevisionWindow:
                 if self.current_title == 'MY TASKS':
                     self.time_interval_label.configure(text = '(for today and tommorow)')
                     if data_row[15] == 'task' and data_row[3] == date_string and data_row[9] == "" and data_row[10] == "" and data_row[16] == 'No':
-                        self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                        self.rows.append(data_row[2])
+                        if data_row[1] not in self.rows:
+                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                            self.rows.append(data_row[1])
                     elif data_row[15] == 'task' and data_row[3] == tomorrow_date and data_row[9] == "" and data_row[10] == "" and data_row[16] == 'No':
-                        self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                        self.rows.append(data_row[2])
+                        if data_row[1] not in self.rows:
+                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                            self.rows.append(data_row[1])
                     for i in range(1,7):
                         future_date = (current_date + timedelta(days=i)).strftime("%d/%m/%Y")
                         if data_row[3] == data_row[4]:
                             pass
                         else:  
                             if data_row[15] == 'task' and data_row[4] == future_date and data_row[9] == "" and data_row[10] == "" and data_row[16] == 'No':
-                                self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                                self.rows.append(data_row[2])
+                                if data_row[1] not in self.rows:
+                                    self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                                    self.rows.append(data_row[1])
                 
                 elif self.current_title == 'DELEGATED TASKS':
                     self.time_interval_label.configure(text = '(in following 7 days)')
                     if data_row[15] == 'task' and data_row[3] == date_string and data_row[9] != "" and data_row[16] == 'No':
-                        self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                        self.rows.append(data_row[2])
+                        if data_row[1] not in self.rows:
+                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                            self.rows.append(data_row[1])
                     elif data_row[15] == 'task' and data_row[3] == tomorrow_date and data_row[9] != "" and data_row[16] == 'No':
-                        self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                        self.rows.append(data_row[2])
+                        if data_row[1] not in self.rows:
+                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                            self.rows.append(data_row[1])
                     for i in range(1,7):
                         future_date = (current_date + timedelta(days=i)).strftime("%d/%m/%Y")
                         if data_row[15] == 'task' and data_row[4] == future_date and data_row[9] != "" and data_row[16] == 'No':
-                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                            self.rows.append(data_row[2])
+                            if data_row[1] not in self.rows:
+                                self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                                self.rows.append(data_row[1])
                 
                 elif self.current_title == 'SHARED TASKS':
                     self.time_interval_label.configure(text = '(in following 7 days)')
                     if data_row[15] == 'task' and data_row[3] == date_string and data_row[9] == "" and data_row[10] != "" and data_row[16] == 'No':
-                        self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                        self.rows.append(data_row[2])
+                        if data_row[1] not in self.rows:
+                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                            self.rows.append(data_row[1])
                     elif data_row[15] == 'task' and data_row[3] == tomorrow_date and data_row[9] == "" and data_row[10] != "" and data_row[16] == 'No':
-                        self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                        self.rows.append(data_row[2])
+                        if data_row[1] not in self.rows:
+                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                            self.rows.append(data_row[1])
                         for i in range(1,7):
                             future_date = (current_date + timedelta(days=i)).strftime("%d/%m/%Y")
                             if data_row[15] == 'task' and data_row[4] == future_date and data_row[9] == "" and data_row[10] != "" and data_row[16] == 'No':
-                                self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                                self.rows.append(data_row[2])
+                                if data_row[1] not in self.rows:
+                                    self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                                    self.rows.append(data_row[1])
 
                 elif self.current_title == 'MY PROJECTS':
                     self.time_interval_label.configure(text = '(in following 7 days)')
                     for i in range(0,7):
                         future_date = (current_date + timedelta(days=i)).strftime("%d/%m/%Y")
                         if data_row[15] == 'project' and data_row[4] == future_date and data_row[9] == "" and data_row[10] == "" and data_row[16] == 'No':
-                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                            self.rows.append(data_row[2])
+                            if data_row[1] not in self.rows:
+                                self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                                self.rows.append(data_row[1])
 
                 elif self.current_title == 'DELEGATED PROJECTS':
                     self.time_interval_label.configure(text = '(in following 7 days)')
                     for i in range(0,7):
                         future_date = (current_date + timedelta(days=i)).strftime("%d/%m/%Y")
                         if data_row[15] == 'project' and data_row[4] == future_date and data_row[9] != "" and data_row[16] == 'No':
-                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                            self.rows.append(data_row[2])
+                            if data_row[1] not in self.rows:
+                                self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                                self.rows.append(data_row[1])
 
                 elif self.current_title == 'SHARED PROJECTS':
                     self.time_interval_label.configure(text = '(in following 7 days)')
                     for i in range(0,7):
                         future_date = (current_date + timedelta(days=i)).strftime("%d/%m/%Y")
                         if data_row[15] == 'project' and data_row[4] == future_date and data_row[9] == "" and data_row[10] != "" and data_row[16] == 'No':
-                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                            self.rows.append(data_row[2])
+                            if data_row[1] not in self.rows:
+                                self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                                self.rows.append(data_row[1])
 
                 elif self.current_title == 'EVENTS':
                     self.time_interval_label.configure(text = '(for tomorrow)')
@@ -125,66 +137,76 @@ class RevisionWindow:
                         future_date = (current_date + timedelta(days=1)).strftime("%d/%m/%Y")
                         future_date_string = datetime.strptime(future_date, "%d/%m/%Y")
                         if start_date <= future_date_string and end_date >= future_date_string:
-                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                            self.rows.append(data_row[2])
+                            if data_row[1] not in self.rows:
+                                self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                                self.rows.append(data_row[1])
 
                 elif self.current_title == 'REMARKS':
                     self.time_interval_label.configure(text = '(for tomorrow)')
                     if data_row[15] == 'remark' and data_row[3] == tomorrow_date:
-                        self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                        self.rows.append(data_row[2])
+                        if data_row[1] not in self.rows:
+                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                            self.rows.append(data_row[1])
 
                 elif self.current_title == 'MAYBE/SOMETIMES':
                     self.time_interval_label.configure(text = '(all)')
                     if data_row[15] == 'maybe/sometimes':
-                        self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                        self.rows.append(data_row[2])
+                        if data_row[1] not in self.data_checrowsk_list:
+                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                            self.rows.append(data_row[1])
 
                 elif self.current_title == 'BIRTHDAYS':
                     self.time_interval_label.configure(text = '(in following 7 days)')
                     for i in range(0,7):
                         future_date = (current_date + timedelta(days=i)).strftime("%d/%m")
                         if data_row[15] == 'personal card' and data_row[3] == future_date:
-                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                            self.rows.append(data_row[2])
+                            if data_row[1] not in self.rows:
+                                self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                                self.rows.append(data_row[1])
 
         elif self.title == 'week':
             for data_row in self.list_data_tuple:
                 if self.current_title == 'MY TASKS':
                     self.time_interval_label.configure(text = '(all)')
                     if data_row[15] == 'task'and data_row[9] == "" and data_row[10] == "" and data_row[16] == 'No':
-                        self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                        self.rows.append(data_row[2])
-                
+                        if data_row[1] not in self.rows:
+                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                            self.rows.append(data_row[1])
+                    
                 elif self.current_title == 'DELEGATED TASKS':
                     self.time_interval_label.configure(text = '(all)')
                     if data_row[15] == 'task'and data_row[9] != "" and data_row[16] == 'No':
-                        self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                        self.rows.append(data_row[2])
+                        if data_row[1] not in self.rows:
+                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                            self.rows.append(data_row[1])
 
                 elif self.current_title == 'SHARED TASKS':
                     self.time_interval_label.configure(text = '(all)')
                     if data_row[15] == 'task'and data_row[9] == "" and data_row[10] != "" and data_row[16] == 'No':
-                        self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                        self.rows.append(data_row[2])
+                        if data_row[1] not in self.rows:
+                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                            self.rows.append(data_row[1])
 
                 elif self.current_title == 'MY PROJECTS':
                     self.time_interval_label.configure(text = '(all)')
                     if data_row[15] == 'project'and data_row[9] == "" and data_row[10] == "" and data_row[16] == 'No':
-                        self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                        self.rows.append(data_row[2])
+                        if data_row[1] not in self.rows:
+                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                            self.rows.append(data_row[1])
 
                 elif self.current_title == 'DELEGATED PROJECTS':
                     self.time_interval_label.configure(text = '(all)')
                     if data_row[15] == 'project'and data_row[9] != "" and data_row[16] == 'No':
-                        self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                        self.rows.append(data_row[2])
+                        if data_row[1] not in self.rows:
+                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                            self.rows.append(data_row[1])
 
                 elif self.current_title == 'SHARED PROJECTS':
                     self.time_interval_label.configure(text = '(all)')
                     if data_row[15] == 'project'and data_row[9] == "" and data_row[10] != "" and data_row[16] == 'No':
-                        self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                        self.rows.append(data_row[2])
+                        if data_row[1] not in self.rows:
+                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                            self.rows.append(data_row[1])
 
                 elif self.current_title == 'EVENTS':
                     self.time_interval_label.configure(text = '(in following 30 days)')
@@ -205,14 +227,16 @@ class RevisionWindow:
                     for i in range(0,30):
                         future_date = (current_date + timedelta(days=i)).strftime("%d/%m/%Y")
                         if data_row[15] == 'remark' and data_row[3] == future_date:
-                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                            self.rows.append(data_row[2])
+                            if data_row[1] not in self.rows:
+                                self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                                self.rows.append(data_row[1])
 
                 elif self.current_title == 'MAYBE/SOMETIMES':
                     self.time_interval_label.configure(text = '(all)')
                     if data_row[15] == 'maybe/sometimes':
-                        self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                        self.rows.append(data_row[2])
+                        if data_row[1] not in self.rows:
+                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                            self.rows.append(data_row[1])
 
                 elif self.current_title == 'BIRTHDAYS':
                     self.time_interval_label.configure(text = '(in following 30 days)')
@@ -220,8 +244,9 @@ class RevisionWindow:
                         for i in range(0,30):
                             future_date = (current_date + timedelta(days=i)).strftime("%d/%m")
                             if data_row[3] == future_date:
-                                self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                                self.rows.append(data_row[2])
+                                if data_row[1] not in self.rows:
+                                    self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                                    self.rows.append(data_row[1])
 
         elif self.title == 'month':
             for data_row in self.list_data_tuple:
@@ -230,11 +255,13 @@ class RevisionWindow:
                     for i in range(0,180):
                         future_date = (current_date + timedelta(days=i)).strftime("%d/%m/%Y")
                         if data_row[15] == 'task' and data_row[4] == future_date and data_row[16] == 'No':
-                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                            self.rows.append(data_row[2])
+                            if data_row[1] not in self.rows:
+                                self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                                self.rows.append(data_row[1])
                         if data_row[15] == 'project' and data_row[4] == future_date and data_row[16] == 'No':
-                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                            self.rows.append(data_row[2])
+                            if data_row[1] not in self.rows:
+                                self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                                self.rows.append(data_row[1])
                 elif self.current_title == 'EVENTS':
                     self.time_interval_label.configure(text = '(in following 180 days)')
                     if data_row[15] == 'event':
