@@ -151,7 +151,7 @@ class RevisionWindow:
                 elif self.current_title == 'MAYBE/SOMETIMES':
                     self.time_interval_label.configure(text = '(all)')
                     if data_row[15] == 'maybe/sometimes':
-                        if data_row[1] not in self.data_checrowsk_list:
+                        if data_row[1] not in self.rows:
                             self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
                             self.rows.append(data_row[1])
 

@@ -1,9 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
-from tkinter import messagebox
 import datetime
-import time
 import calendar
 from DBManager import *
 from DataFormObject import *
@@ -502,7 +500,6 @@ class CalendarDateWindow:
             self.rows = []
 
         def fill_initial_data_to_treeview(self):
-
             self.treeview.delete(*self.treeview.get_children())
             self.rows.clear()
             birthday_date = self.date[:5]
@@ -513,12 +510,14 @@ class CalendarDateWindow:
                         if data_row[1] not in self.rows:
                             self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[16]))
                             self.rows.append(data_row[1])
+                    self.number_elements = len(self.rows)
+                    self.number_tasks.configure(text = self.number_elements)
             
                 if data_row[15] == 'personal card' and data_row[3] == birthday_date:
-                    print('birthday!')
                     if data_row[1] not in self.rows:
                             self.treeview_birthdays.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4]))
                             self.rows.append(data_row[1])
+            self.number_elements = len(self.rows)
         
         def insert_data_to_treeview(self, event):
             clicked_button = event.widget
@@ -560,7 +559,43 @@ class CalendarDateWindow:
                             if data_row[1] not in self.rows:
                                 self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
                                 self.rows.append(data_row[1])
-        
+                
+                else:
+                    print('Wrong title in CalendarDateWindow')
+    
+        def show_total_number_of_elements(self):  
+            tasks_for_day = []
+            deadlines_for_day = []
+            remarks_for_day = []
+            events_for_day = []
+
+            for data_row in self.list_data_tuple:
+                if data_row[15] == 'task' and data_row[3] == self.date:
+                    tasks_for_day.append(data_row[1])
+
+                if data_row[15] == 'task' and data_row[4] == self.date:
+                    deadlines_for_day.append(data_row[1])
+
+                if data_row[15] == 'project' and data_row[4] == self.date:
+                    deadlines_for_day.append(data_row[1])
+
+                if data_row[15] == 'remark' and data_row[3] == self.date:
+                    remarks_for_day.append(data_row[1]) 
+
+                if data_row[15] == 'event':
+                    start_date = datetime.strptime(data_row[3], "%d/%m/%Y")
+                    end_date = datetime.strptime(data_row[4], "%d/%m/%Y")
+                    date_string = datetime.strptime(self.date, "%d/%m/%Y")
+                    if start_date <= date_string and end_date >= date_string:
+                        events_for_day.append(data_row[1])
+            
+             
+            self.number_tasks.configure(text=len(tasks_for_day))
+            self.number_deadlines.configure(text=len(deadlines_for_day))
+            self.number_remarks.configure(text=len(remarks_for_day))
+            self.number_events.configure(text=len(events_for_day))
+            
+
         def exit(self):
             self.window.destroy()
 
@@ -593,6 +628,15 @@ class CalendarDateWindow:
             task_button.place(x = 16, y = 160)
             task_button.bind("<Button-1>", self.insert_data_to_treeview)
 
+            self.number_tasks = tk.Label(
+                right_frame,
+                text = "0",
+                font = ('Montserrat', '12'),
+                background = "#2F3030",
+                foreground = "#FFFFFF"
+            )
+            self.number_tasks.place(x = 200, y = 162)
+
             deadline_button = tk.Button(
                 right_frame,
                 text = "DEADLINES",
@@ -604,6 +648,15 @@ class CalendarDateWindow:
             )
             deadline_button.place(x = 16, y = 200)
             deadline_button.bind("<Button-1>", self.insert_data_to_treeview)
+
+            self.number_deadlines = tk.Label(
+                right_frame,
+                text = "0",
+                font = ('Montserrat', '12'),
+                background = "#2F3030",
+                foreground = "#FFFFFF"
+            )
+            self.number_deadlines.place(x = 200, y = 202)
 
             remark_button = tk.Button(
                 right_frame,
@@ -617,6 +670,15 @@ class CalendarDateWindow:
             remark_button.place(x = 16, y = 240)
             remark_button.bind("<Button-1>", self.insert_data_to_treeview)
 
+            self.number_remarks = tk.Label(
+                right_frame,
+                text = "0",
+                font = ('Montserrat', '12'),
+                background = "#2F3030",
+                foreground = "#FFFFFF"
+            )
+            self.number_remarks.place(x = 200, y = 242)
+
             event_button = tk.Button(
                 right_frame,
                 text = "EVENTS",
@@ -628,6 +690,15 @@ class CalendarDateWindow:
             )
             event_button.place(x = 16, y = 280)
             event_button.bind("<Button-1>", self.insert_data_to_treeview)
+
+            self.number_events = tk.Label(
+                right_frame,
+                text = "0",
+                font = ('Montserrat', '12'),
+                background = "#2F3030",
+                foreground = "#FFFFFF"
+            )
+            self.number_events.place(x = 200, y = 282)
 
             exit_button = tk.Button(
                 right_frame,
@@ -787,3 +858,4 @@ class CalendarDateWindow:
             self.treeview_birthdays.place (x = 10, y = 35)
 
             self.fill_initial_data_to_treeview()
+            self.show_total_number_of_elements()

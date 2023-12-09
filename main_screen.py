@@ -27,6 +27,7 @@ db = 'data'
 db_manager = DBManager()
 data = DataForm()
 data_store_manager = DataStoreManager()
+tooltip_window = None
 
 def check_connection():
     check_internet(top_frame_left, top_frame_right)
@@ -377,6 +378,50 @@ def check_notifications():
         pass
         notification_dot_label.place_forget()
 
+def show_tooltip(event):
+    global tooltip_window
+    hovered_button = event.widget
+
+    if tooltip_window is None:
+        tooltip_window = tk.Toplevel(root)
+        tooltip_window.wm_overrideredirect(True)  # Remove window decorations
+        tooltip_window.wm_geometry(f"+{event.x_root + 10}+{event.y_root + 10}")
+        label = tk.Label(tooltip_window, text="", padx=5, pady=3)
+        label.pack()
+        if hovered_button == done_button:
+            label.configure(text = 'Task Done')
+        elif hovered_button == see_task_button:
+            label.configure(text = 'Task View')
+        elif hovered_button == do_it_tomorrow_button:
+            label.configure(text = 'Do Task Tomorrow')
+        elif hovered_button == move_to_button:
+            label.configure(text = 'Move Task to')
+        elif hovered_button == delete_button:
+            label.configure(text ='Delete Task' )
+        elif hovered_button == refresh_button:
+            label.configure(text = 'Refresh Screen')
+        elif hovered_button == notification_button:
+            label.configure(text = 'Notifications')
+        elif hovered_button == remarks_database_button:
+            label.configure(text = 'List of Remarks')
+        elif hovered_button == see_remark_button:
+            label.configure(text = 'Remark View')
+        elif hovered_button == delete_remark_button:
+            label.configure(text = 'Delete Remark')
+        elif hovered_button == event_database_button:
+            label.configure(text = 'List of Events')
+        elif hovered_button == see_event_button:
+            label.configure(text = 'Event View')
+        elif hovered_button == delete_event_button:
+            label.configure(text = 'Delete Event')
+
+def hide_tooltip(event):
+    global tooltip_window
+
+    if tooltip_window:
+        tooltip_window.destroy()
+        tooltip_window = None
+
 
 if __name__ == "__main__":
     root = tk.Tk()
@@ -419,6 +464,8 @@ if __name__ == "__main__":
         foreground = '#000000'
     )
     refresh_button.place(x = 170, y = 10)
+    refresh_button.bind("<Enter>", show_tooltip)
+    refresh_button.bind("<Leave>", hide_tooltip)
 
     empty_inbox_img = PhotoImage(
     file = r"Pictures\empty_inbox2.png"
@@ -435,6 +482,8 @@ if __name__ == "__main__":
         foreground = '#000000'
     )
     notification_button.place(x = 120, y = 10)
+    notification_button.bind("<Enter>", show_tooltip)
+    notification_button.bind("<Leave>", hide_tooltip)
 
     notification_dot_label = tk.Label(
         right_frame,
@@ -661,6 +710,8 @@ if __name__ == "__main__":
         foreground = '#FFFFFF'
     )
     done_button.place(x = 10, y = 20)
+    done_button.bind("<Enter>", show_tooltip)
+    done_button.bind("<Leave>", hide_tooltip)
 
     see_task_button_img = PhotoImage(
     file = r"Pictures\magnifier_icon.png"
@@ -677,6 +728,8 @@ if __name__ == "__main__":
         foreground = '#FFFFFF'
     )
     see_task_button.place(x = 10, y = 60)
+    see_task_button.bind("<Enter>", show_tooltip)
+    see_task_button.bind("<Leave>", hide_tooltip)
 
     do_tommorrow_button_img = PhotoImage(
     file = r"Pictures\tomorrow_icon.png"
@@ -693,6 +746,8 @@ if __name__ == "__main__":
         foreground = '#FFFFFF'
     )
     do_it_tomorrow_button.place(x = 10, y = 100)
+    do_it_tomorrow_button.bind("<Enter>", show_tooltip)
+    do_it_tomorrow_button.bind("<Leave>", hide_tooltip)
 
     move_to_button_img = PhotoImage(
     file = r"Pictures\change_icon.png"
@@ -709,6 +764,8 @@ if __name__ == "__main__":
         foreground = '#FFFFFF'
     )
     move_to_button.place(x = 10, y = 140)
+    move_to_button.bind("<Enter>", show_tooltip)
+    move_to_button.bind("<Leave>", hide_tooltip)
 
     delete_button_img = PhotoImage(
     file = r"Pictures\delete_icon.png"
@@ -725,6 +782,8 @@ if __name__ == "__main__":
         foreground = '#FFFFFF'
     )
     delete_button.place(x = 10, y = 180)
+    delete_button.bind("<Enter>", show_tooltip)
+    delete_button.bind("<Leave>", hide_tooltip)
 
     task_treeview_label = tk.Label(
         middle_frame_left,
@@ -790,6 +849,8 @@ if __name__ == "__main__":
         foreground = '#FFFFFF'
     )
     remarks_database_button.place(x = 235, y = 35)
+    remarks_database_button.bind("<Enter>", show_tooltip)
+    remarks_database_button.bind("<Leave>", hide_tooltip)
 
     see_remark_button = tk.Button(
         bottom_frame_left,
@@ -801,6 +862,8 @@ if __name__ == "__main__":
         foreground = '#FFFFFF'
     )
     see_remark_button.place(x = 235, y = 70)
+    see_remark_button.bind("<Enter>", show_tooltip)
+    see_remark_button.bind("<Leave>", hide_tooltip)
 
     delete_remark_button = tk.Button(
         bottom_frame_left,
@@ -812,6 +875,8 @@ if __name__ == "__main__":
         foreground = '#FFFFFF'
     )
     delete_remark_button.place(x = 235, y = 105)
+    delete_remark_button.bind("<Enter>", show_tooltip)
+    delete_remark_button.bind("<Leave>", hide_tooltip)
 
     bottom_frame_right = tk.Frame(
         None,
@@ -851,6 +916,8 @@ if __name__ == "__main__":
         foreground = '#FFFFFF'
     )
     event_database_button.place(x = 235, y = 35)
+    event_database_button.bind("<Enter>", show_tooltip)
+    event_database_button.bind("<Leave>", hide_tooltip)
     
     see_event_button = tk.Button(
         bottom_frame_right,
@@ -862,6 +929,8 @@ if __name__ == "__main__":
         foreground = '#FFFFFF'
     )
     see_event_button.place(x = 235, y = 70)
+    see_event_button.bind("<Enter>", show_tooltip)
+    see_event_button.bind("<Leave>", hide_tooltip)
 
     delete_event_button = tk.Button(
         bottom_frame_right,
@@ -873,6 +942,8 @@ if __name__ == "__main__":
         foreground = '#FFFFFF'
     )
     delete_event_button.place(x = 235, y = 105)
+    delete_event_button.bind("<Enter>", show_tooltip)
+    delete_event_button.bind("<Leave>", hide_tooltip)
 
     very_bottom_frame1 = tk.Frame(
         None,
