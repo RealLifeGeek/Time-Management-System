@@ -37,19 +37,25 @@ class DataStoreManager:
         return self.day_data_tuple
 
     def insert_day_data_to_treeview(self, treeview, category): # Inserting data to treeviews on MainScreen
+        check_list = []
         treeview.delete(*treeview.get_children())
         try:
                 for data_row in self.day_data_tuple:
                     if category == 'task':
                         if data_row [15] == 'task' and data_row[9] == "" and data_row[16] == 'No':
-                            treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[7]))
+                            if data_row[1] not in check_list:
+                                treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[7]))
+                                check_list.append[data_row[1]]
                     else:
                         if data_row[15] == category:
-                            treeview.insert('', 'end', values=(data_row[1], data_row[2]))
+                            if data_row[1] not in check_list:
+                                treeview.insert('', 'end', values=(data_row[1], data_row[2]))
+                                check_list.append(data_row[1])
                         else:
                             pass     
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
+        check_list.clear()
 
     def insert_data_to_project_treeview(self, treeview, project_name):
         treeview.delete(*treeview.get_children())
