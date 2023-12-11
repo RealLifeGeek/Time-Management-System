@@ -197,6 +197,20 @@ class MyCalendar:
             else:
                 self.birthday_frames[i].place_forget()
 
+    def show_weekends_and_current_day_in_calendar(self, i):
+        if 'Saturday' in self.button_names[i].cget('text'):
+            self.frame_names[i].configure(background='#565656')
+        elif 'Sunday' in self.button_names[i].cget('text'):
+            self.frame_names[i].configure(background='#565656')
+        else:
+            self.frame_names[i].configure(background='#2F3030')
+            
+        if date_string in self.button_names[i].cget('text'):
+            self.button_names[i].configure(background="#105C18")
+        else:
+            self.button_names[i].configure(background="#001B81")
+
+
     def show_date_frames(self):
         x = 15
         y = 75
@@ -230,6 +244,7 @@ class MyCalendar:
             self.button_names[i].configure(text=self.selected_date)
             self.create_notification_bars(i)
             x += gap
+            self.show_weekends_and_current_day_in_calendar(i)
         
         x = 15
         y = 200
@@ -244,6 +259,7 @@ class MyCalendar:
             self.create_notification_bars(i)
             self.button_names[i].configure(text=self.selected_date)
             x += gap
+            self.show_weekends_and_current_day_in_calendar(i)
 
         x = 15
         y = 325
@@ -258,6 +274,7 @@ class MyCalendar:
             self.create_notification_bars(i)
             self.button_names[i].configure(text=self.selected_date)
             x += gap
+            self.show_weekends_and_current_day_in_calendar(i)
 
         x = 15
         y = 450
@@ -272,6 +289,7 @@ class MyCalendar:
             self.create_notification_bars(i)
             self.button_names[i].configure(text=self.selected_date)
             x += gap
+            self.show_weekends_and_current_day_in_calendar(i)
 
         x = 15
         y = 575
@@ -288,12 +306,12 @@ class MyCalendar:
                     frame = self.create_frame(i, x, y)
                 else:
                     self.frame_name.place(x=x, y=y)
-                #self.delete_notification_bars()
                 self.create_notification_bars(i)
                 self.button_names[i].configure(text=self.selected_date)
                 x += gap
-            for i in range(29, 31):
-                self.frame_names[i].place_forget()
+                self.show_weekends_and_current_day_in_calendar(i)
+                for i in range(29, 31):
+                    self.frame_names[i].place_forget()
 
         elif number_days_in_month == 30:
             for i in range(28, 30):
@@ -304,12 +322,12 @@ class MyCalendar:
                     frame = self.create_frame(i, x, y)
                 else:
                     self.frame_names[i].place(x=x, y=y)
-                #self.delete_notification_bars()
                 self.create_notification_bars(i)
                 self.button_names[i].configure(text=self.selected_date)
                 x += gap
-            for i in range(30, 31):
-                self.frame_name.place_forget()
+                self.show_weekends_and_current_day_in_calendar(i)
+                for i in range(30, 31):
+                    self.frame_name.place_forget()
 
         elif number_days_in_month == 31:
             for i in range(28, 31):
@@ -318,10 +336,10 @@ class MyCalendar:
                     frame = self.create_frame(i, x, y)
                 else:
                     self.frame_names[i].place(x=x, y=y)
-                #self.delete_notification_bars()
                 self.create_notification_bars(i)
                 self.button_names[i].configure(text=self.selected_date)
                 x += gap
+                self.show_weekends_and_current_day_in_calendar(i)
         self.heading = None
 
     def previous_month(self):

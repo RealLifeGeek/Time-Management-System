@@ -21,19 +21,25 @@ class DataStoreManager:
         return self.list_data_tuple
 
     def make_day_data_tuple(self):
+        check_list = []
         self.day_data_tuple.clear()   
         for data_row in self.list_data_tuple:
             if data_row[15] != 'event' and data_row[3] == date_string or data_row[4] == date_string:
-                self.day_data_tuple.append(data_row)
+                if data_row[1] not in check_list:
+                    self.day_data_tuple.append(data_row)
+                    check_list.append(data_row[1])
+
             if data_row[15] == 'event':
                 start_date = datetime.strptime(data_row[3], "%d/%m/%Y")
                 end_date = datetime.strptime(data_row[4], "%d/%m/%Y")
                 date_string_datetime = datetime.strptime(date_string, "%d/%m/%Y")
                 if start_date <= date_string_datetime and end_date >= date_string_datetime:
-                    self.day_data_tuple.append(data_row)
+                    if data_row[1] not in check_list:
+                        self.day_data_tuple.append(data_row)
+                        check_list.append(data_row[1])
             else:
                 pass
-        #print('Creating new day_data_tuple: DataStoreManager')
+        check_list.clear()
         return self.day_data_tuple
 
     def insert_day_data_to_treeview(self, treeview, category): # Inserting data to treeviews on MainScreen
@@ -41,11 +47,10 @@ class DataStoreManager:
         treeview.delete(*treeview.get_children())
         try:
                 for data_row in self.day_data_tuple:
-                    if category == 'task':
-                        if data_row [15] == 'task' and data_row[9] == "" and data_row[16] == 'No':
-                            if data_row[1] not in check_list:
-                                treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[7]))
-                                check_list.append[data_row[1]]
+                    if category == 'task' and data_row[15] == 'task' and data_row[9] == "" and data_row[16] == 'No':
+                        if data_row[1] not in check_list:
+                            treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[7]))
+                            check_list.append(data_row[1])
                     else:
                         if data_row[15] == category:
                             if data_row[1] not in check_list:
@@ -165,18 +170,24 @@ class DataStoreManager:
             pass
 
     def count_number_of_day_element(self, category): # no need of today date_string, data_tuple is generated for today
+        check_list= []
         try:
             number_elements = 0
             for data_row in self.day_data_tuple:
                 if category == 'task' and data_row[15] == 'task' and data_row[9] == "" and data_row[16] == 'No':
-                    number_elements += 1
+                    if data_row[1] not in check_list:
+                        number_elements += 1
+                        check_list.append(data_row[1])
                 elif data_row[15] == category and category != 'task':
-                    number_elements += 1
+                    if data_row[1] not in check_list:
+                        number_elements += 1
+                        check_list.append(data_row[1])
                 else:
                     pass
             return number_elements
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
+        check_list.clear()
 
     def count_total_number_of_elements(self, category, delegated, done, ProgressBar_bool):
             rows = []
@@ -321,7 +332,6 @@ class DataStoreManager:
 
     def insert_values_to_task_form(self, element_id, win, row1, row2, row3, row4, row5, row6, row7, row8, row9):
         data_row = self.check_elementid_in_tuple(element_id)
-        print(data_row)
 
         element_id_label = tk.Label(
             win,
@@ -583,7 +593,6 @@ class DataStoreManager:
                                 if data_row[1] not in self.data_check_list:
                                         treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9]))
                                         self.data_check_list.append(data_row[1])
-                                        print(self.data_check_list)
                         elif list_category == 'Delegated Tasks':
                             if data_row [15] == 'task' and data_row[9] != "" and data_row[16] != 'DONE':
                                 if data_row[1] not in self.data_check_list:
@@ -592,7 +601,7 @@ class DataStoreManager:
                         elif list_category == 'Personal Cards':
                             if data_row[15] == 'personal card':
                                 if data_row[1] not in self.data_check_list:
-                                    treeview.insert('', 'end', values=(data_row[1], data_row[12], data_row[2], data_row[3], data_row[4]))
+                                    treeview.insert('', 'end', values=(data_row[1], data_row[11], data_row[2], data_row[3], data_row[4]))
                                     self.data_check_list.append(data_row[1])
                         elif list_category == 'Events':
                             if data_row[15] == 'event':
@@ -630,7 +639,6 @@ class DataStoreManager:
         for data_row in self.list_data_tuple:
             if data_row[8] == project_name:
                 rows.append(data_row[1])
-                print(data_row)
             else:
                 pass
         if rows == []:

@@ -58,7 +58,7 @@ class RevisionWindow:
                         if data_row[1] not in self.rows:
                             self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
                             self.rows.append(data_row[1])
-                    for i in range(1,7):
+                    for i in range(0,1):
                         future_date = (current_date + timedelta(days=i)).strftime("%d/%m/%Y")
                         if data_row[3] == data_row[4]:
                             pass
@@ -416,6 +416,9 @@ class RevisionWindow:
                 pass
         else:
             messagebox.showwarning("ERROR", "Select an element")
+    
+    def show_element_window_on_double_click(self,event):
+        self.show_existing_element_window()
 
     def show_existing_element_window(self):
         selection = self.treeview.selection()
@@ -449,7 +452,7 @@ class RevisionWindow:
                 new_title = 'Maybe/Sometimes View'
                 new_title == 'Task View' 
             else:
-                pass
+                new_title = 'Task View'
             element_window = element_window_extended(
                 self.window, new_title, element_id
             )
@@ -515,6 +518,7 @@ class RevisionWindow:
         self.treeview.column('#6', width=150)
 
         self.treeview.place (x = 15, y = 105)
+        self.treeview.bind('<Double-1>', self.show_element_window_on_double_click)
 
         self.done_button = tk.Button(
             self.window,

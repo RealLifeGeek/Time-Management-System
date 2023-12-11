@@ -113,6 +113,9 @@ class ProjectWindow:
         )
         task_window.create_window()
         task_window.insert_values()
+    
+    def show_task_window_on_double_click(self, event):
+        self.show_existing_task_window()
 
     def save_or_edit_project(self):       
         try:
@@ -289,6 +292,7 @@ class ProjectWindow:
         self.treeview.column('#6', width=110)
 
         self.treeview.place (x = 15, y = 55)
+        self.treeview.bind("<Double-1>", self.show_task_window_on_double_click)
 
         self.header_label = tk.Label(
             self.window,
