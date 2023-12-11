@@ -75,6 +75,9 @@ class ListWindow:
             element_window.create_window()
             element_window.insert_values()
 
+    def show_element_window_on_double_click(self, event):
+        self.show_existing_element_window()
+
     def show_new_element_window(self):
         if self.title == 'My Tasks' or self.title == 'Delegated Tasks':
             task_window = element_window_extended(
@@ -170,6 +173,9 @@ class ListWindow:
             data_store_manager.find_element_in_list_tuple(self.treeview, searched_item, self.title)
         else:
             messagebox.showwarning("ERROR", "Find Field is Empty!")
+    
+    def find_on_enter_click(self, event):
+        self.find()
     
     def cancel_find(self):
         self.find_row.delete(0, 'end')
@@ -501,6 +507,8 @@ class ListWindow:
             self.treeview.column('#5', width=120)            
 
             self.treeview.place (x = 15, y = 75)
+        
+        self.treeview.bind("<Double-1>", self.show_element_window_on_double_click)
 
         if self.title == 'Maybe/Sometimes':
             pass
@@ -568,6 +576,7 @@ class ListWindow:
             foreground = "#FFFFFF"
         )
         self.find_row.place(x = 65, y = 382)
+        self.find_row.bind("<Return>", self.find_on_enter_click)
 
         find_button = tk.Button(
             self.window,

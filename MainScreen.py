@@ -26,6 +26,7 @@ class MainScreen:
     db_manager = DBManager()
     data = DataForm()
     data_store_manager = DataStoreManager()
+    db_manager.create_db()
 
     def __init__(self, root):
         #self.root = tk.Toplevel()
@@ -280,6 +281,9 @@ class MainScreen:
         task_window.create_window()
         task_window.insert_values()
 
+    def show_task_window_on_double_click(self, event):
+        self.show_existing_task_window()
+
     def show_new_event_window(self):
         event_window = element_window_extended(
             self.root, 'Event', None
@@ -298,6 +302,9 @@ class MainScreen:
         event_window.create_window()
         event_window.insert_values()
 
+    def show_event_on_double_click(self, event):
+        self.show_existing_event_window()
+
     def show_new_remark_window(self):
         remark_window = element_window_extended(
             self.root, "Remark", None
@@ -315,6 +322,9 @@ class MainScreen:
         )
         remark_window.create_window()
         remark_window.insert_values()
+    
+    def show_remark_window_on_double_click(self, event):
+        self.show_existing_remark_window()
 
     def show_new_idea_window(self):
         idea_window = element_window_small(
@@ -805,6 +815,7 @@ class MainScreen:
         self.treeview.heading('#3', text='Time')
         self.treeview.column('#3', width=100)
         self.treeview.place (x = 15, y = 35)
+        self.treeview.bind("<Double-1>", self.show_task_window_on_double_click)
         
         self.bottom_frame_left = tk.Frame(
             self.root,
@@ -833,6 +844,7 @@ class MainScreen:
         self.treeview_remarks.heading('#2', text='Remark')
         self.treeview_remarks.column('#2', width=210)
         self.treeview_remarks.place (x = 10, y = 35)
+        self.treeview_remarks.bind("<Double-1>", self.show_remark_window_on_double_click)
 
         self.view_database_button_img = PhotoImage(
         file = r"Pictures\view_list.png"
@@ -905,6 +917,7 @@ class MainScreen:
         self.treeview_events.heading('#2', text='Event')
         self.treeview_events.column('#2', width=210)
         self.treeview_events.place (x = 10, y = 35)
+        self.treeview_events.bind("<Double-1>", self.show_event_on_double_click)
 
         self.event_database_button = tk.Button(
             self.bottom_frame_right,
