@@ -17,3 +17,11 @@ class DataForm:
         self.keywords = ""          # in Personal Cards == phone number
         self.category = ""
         self.done = "No"            # Initially 'No' for everything, when done the field is updated to 'DONE'
+
+class UserForm:
+    def __init__(self):
+        self.user_id = ""
+        self.firstName = ""
+        self.lastName = ""
+        user_email = ""
+        hashed_password = ""

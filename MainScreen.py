@@ -29,7 +29,6 @@ class MainScreen:
     db_manager.create_db()
 
     def __init__(self, root):
-        #self.root = tk.Toplevel()
         self.root = root
         self.root.geometry ("800x600+300+50")
         self.root.title("Main Screen")
