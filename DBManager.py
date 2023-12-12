@@ -13,16 +13,15 @@ date_string = current_date.strftime("%d/%m/%Y")
 tomorrow = datetime.datetime.today() + datetime.timedelta(days=1)
 tomorrow_date = tomorrow.strftime('%d/%m/%Y')
 
-class DBManager:   
+class DBManager:
     def __init__(self):
-        db = 'data'
-        self.db = db
+        self.db_name = 'data'
 
     def set_element_id(self, element_id):
         self.element_id = element_id
 
     def open_db(self):
-        self.conn = sqlite3.connect(self.db + '.db')
+        self.conn = sqlite3.connect(self.db_name + '.db')
         self.cursor = self.conn.cursor()
 
     def close_db(self):
@@ -32,10 +31,22 @@ class DBManager:
     def create_db(self):
         try:
             self.open_db()
-            self.cursor.execute(f'CREATE TABLE IF NOT EXISTS {self.db} (id INTEGER PRIMARY KEY,'
+            self.cursor.execute(f'CREATE TABLE IF NOT EXISTS data (id INTEGER PRIMARY KEY,'
                                 'element_ID TEXT, element TEXT, date TEXT, deadline TEXT, field1 TEXT,'
                                 'field2 TEXT, field3 TEXT, project TEXT, delegated TEXT, cooperating TEXT, field4 TEXT,'
                                 'field5 TEXT, remarks TEXT, keywords TEXT, category TEXT, done TEXT)')
+
+            self.cursor.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id TEXT NOT NULL,
+                    user_firstName TEXT NOT NULL,
+                    user_lastName TEXT NOT NULL,
+                    user_email TEXT UNIQUE NOT NULL,
+                    hashed_password TEXT NOT NULL
+                )
+            ''')
+            self.conn.commit()
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
         finally:
@@ -44,10 +55,10 @@ class DBManager:
     def delete_from_db(self):
         try:
             self.open_db()
-            self.cursor.execute(f"SELECT id FROM {self.db} WHERE element_ID=?", (self.element_id,))
+            self.cursor.execute(f"SELECT id FROM data WHERE element_ID=?", (self.element_id,))
             row = self.cursor.fetchone()
             row_id = row[0]
-            self.cursor.execute(f"DELETE FROM {self.db} WHERE id = ?", (row_id,))
+            self.cursor.execute(f"DELETE FROM data WHERE id = ?", (row_id,))
             self.conn.commit()
             messagebox.showinfo("SUCCESS", "Successfully DELETED!")
         except Exception as e:
@@ -60,7 +71,7 @@ class DBManager:
             self.open_db()
             answer = messagebox.askyesno("SAVE", "Save element?")
             if answer:
-                query = f"INSERT INTO {self.db} (element_ID, element, date, deadline, field1, field2, field3, project, delegated, cooperating, field4, field5, remarks, keywords, category, done) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                query = f"INSERT INTO data (element_ID, element, date, deadline, field1, field2, field3, project, delegated, cooperating, field4, field5, remarks, keywords, category, done) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                 values = (
                     data.element_id,
                     data.element,
@@ -94,7 +105,7 @@ class DBManager:
             self.open_db()
             answer = messagebox.askyesno("UPDATE", "Update element?")
             if answer:
-                query = f"UPDATE {self.db} SET element = ?, date = ?, deadline = ?, field1 = ?, field2 = ?, field3 = ?, project = ?, delegated = ?, cooperating = ?, " \
+                query = f"UPDATE data SET element = ?, date = ?, deadline = ?, field1 = ?, field2 = ?, field3 = ?, project = ?, delegated = ?, cooperating = ?, " \
                         "field4 = ?, field5 = ?, remarks = ?, keywords = ?, category = ?, done = ? WHERE element_ID = ?"
                 if data.deadline == date_string or data.deadline == None:
                     data.deadline = tomorrow_date
@@ -131,9 +142,8 @@ class DBManager:
     def get_list_data_tuple(self):        # List data for DataStoreManager - ListWindow
         self.open_db()
         try:
-            self.cursor.execute(f"SELECT * FROM {self.db}")
+            self.cursor.execute(f"SELECT * FROM data")
             rows = self.cursor.fetchall()
-            #print('\n\nCreating new list_data_tuple: DBManager')
             return rows
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
@@ -151,7 +161,7 @@ class DBManager:
     def element_id_already_exists(self, id):
         self.open_db()
         try:
-            self.cursor.execute(f"SELECT * FROM {self.db} WHERE element_ID=?", (id,))
+            self.cursor.execute(f"SELECT * FROM data WHERE element_ID=?", (id,))
             result = self.cursor.fetchone()
 
             if result is not None:
@@ -162,3 +172,54 @@ class DBManager:
             messagebox.showerror("ERROR", f"ERROR: {e}")
         finally:
             self.close_db()
+
+    #### LOGIN ###3#
+
+    def get_hashed_password(self, user_email):
+        self.open_db()
+        try:
+            self.cursor.execute('SELECT hashed_password FROM users WHERE user_email = ?', (user_email,))
+            result = self.cursor.fetchone()
+            return result
+        
+        except Exception as e:
+            messagebox.showerror("ERROR", f"ERROR: {e}")
+        finally:
+            self.close_db()
+
+    def save_user_to_db(self, user):
+        try:
+            self.open_db()
+            if self.check_user_exists(user) is False:
+                query = f"INSERT INTO users (user_id, user_firstName, user_lastName, user_email, hashed_password) VALUES (?, ?, ?, ?, ?)"
+                values = (
+                    user.user_id,
+                    user.firstName,
+                    user.lastName,
+                    user.user_email,
+                    user.hashed_password
+                )
+                self.cursor.execute(query, values)
+                self.conn.commit()
+                messagebox.showinfo("CONGRATS", "User registred")
+            else:
+                pass
+        except Exception as e:
+            messagebox.showerror("ERROR",f"ERROR: {e}")
+        finally:
+            self.close_db()
+    
+    def check_user_exists(self, user):
+        try:
+            query = "SELECT * FROM users WHERE user_email = ?"
+            values = (user.user_email,)
+            self.cursor.execute(query, values)
+            rows = self.cursor.fetchall()
+            if rows:
+                messagebox.showerror("UNABLE", "E-mail address already registered")
+                return True
+            else:
+                return False
+        except Exception as e:
+            messagebox.showerror("ERROR", f"ERROR: {e}")
+            

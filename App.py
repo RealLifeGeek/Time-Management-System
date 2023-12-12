@@ -1,13 +1,14 @@
-from MainScreen import *
 from tkinter import Tk
+from MainScreen import *
+from LoginForm import *
 
 class App:
     def __init__(self):
         self.root = Tk()
-        self.main_screen = MainScreen(self.root)
+        self.login_form = LoginForm(self.root)
 
     def run(self):
-        self.main_screen.create_window()
+        self.login_form.show_login_window()
         self.root.mainloop()
 
 if __name__ == "__main__":

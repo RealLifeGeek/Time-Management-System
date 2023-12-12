@@ -47,10 +47,11 @@ class DataStoreManager:
         treeview.delete(*treeview.get_children())
         try:
                 for data_row in self.day_data_tuple:
-                    if category == 'task' and data_row[15] == 'task' and data_row[9] == "" and data_row[16] == 'No':
-                        if data_row[1] not in check_list:
-                            treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[7]))
-                            check_list.append(data_row[1])
+                    if category == 'task':
+                        if data_row[15] == 'task' and data_row[9] == "" and data_row[16] == 'No':
+                            if data_row[1] not in check_list:
+                                treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[7]))
+                                check_list.append(data_row[1])
                     else:
                         if data_row[15] == category:
                             if data_row[1] not in check_list:
