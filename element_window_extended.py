@@ -8,8 +8,6 @@ from DataStoreManager import *
 chosen_date = None
 chosen_deadline = None
 element_id = None
-db_manager = DBManager()
-data_store_manager = DataStoreManager()
 data = DataForm()
 
 
@@ -17,7 +15,11 @@ class element_window_extended: # task, remark, event
 # for new element use title as 'Task', 'Remark', 'Event'
 # for view existing element use title as 'Task View', 'Remark View' or 'Event View'
 # for element_id use element_id or None
-    def __init__(self, parent, title, element_id):
+    def __init__(self, parent, title, element_id, user_id):
+        self.user_id = user_id
+        self.db_manager = DBManager(self.user_id)
+        self.data_store_manager = DataStoreManager(self.user_id)
+
         self.window = tk.Toplevel(parent)
         self.window.geometry("600x400+100+100")
         self.window.configure(bg="#212121")
@@ -32,11 +34,11 @@ class element_window_extended: # task, remark, event
 
         if element_id == None:
             if title == 'Task':
-                element_id = db_manager.generate_element_id('NT')
+                element_id = self.db_manager.generate_element_id('NT')
             elif title ==  'Remark':
-                element_id = db_manager.generate_element_id('RE')
+                element_id = self.db_manager.generate_element_id('RE')
             elif title == 'Event':
-                element_id = db_manager.generate_element_id('EV')
+                element_id = self.db_manager.generate_element_id('EV')
         else:
             pass
         
@@ -118,17 +120,17 @@ class element_window_extended: # task, remark, event
     def save_or_edit_task(self):
         try:
             self.get_task_data()
-            if db_manager.element_id_already_exists(self.element_id):
-                db_manager.update_db_fields(data)
+            if self.db_manager.element_id_already_exists(self.element_id):
+                self.db_manager.update_db_fields(data)
             else:
-                db_manager.save_to_db(data)
+                self.db_manager.save_to_db(data)
 
             if len(self.project_row.get()) != 0:
                 project_name = data.project
-                rows = data_store_manager.project_name_does_not_exist(project_name)
+                rows = self.data_store_manager.project_name_does_not_exist(project_name)
                 print(rows)
                 if rows == True:
-                    data.element_id = db_manager.generate_element_id('PR')
+                    data.element_id = self.db_manager.generate_element_id('PR')
                     data.element = project_name
                     data.date = data.date
                     data.deadline = data.deadline
@@ -138,12 +140,12 @@ class element_window_extended: # task, remark, event
                     data.keywords = self.keywords_row.get()
                     data.category = 'project'
 
-                    db_manager.save_to_db(data)
+                    self.db_manager.save_to_db(data)
                 else:
                     pass
             else:
                 pass
-            data_store_manager.make_list_data_tuple()
+            self.data_store_manager.make_list_data_tuple()
             self.window.destroy()
         except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
@@ -154,12 +156,12 @@ class element_window_extended: # task, remark, event
     def save_or_edit_event(self):
         try:
             self.get_event_data()
-            if db_manager.element_id_already_exists(self.element_id):
-                db_manager.update_db_fields(data)
+            if self.db_manager.element_id_already_exists(self.element_id):
+                self.db_manager.update_db_fields(data)
             else:
-                db_manager.save_to_db(data)
+                self.db_manager.save_to_db(data)
             self.window.destroy()
-            data_store_manager.make_list_data_tuple()
+            self.data_store_manager.make_list_data_tuple()
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
             self.window.destroy()
@@ -167,12 +169,12 @@ class element_window_extended: # task, remark, event
     def save_or_edit_remark(self):
         try:
             self.get_remark_data()
-            if db_manager.element_id_already_exists(self.element_id):
-                db_manager.update_db_fields(data)
+            if self.db_manager.element_id_already_exists(self.element_id):
+                self.db_manager.update_db_fields(data)
             else:
-                db_manager.save_to_db(data)
+                self.db_manager.save_to_db(data)
             self.window.destroy()
-            data_store_manager.make_list_data_tuple()
+            self.data_store_manager.make_list_data_tuple()
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
             self.window.destroy()
@@ -617,7 +619,7 @@ class element_window_extended: # task, remark, event
             row8 = self.cooperating_row
             row9 = self.keywords_row
 
-            data_store_manager.insert_values_to_task_form(
+            self.data_store_manager.insert_values_to_task_form(
                 self.element_id, win, row1, row2, row3, row4, row5, row6, row7, row8, row9
             )
             
@@ -628,7 +630,7 @@ class element_window_extended: # task, remark, event
             row3 = self.field2_row
             row4 = self.date_row
 
-            data_store_manager.insert_values_to_remark_form(
+            self.data_store_manager.insert_values_to_remark_form(
                 self.element_id, win, row1, row2, row3, row4
             )
 
@@ -642,7 +644,7 @@ class element_window_extended: # task, remark, event
             row6 = self.field3_row
             row7 = self.field4_row
 
-            data_store_manager.insert_values_to_event_form(
+            self.data_store_manager.insert_values_to_event_form(
                 self.element_id, win, row1, row2, row3, row4, row5, row6, row7
             )
         

@@ -16,14 +16,12 @@ current_date = datetime.now()
 date_string = current_date.strftime("%d/%m/%Y")
 tomorrow = datetime.today() + timedelta(days=1)
 tomorrow_date = tomorrow.strftime('%d/%m/%Y')
-db_manager = DBManager()
-data_store_manager = DataStoreManager()
 data = DataForm()
 
 month_and_year = current_date.strftime("%B %Y")
 
 class MyCalendar:
-    def __init__(self, parent):
+    def __init__(self, parent, user_id):
         self.window = tk.Toplevel(parent)
         self.window.geometry("1000x695+200+0")
         self.window.configure(bg="#212121")
@@ -32,6 +30,10 @@ class MyCalendar:
       
         style = ttk.Style()
         style.theme_use('clam')
+
+        self.user_id = user_id
+        self.db_manager = DBManager(self.user_id)
+        self.data_store_manager = DataStoreManager(self.user_id)
 
         self.month_and_year = current_date
         self.month_and_year_str = current_date.strftime("%B %Y")
@@ -151,7 +153,7 @@ class MyCalendar:
         return self.frame_name
     
     def create_notification_bars(self, i):
-        list_data_tuple = data_store_manager.make_list_data_tuple()
+        list_data_tuple = self.data_store_manager.make_list_data_tuple()
         searched_date = (str(self.selected_date))[:10]
         searched_birthday = (str(self.selected_date))[:5]
 
@@ -361,7 +363,7 @@ class MyCalendar:
         date_and_day = clicked_button.cget('text')
         date = date_and_day[:10]
         day = date_and_day[11:]
-        calendar_date_window = CalendarDateWindow(self.window, date, day)
+        calendar_date_window = CalendarDateWindow(self.window, date, day, self.user_id)
 
         calendar_date_window.create_window()
 
@@ -501,7 +503,11 @@ class MyCalendar:
 
 
 class CalendarDateWindow:
-        def __init__(self, parent, date, day):
+        def __init__(self, parent, date, day, user_id):
+            self.user_id = user_id
+            self.db_manager = DBManager(self.user_id)
+            self.data_store_manager = DataStoreManager(self.user_id)
+
             self.window = tk.Toplevel(parent)
             self.window.geometry("800x560+50+50")
             self.window.configure(bg="#212121")
@@ -511,7 +517,7 @@ class CalendarDateWindow:
             style = ttk.Style()
             style.theme_use('clam')
 
-            self.list_data_tuple = data_store_manager.make_list_data_tuple()
+            self.list_data_tuple = self.data_store_manager.make_list_data_tuple()
             self.date = date
             self.day = day
             self.text = 'TASKS'

@@ -5,17 +5,17 @@ from DBManager import *
 from DataStoreManager import *
 from DataFormObject import *
 
-db_manager = DBManager()
-data_store_manager = DataStoreManager()
 data = DataForm()
-
 
 
 class element_window_small: # Ahoc Task, Idea
     # for new element use title as 'Adhoc Task', 'Idea'
     # for view existing element use title as 'Idea View'
     # for element_id use element_id or None
-    def __init__(self, parent, title, element_id):
+    def __init__(self, parent, title, element_id, user_id):
+        self.user_id = user_id
+        self.db_manager = DBManager(self.user_id)
+        self.data_store_manager = DataStoreManager(self.user_id)
 
         self.window = tk.Toplevel(parent)
         self.window.geometry("600x240+100+200")
@@ -24,9 +24,9 @@ class element_window_small: # Ahoc Task, Idea
 
         if element_id == None:
             if title == 'Adhoc Task':
-                element_id = db_manager.generate_element_id('AD')
+                element_id = self.db_manager.generate_element_id('AD')
             elif title ==  'Idea':
-                element_id = db_manager.generate_element_id('ID')
+                element_id = self.db_manager.generate_element_id('ID')
         else:
             pass
         
@@ -44,7 +44,7 @@ class element_window_small: # Ahoc Task, Idea
             row2 = self.field1_row 
             row3 = self.field2_row
 
-            data_store_manager.insert_values_to_idea_form(
+            self.data_store_manager.insert_values_to_idea_form(
                 self.element_id, win, row1, row2, row3
             )
 
@@ -85,14 +85,14 @@ class element_window_small: # Ahoc Task, Idea
     def save_or_edit_task(self):
         try:
             self.get_task_data()
-            db_manager.save_to_db(data)
+            self.db_manager.save_to_db(data)
 
             if len(self.project_row.get()) != 0:
                 project_name = data.project
-                rows = data_store_manager.project_name_does_not_exist(project_name)
+                rows = self.data_store_manager.project_name_does_not_exist(project_name)
                 print(rows)
                 if rows == []:
-                    data.element_id = db_manager.generate_element_id('PR')
+                    data.element_id = self.db_manager.generate_element_id('PR')
                     data.element = project_name
                     data.date = data.date
                     data.deadline = data.deadline
@@ -102,10 +102,10 @@ class element_window_small: # Ahoc Task, Idea
                     data.keywords = self.keywords_row.get()
                     data.category = 'project'
 
-                    db_manager.save_to_db(data)
+                    self.db_manager.save_to_db(data)
             else:
                 pass
-            data_store_manager.make_list_data_tuple()
+            self.data_store_manager.make_list_data_tuple()
             self.window.destroy()
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")
@@ -114,11 +114,11 @@ class element_window_small: # Ahoc Task, Idea
     def save_or_edit_idea(self):
         try:
             self.get_idea_data()    
-            if db_manager.element_id_already_exists(self.element_id):
-                db_manager.update_db_fields(data)
+            if self.db_manager.element_id_already_exists(self.element_id):
+                self.db_manager.update_db_fields(data)
             else:
-                db_manager.save_to_db(data)
-            data_store_manager.make_list_data_tuple()
+                self.db_manager.save_to_db(data)
+            self.data_store_manager.make_list_data_tuple()
             self.window.destroy()
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR: {e}")

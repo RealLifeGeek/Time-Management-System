@@ -13,13 +13,15 @@ from element_window_extended import *
 
 current_date = datetime.now()
 date_string = current_date.strftime("%d/%m/%Y")
-db_manager = DBManager()
-data_store_manager = DataStoreManager()
 data = DataForm()
 
 
 class ProjectWindow:   
-    def __init__(self, parent, element_id):
+    def __init__(self, parent, element_id, user_id):
+        self.user_id = user_id
+        self.db_manager = DBManager(self.user_id)
+        self.data_store_manager = DataStoreManager(self.user_id)
+
         self.window = tk.Toplevel(parent)
         self.window.geometry('800x600')
         self.window.title('PROJECT')
@@ -35,7 +37,7 @@ class ProjectWindow:
         self.calendar.place(x= 525, y= 320)
 
         if element_id == None:
-            element_id = db_manager.generate_element_id('PR')
+            element_id = self.db_manager.generate_element_id('PR')
         else:
             pass
         
@@ -51,8 +53,8 @@ class ProjectWindow:
         self.window.after(10000, self.check_project_name)
 
     def insert_values_to_treeview(self):
-        data_store_manager.make_list_data_tuple()
-        data_store_manager.insert_data_to_project_treeview(self.treeview, self.project_name)
+        self.data_store_manager.make_list_data_tuple()
+        self.data_store_manager.insert_data_to_project_treeview(self.treeview, self.project_name)
         self.window.after(10000, self.insert_values_to_treeview)
 
     def insert_values(self):
@@ -69,7 +71,7 @@ class ProjectWindow:
         row4.delete(0, tk.END)
         row5.delete(0, tk.END)
 
-        data_store_manager.insert_values_to_project_form(
+        self.data_store_manager.insert_values_to_project_form(
             self.element_id, win, row1, row2, row3, row4, row5
         )
         self.check_project_name()
@@ -120,31 +122,31 @@ class ProjectWindow:
     def save_or_edit_project(self):       
         try:
             self.get_project_data()
-            if db_manager.element_id_already_exists(self.element_id):
-                db_manager.update_db_fields(data)
+            if self.db_manager.element_id_already_exists(self.element_id):
+                self.db_manager.update_db_fields(data)
             else:
-                db_manager.save_to_db(data)
-            data_store_manager.make_list_data_tuple()
+                self.db_manager.save_to_db(data)
+            self.data_store_manager.make_list_data_tuple()
             self.window.destroy()
         except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
                 self.window.destroy()
     
     def project_done(self):
-        if db_manager.element_id_already_exists(self.element_id):
+        if self.db_manager.element_id_already_exists(self.element_id):
             self.get_project_data()
             if data.done == 'DONE':
                 messagebox.showwarning("ALREADY DONE", "This project is already done")
             else:
                 data.done = 'DONE'
-                db_manager.update_db_fields(data)
+                self.db_manager.update_db_fields(data)
                 print('Project_name for related tasks is: ' + self.project_name)
-                rows = data_store_manager.get_all_project_tasks_id_from_list_data_tuple(self.project_name)
+                rows = self.data_store_manager.get_all_project_tasks_id_from_list_data_tuple(self.project_name)
                 if rows is not None:
                     for row in rows:
                         messagebox.showwarning("DONE ASSOCIATED", f"Asscociated task {row} is to be done")
-                        db_manager.set_element_id(row)
-                        data_row = data_store_manager.get_data_row_from_list_data_tuple(row)
+                        self.db_manager.set_element_id(row)
+                        data_row = self.data_store_manager.get_data_row_from_list_data_tuple(row)
 
                         data.element_id = row
                         data.element = data_row[2]
@@ -163,10 +165,10 @@ class ProjectWindow:
                         data.category = data_row[15]
                         data.done = 'DONE'
 
-                        db_manager.update_db_fields(data)
+                        self.db_manager.update_db_fields(data)
                 else:
                     print('No related tasks to the project: ' + self.project_name)
-            data_store_manager.make_list_data_tuple()
+            self.data_store_manager.make_list_data_tuple()
             self.exit()
         else:
             messagebox.showerror("ERROR", "Unable to finish non-existing project")
@@ -182,7 +184,7 @@ class ProjectWindow:
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]
-            data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+            data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
 
             data.element_id = element_id
             data.element = data_row[2]
@@ -201,9 +203,9 @@ class ProjectWindow:
             data.category = data_row[15]
             data.done = 'DONE'
 
-            db_manager.update_db_fields(data)
-            data_store_manager.make_list_data_tuple()
-            data_store_manager.insert_data_to_project_treeview(self.treeview, self.project_name)
+            self.db_manager.update_db_fields(data)
+            self.data_store_manager.make_list_data_tuple()
+            self.data_store_manager.insert_data_to_project_treeview(self.treeview, self.project_name)
         else:
             messagebox.showwarning("Error", "Select an element")
     
@@ -211,12 +213,12 @@ class ProjectWindow:
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]
-            db_manager.set_element_id(element_id)
+            self.db_manager.set_element_id(element_id)
             answer = messagebox.askyesno("DELETE", "DELETE from database?")
             if answer:
-                db_manager.delete_from_db()
-                data_store_manager.make_list_data_tuple()
-                data_store_manager.insert_data_to_project_treeview(self.treeview, self.project_name)
+                self.db_manager.delete_from_db()
+                self.data_store_manager.make_list_data_tuple()
+                self.data_store_manager.insert_data_to_project_treeview(self.treeview, self.project_name)
                 #self.exit()
             else:
                 pass
@@ -229,8 +231,8 @@ class ProjectWindow:
     def progress_bar_of_project(self):
         self.insert_values()
         try:
-            number_tasks_done = data_store_manager.count_number_elements_for_project(self.project_name, 'DONE')
-            number_tasks_to_fulfill = data_store_manager.count_number_elements_for_project(self.project_name, 'No')
+            number_tasks_done = self.data_store_manager.count_number_elements_for_project(self.project_name, 'DONE')
+            number_tasks_to_fulfill = self.data_store_manager.count_number_elements_for_project(self.project_name, 'No')
             total_number_tasks = number_tasks_done + number_tasks_to_fulfill
             if total_number_tasks != 0:
                 task_value = 100/total_number_tasks

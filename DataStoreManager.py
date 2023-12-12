@@ -4,19 +4,20 @@ from DBManager import *
 from DataFormObject import *
 from datetime import datetime, timedelta
 
-db_manager = DBManager()
 data = DataForm()
 current_date = datetime.now()
 date_string = current_date.strftime("%d/%m/%Y")
 
 class DataStoreManager:
-    def __init__(self):
+    def __init__(self, user_id):
+        self.user_id = user_id
+        self.db_manager = DBManager(self.user_id)
         self.day_data_tuple = []
         self.list_data_tuple = []
         self.data_check_list = []
     
     def make_list_data_tuple(self): # Tuple for ListWindow
-        self.list_data_tuple = db_manager.get_list_data_tuple()
+        self.list_data_tuple = self.db_manager.get_list_data_tuple()
         self.make_day_data_tuple()
         return self.list_data_tuple
 
@@ -60,7 +61,7 @@ class DataStoreManager:
                         else:
                             pass     
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 200: {e}")
         check_list.clear()
 
     def insert_data_to_project_treeview(self, treeview, project_name):
@@ -147,7 +148,7 @@ class DataStoreManager:
                 else:
                     pass
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 201: {e}")
 
     def insert_data_to_personal_card_treeview(self, treeview, category, name):
         self.make_list_data_tuple()
@@ -187,7 +188,7 @@ class DataStoreManager:
                     pass
             return number_elements
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 202: {e}")
         check_list.clear()
 
     def count_total_number_of_elements(self, category, delegated, done, ProgressBar_bool):
@@ -632,7 +633,7 @@ class DataStoreManager:
                         else:
                             pass
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 203: {e}")
 
     def project_name_does_not_exist(self, project_name):
         self.make_list_data_tuple

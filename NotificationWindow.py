@@ -11,13 +11,15 @@ from PersonalCardWindow import *
 
 current_date = datetime.now()
 date_string = current_date.strftime("%d/%m/%Y")
-db_manager = DBManager()
-data_store_manager = DataStoreManager()
 data = DataForm()
 
 class NotificationWindow:
 
-    def __init__(self, parent):
+    def __init__(self, parent, user_id):
+        self.user_id = user_id
+        self.db_manager = DBManager(self.user_id)
+        self.data_store_manager = DataStoreManager(self.user_id)
+
         self.window = tk.Toplevel(parent)
         self.window.geometry('800x600+100+50')
         self.window.title('NOTIFICATIONS')
@@ -26,7 +28,7 @@ class NotificationWindow:
         self.window.resizable(0,0)
 
     def show_total_number_of_undone_elements(self, category, frame, XX, YY):
-        number_elements = data_store_manager.count_number_undone_elements(category, frame, XX, YY)
+        number_elements = self.data_store_manager.count_number_undone_elements(category, frame, XX, YY)
         number_elements_label = tk.Label(
             frame,
             text = f"{number_elements} ",
@@ -40,7 +42,7 @@ class NotificationWindow:
             number_elements_label.configure(foreground="#FF0018")
 
     def show_total_number_of_closing_deadlines(self, frame, XX, YY):
-        number_elements = data_store_manager.count_closing_deadlines(frame, XX, YY)
+        number_elements = self.data_store_manager.count_closing_deadlines(frame, XX, YY)
         number_elements_label = tk.Label(
             frame,
             text = f"{number_elements} ",
@@ -54,7 +56,7 @@ class NotificationWindow:
             number_elements_label.configure(foreground="#FF0018")
     
     def show_number_of_pending_ideas(self, frame, XX, YY):
-        number_elements = data_store_manager.count_pending_ideas(frame, XX, YY)
+        number_elements = self.data_store_manager.count_pending_ideas(frame, XX, YY)
         number_elements_label = tk.Label(
             frame,
             text = f"{number_elements} ",
@@ -68,30 +70,30 @@ class NotificationWindow:
             number_elements_label.configure(foreground="#FF0018")
 
     def show_undone_tasks_in_treeview(self):
-        data_store_manager.insert_data_to_notifications_treeview(self.treeview, 'tasks')
+        self.data_store_manager.insert_data_to_notifications_treeview(self.treeview, 'tasks')
         self.treeview_label.configure(text='MY TASKS UNDONE: ')
 
     def show_undone_delegated_tasks_in_treeview(self):
-        data_store_manager.insert_data_to_notifications_treeview(self.treeview, 'delegated tasks')
+        self.data_store_manager.insert_data_to_notifications_treeview(self.treeview, 'delegated tasks')
         self.treeview_label.configure(text='DELEGATED TASKS UNDONE: ')
 
     def show_undone_projects_in_treeview(self):
-        data_store_manager.insert_data_to_notifications_treeview(self.treeview, 'projects')
+        self.data_store_manager.insert_data_to_notifications_treeview(self.treeview, 'projects')
         self.treeview_label.configure(text='PROJECTS UNDONE: ')
 
     def show_closing_deadlines_in_treeview(self):
-        data_store_manager.insert_data_to_notifications_treeview(self.treeview, 'closing deadlines')
+        self.data_store_manager.insert_data_to_notifications_treeview(self.treeview, 'closing deadlines')
         self.treeview_label.configure(text='CLOSING DEADLINES: ')
     
     def show_pending_ideas_in_treeview(self):
-        data_store_manager.insert_data_to_notifications_treeview(self.treeview, 'pending ideas')
+        self.data_store_manager.insert_data_to_notifications_treeview(self.treeview, 'pending ideas')
         self.treeview_label.configure(text = 'PENDING IDEAS: ')
 
     def show_existing_element_window(self):
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]
-            data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+            data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
             if data_row[15] == 'task':
                 title = 'Task View'
                 element_window = element_window_extended(
@@ -116,6 +118,9 @@ class NotificationWindow:
                 idea_window.insert_values()
             else:
                 pass
+    
+    def show_element_window_on_double_click(self, event):
+        self.show_existing_element_window()
 
     def show_existing_personal_card(self):
         selection =  self.birthday_treeview.selection()
@@ -128,12 +133,15 @@ class NotificationWindow:
             personal_card_window.insert_values()
         else:
             messagebox.showwarning("Error", "Select an element")
+    
+    def show_personal_card_on_double_click(self, event):
+        self.show_existing_personal_card()
 
     def delete_from_database(self):
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]
-            data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+            data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
             category = data_row[15]
             delegated = data_row[9]
             if category == 'task' and delegated == "":
@@ -142,21 +150,21 @@ class NotificationWindow:
                 str_category = 'delegated tasks'
             elif category == 'project':
                 str_category = 'projects'
-            db_manager.set_element_id(element_id)
+            self.db_manager.set_element_id(element_id)
             answer = messagebox.askyesno("DELETE", "DELETE from database?")
             if answer:
-                db_manager.delete_from_db()
+                self.db_manager.delete_from_db()
                 if category == 'project':
                     element_name = self.treeview.item(selection, 'values')[1]
-                    rows = data_store_manager.get_all_project_tasks_id_from_list_data_tuple(element_name)
+                    rows = self.data_store_manager.get_all_project_tasks_id_from_list_data_tuple(element_name)
                     if rows is not None:
                         for row in rows:
-                            db_manager.set_element_id(row)
+                            self.db_manager.set_element_id(row)
                             messagebox.showwarning("DELETE ASSOCIATED", f"Asscociated task {row} is to be deleted.")
-                            db_manager.delete_from_db()
+                            self.db_manager.delete_from_db()
 
-                data_store_manager.make_list_data_tuple()
-                data_store_manager.insert_data_to_notifications_treeview(self.treeview, str_category)
+                self.data_store_manager.make_list_data_tuple()
+                self.data_store_manager.insert_data_to_notifications_treeview(self.treeview, str_category)
                 self.show_total_number_of_undone_elements('tasks', self.left_frame, 160, 112)
                 self.show_total_number_of_undone_elements('delegated tasks', self.left_frame, 160, 152)
                 self.show_total_number_of_undone_elements('projects', self.left_frame, 160, 192)
@@ -333,6 +341,7 @@ class NotificationWindow:
         self.treeview.column('#4', width=150)
 
         self.treeview.place (x = 250, y = 175)
+        self.treeview.bind("<Double-1>", self. show_element_window_on_double_click)
 
         view_button = tk.Button(
             self.window,
@@ -383,6 +392,7 @@ class NotificationWindow:
         self.birthday_treeview.column('#4', width=150)
 
         self.birthday_treeview.place (x = 250, y = 375)
+        self.birthday_treeview.bind("<Double-1>", self.show_personal_card_on_double_click)
 
         view_birthday_button = tk.Button(
             self.window,
@@ -411,6 +421,6 @@ class NotificationWindow:
         self.show_total_number_of_undone_elements('projects', self.left_frame, 160, 192)
         self.show_total_number_of_closing_deadlines(self.left_frame, 160, 332)
         self.show_number_of_pending_ideas(self.left_frame, 160, 472)
-        data_store_manager.insert_data_to_notifications_treeview(self.treeview, 'tasks')
-        data_store_manager.insert_data_to_notifications_treeview(self.birthday_treeview, 'birthdays')
+        self.data_store_manager.insert_data_to_notifications_treeview(self.treeview, 'tasks')
+        self.data_store_manager.insert_data_to_notifications_treeview(self.birthday_treeview, 'birthdays')
 
