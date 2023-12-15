@@ -22,7 +22,7 @@ class NotificationWindow:
 
         self.window = tk.Toplevel(parent)
         self.window.geometry('800x600+100+50')
-        self.window.title('NOTIFICATIONS')
+        self.window.title('NOTIFICATION CENTRE')
         self.window.option_add('*Dialog.msg.title.bg', '#000000')
         self.window.configure(bg = "#AFAFAF")
         self.window.resizable(0,0)
@@ -68,6 +68,14 @@ class NotificationWindow:
 
         if number_elements != 0:
             number_elements_label.configure(foreground="#FF0018")
+    
+    def show_number_of_birthdays(self):
+        number_birthdays = self.data_store_manager.count_birthday()
+        if number_birthdays == 0:
+            pass
+        else:
+            self.birthday_number_label.configure(text = str(number_birthdays) )
+            self.birthday_number_label.configure(foreground = "#FF0018")
 
     def show_undone_tasks_in_treeview(self):
         self.data_store_manager.insert_data_to_notifications_treeview(self.treeview, 'tasks')
@@ -97,7 +105,7 @@ class NotificationWindow:
             if data_row[15] == 'task':
                 title = 'Task View'
                 element_window = element_window_extended(
-                    self.window, title, element_id
+                    self.window, title, element_id, self.user_id
                 )
                 element_window.create_window()
                 element_window.insert_values()
@@ -118,6 +126,8 @@ class NotificationWindow:
                 idea_window.insert_values()
             else:
                 pass
+        else:
+            messagebox.showwarning("Error", "Select an element")
     
     def show_element_window_on_double_click(self, event):
         self.show_existing_element_window()
@@ -127,7 +137,7 @@ class NotificationWindow:
         if selection:
             element_id = self.birthday_treeview.item(selection, 'values')[0]
             personal_card_window = PersonalCardWindow(
-                self.window, element_id
+                self.window, element_id, self.user_id
             )
             personal_card_window.create_window()
             personal_card_window.insert_values()
@@ -189,7 +199,7 @@ class NotificationWindow:
 
         header_label = tk.Label(
             top_frame,
-            text = "NOTIFICATIONS",
+            text = "NOTIFICATION CENTRE",
             font = ('Montserrat', '25', 'bold'),
             background = "#D9D0AF",
             foreground = "#2D4A54"
@@ -365,14 +375,23 @@ class NotificationWindow:
         )
         delete_button.place(x=680, y=245)
 
-        birthday_treeview_label = tk.Label(
+        self.birthday_treeview_label = tk.Label(
             self.window,
             text = "BIRTHDAYS AND CLOSING BIRTHDAYS: ",
             font = ('Montserrat', '12', 'bold'),
             background = "#AFAFAF",
             foreground = "#2D4A54"
         )
-        birthday_treeview_label.place(x = 250, y = 350)
+        self.birthday_treeview_label.place(x = 250, y = 350)
+
+        self.birthday_number_label = tk.Label(
+            self.window,
+            text = "0",
+            font = ('Montserrat', '12', 'bold'),
+            background = "#AFAFAF",
+            foreground = "#06CA00"
+        )
+        self.birthday_number_label.place(x = 570, y = 350)
 
         self.birthday_treeview = ttk.Treeview(
             self.window, 
@@ -386,9 +405,9 @@ class NotificationWindow:
         self.birthday_treeview.column('#1', width=0, stretch = False)
         self.birthday_treeview.heading('#2', text='Name')
         self.birthday_treeview.column('#2', width=180)
-        self.birthday_treeview.heading('#3', text='Date of Birth')
+        self.birthday_treeview.heading('#3', text='Date')
         self.birthday_treeview.column('#3', width=80)
-        self.birthday_treeview.heading('#4', text='Year of Birth')
+        self.birthday_treeview.heading('#4', text='Year')
         self.birthday_treeview.column('#4', width=150)
 
         self.birthday_treeview.place (x = 250, y = 375)
@@ -423,4 +442,5 @@ class NotificationWindow:
         self.show_number_of_pending_ideas(self.left_frame, 160, 472)
         self.data_store_manager.insert_data_to_notifications_treeview(self.treeview, 'tasks')
         self.data_store_manager.insert_data_to_notifications_treeview(self.birthday_treeview, 'birthdays')
+        self.show_number_of_birthdays()
 

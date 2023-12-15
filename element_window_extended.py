@@ -104,7 +104,7 @@ class element_window_extended: # task, remark, event
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
         data.date = self.date_row.get()
-        data.deadline = self.date_row.get()
+        data.deadline = ""
         data.field1 = self.field1_row.get()
         data.field2 = self.field2_row.get()
         data.field3 = ""
@@ -129,7 +129,7 @@ class element_window_extended: # task, remark, event
                 project_name = data.project
                 rows = self.data_store_manager.project_name_does_not_exist(project_name)
                 print(rows)
-                if rows == True:
+                if rows == []:
                     data.element_id = self.db_manager.generate_element_id('PR')
                     data.element = project_name
                     data.date = data.date
@@ -148,7 +148,7 @@ class element_window_extended: # task, remark, event
             self.data_store_manager.make_list_data_tuple()
             self.window.destroy()
         except Exception as e:
-                messagebox.showerror("ERROR", f"ERROR: {e}")
+                messagebox.showerror("ERROR", f"ERROR 300: {e}")
                 self.window.destroy()
         else:
             pass
@@ -163,7 +163,7 @@ class element_window_extended: # task, remark, event
             self.window.destroy()
             self.data_store_manager.make_list_data_tuple()
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 301: {e}")
             self.window.destroy()
     
     def save_or_edit_remark(self):
@@ -176,7 +176,7 @@ class element_window_extended: # task, remark, event
             self.window.destroy()
             self.data_store_manager.make_list_data_tuple()
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 302: {e}")
             self.window.destroy()
 
     def exit(self):

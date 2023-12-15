@@ -108,7 +108,7 @@ class element_window_small: # Ahoc Task, Idea
             self.data_store_manager.make_list_data_tuple()
             self.window.destroy()
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 400: {e}")
             self.window.destroy()
 
     def save_or_edit_idea(self):
@@ -121,7 +121,7 @@ class element_window_small: # Ahoc Task, Idea
             self.data_store_manager.make_list_data_tuple()
             self.window.destroy()
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 401: {e}")
             self.window.destroy()
     
     def exit(self):

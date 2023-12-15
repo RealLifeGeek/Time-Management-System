@@ -41,7 +41,7 @@ class DBDirector:
             ''')
             self.conn.commit()
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 101: {e}")
         finally:
             self.close_db()
 
@@ -53,7 +53,7 @@ class DBDirector:
             return result
         
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 102: {e}")
         finally:
             self.close_db()
 
@@ -75,7 +75,7 @@ class DBDirector:
             else:
                 pass
         except Exception as e:
-            messagebox.showerror("ERROR",f"ERROR: {e}")
+            messagebox.showerror("ERROR",f"ERROR 103: {e}")
         finally:
             self.close_db()
     
@@ -91,7 +91,7 @@ class DBDirector:
             else:
                 return False
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 104: {e}")
     
     def get_user_id(self, user_email):
         self.open_db()
@@ -104,7 +104,7 @@ class DBDirector:
             return user_id
             
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 105: {e}")
         
         finally:
             self.close_db()
@@ -128,7 +128,7 @@ class DBDirector:
             else:
                 return False
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 106: {e}")
         finally:
             self.close_db()
 
@@ -152,7 +152,7 @@ class DBManager(DBDirector):
                                 'field5 TEXT, remarks TEXT, keywords TEXT, category TEXT, done TEXT)')
             self.conn.commit()
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR 100: {e}")
+            messagebox.showerror("ERROR", f"ERROR 110: {e}")
         finally:
             self.close_db()
 
@@ -166,7 +166,7 @@ class DBManager(DBDirector):
             self.conn.commit()
             messagebox.showinfo("SUCCESS", "Successfully DELETED!")
         except Exception as e:
-            messagebox.showerror("ERROR",f"ERROR: {e}")
+            messagebox.showerror("ERROR",f"ERROR 111: {e}")
         finally:
             self.close_db()
 
@@ -200,7 +200,7 @@ class DBManager(DBDirector):
             else:
                 pass
         except Exception as e:
-            messagebox.showerror("ERROR",f"ERROR: {e}")
+            messagebox.showerror("ERROR",f"ERROR 112: {e}")
         finally:
             self.close_db()
 
@@ -239,7 +239,7 @@ class DBManager(DBDirector):
             else:
                 pass
         except Exception as e:
-            messagebox.showwarning("ERROR", f"ERROR: {e}")
+            messagebox.showwarning("ERROR", f"ERROR 113: {e}")
         finally:
             self.close_db()
 
@@ -250,7 +250,7 @@ class DBManager(DBDirector):
             rows = self.cursor.fetchall()
             return rows
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 114: {e}")
         finally:
             self.close_db()
 
@@ -273,6 +273,6 @@ class DBManager(DBDirector):
             else:
                 return False
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 115: {e}")
         finally:
             self.close_db()

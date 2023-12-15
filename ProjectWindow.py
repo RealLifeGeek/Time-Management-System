@@ -129,7 +129,7 @@ class ProjectWindow:
             self.data_store_manager.make_list_data_tuple()
             self.window.destroy()
         except Exception as e:
-                messagebox.showerror("ERROR", f"ERROR: {e}")
+                messagebox.showerror("ERROR", f"ERROR 700: {e}")
                 self.window.destroy()
     
     def project_done(self):
@@ -175,7 +175,7 @@ class ProjectWindow:
 
     def show_new_task_window(self):
         task_window = element_window_extended(
-            self.window, 'Task', None
+            self.window, 'Task', None, self.user_id
         )
         task_window.create_window()
         task_window.project_row.insert(0, self.project_name)
@@ -189,7 +189,7 @@ class ProjectWindow:
             data.element_id = element_id
             data.element = data_row[2]
             data.date = data_row[3]
-            data.deadline = data_row[4]
+            data.deadline = ""
             data.field1 = data_row[5]
             data.field2 = data_row[6]
             data.field3 = data_row[7]
@@ -268,7 +268,7 @@ class ProjectWindow:
                 else:
                     style_progressbar.configure("green.Horizontal.TProgressbar", background= '#20EE00',  troughcolor='#666666')
         except Exception as e:
-            messagebox.showerror("ERROR", f"Progress bar error: {e}")
+            messagebox.showerror("ERROR", f"Progress bar error 701: {e}")
         self.window.after(10000, self.progress_bar_of_project)
 
 

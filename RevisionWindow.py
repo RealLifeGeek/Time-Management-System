@@ -300,8 +300,8 @@ class RevisionWindow:
             print('Wrong self.title in RevisionWindow: function Next')
 
         self.insert_data_to_revision_treeview()
-        total_number_elements = len(self.rows)
-        self.treeview_label.configure(text = str(self.current_title) + ': ' + str(total_number_elements))
+        self.total_number_elements = len(self.rows)
+        self.treeview_label.configure(text = str(self.current_title) + ': ' + str(self.total_number_elements))
         if self.current_title == 'MY TASKS' or self.current_title == 'DELEGATED TASKS' or self.current_title == 'SHARED TASKS' or self.current_title == 'MY PROJECTS' or self.current_title == 'DELEGATED PROJECTS' or self.current_title == 'SHARED PROJECTS' or self.current_title == 'DEADLINES':
             self.done_button.place(x = 15, y = 400)
         else:
@@ -336,7 +336,7 @@ class RevisionWindow:
                 data.element_id = element_id
                 data.element = data_row[2]
                 data.date = data_row[3]
-                data.deadline = data_row[4]
+                data.deadline = ""
                 data.field1 = data_row[5]
                 data.field2 = data_row[6]
                 data.field3 = data_row[7]
@@ -431,14 +431,14 @@ class RevisionWindow:
 
         if self.current_title == 'MY PROJECTS' or self.current_title == 'DELEGATED PROJECTS' or self.current_title == 'SHARED PROJECTS':
             project_window = ProjectWindow(
-                self.window, element_id
+                self.window, element_id, self.user_id
             )
             project_window.create_window()
             project_window.insert_values()
 
         elif self.current_title == 'BIRTHDAYS':
             personal_card_window = PersonalCardWindow(
-                self.window, element_id
+                self.window, element_id, self.user_id
             )
             personal_card_window.create_window()
             personal_card_window.insert_values()
@@ -456,7 +456,7 @@ class RevisionWindow:
             else:
                 new_title = 'Task View'
             element_window = element_window_extended(
-                self.window, new_title, element_id
+                self.window, new_title, element_id, self.user_id
             )
             element_window.create_window()
             element_window.insert_values()
@@ -466,7 +466,7 @@ class RevisionWindow:
 
     def show_new_idea_window(self):
         idea_window = element_window_small(
-            self.window, 'Idea', None
+            self.window, 'Idea', None, self.user_id
         )
         idea_window.create_window()
     
