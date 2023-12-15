@@ -1,5 +1,4 @@
 from tkinter import Tk
-from MainScreen import *
 from LoginForm import *
 
 class App:

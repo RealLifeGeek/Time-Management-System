@@ -4,19 +4,22 @@ from DBManager import *
 from DataFormObject import *
 from datetime import datetime, timedelta
 
-db_manager = DBManager()
 data = DataForm()
 current_date = datetime.now()
 date_string = current_date.strftime("%d/%m/%Y")
+tomorrow = datetime.today() + timedelta(days=1)
+tomorrow_date = tomorrow.strftime('%d/%m/%Y')
 
 class DataStoreManager:
-    def __init__(self):
+    def __init__(self, user_id):
+        self.user_id = user_id
+        self.db_manager = DBManager(self.user_id)
         self.day_data_tuple = []
         self.list_data_tuple = []
         self.data_check_list = []
     
     def make_list_data_tuple(self): # Tuple for ListWindow
-        self.list_data_tuple = db_manager.get_list_data_tuple()
+        self.list_data_tuple = self.db_manager.get_list_data_tuple()
         self.make_day_data_tuple()
         return self.list_data_tuple
 
@@ -60,7 +63,7 @@ class DataStoreManager:
                         else:
                             pass     
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 200: {e}")
         check_list.clear()
 
     def insert_data_to_project_treeview(self, treeview, project_name):
@@ -92,18 +95,36 @@ class DataStoreManager:
         elif category == 'birthdays':
             for i in range(0,7):
                 future_date = (current_date + timedelta(days=i)).strftime('%d/%m')
+                today_birthday_date = current_date.strftime("%d/%m")
+                tomorrow_birthday_date = tomorrow.strftime("%d/%m")
                 for data_row in self.list_data_tuple:
+
                     if data_row[15] == 'personal card' and data_row[3] == future_date:
-                        treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4]))
+                        if data_row[3] == today_birthday_date:
+                            treeview.insert('', 'end', values=(data_row[1], data_row[2], 'TODAY', data_row[4]))
+                        elif data_row[3] == tomorrow_birthday_date:
+                            treeview.insert('', 'end', values=(data_row[1], data_row[2], 'TOMORROW', data_row[4]))
+                        else:
+                            treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4]))
         
         elif category == 'closing deadlines':
-            for i in range(0,6):
+            for i in range(0,2):
                 future_date = (current_date + timedelta(days=i)).strftime('%d/%m/%Y')
                 for data_row in self.list_data_tuple:
                     if data_row[15] == 'task' and data_row[4] == future_date and data_row[16] == 'No':
-                        treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[4], data_row[9]))
+                        if data_row[4] == date_string:
+                            treeview.insert('', 'end', values=(data_row[1], data_row[2], 'TODAY', data_row[9]))
+                        elif data_row[4] == tomorrow_date:
+                           treeview.insert('', 'end', values=(data_row[1], data_row[2], 'TOMORROW', data_row[9]))
+                        else:
+                            treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[4], data_row[9]))
                     if data_row[15] == 'project' and data_row[4] == future_date and data_row[16] == 'No':
-                        treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[4], data_row[9]))
+                        if data_row[4] == date_string:
+                            treeview.insert('', 'end', values=(data_row[1], data_row[2], 'TODAY', data_row[9]))
+                        elif data_row[4] == tomorrow_date:
+                           treeview.insert('', 'end', values=(data_row[1], data_row[2], 'TOMORROW', data_row[9]))
+                        else:
+                            treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[4], data_row[9]))
                     else:
                         pass
         elif category == 'pending ideas':
@@ -113,8 +134,7 @@ class DataStoreManager:
                     if data_row[15] == 'idea' and data_row[3] == previous_date:
                         treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[4], data_row[9]))
         else:
-            print('Wrong category in function: insert_data_to_notifications_treeview.')
-    
+            print('Wrong category in function: insert_data_to_notifications_treeview.') 
 
     def insert_list_data_to_treeview(self, treeview, list_category): # Inserting data to treeviews in ListWindow
         treeview.delete(*treeview.get_children())
@@ -147,7 +167,7 @@ class DataStoreManager:
                 else:
                     pass
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 201: {e}")
 
     def insert_data_to_personal_card_treeview(self, treeview, category, name):
         self.make_list_data_tuple()
@@ -187,7 +207,7 @@ class DataStoreManager:
                     pass
             return number_elements
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 202: {e}")
         check_list.clear()
 
     def count_total_number_of_elements(self, category, delegated, done, ProgressBar_bool):
@@ -257,7 +277,7 @@ class DataStoreManager:
     def count_closing_deadlines(self, frame, XX, YY):
         results = []
         results.clear()
-        for i in range(0,6):
+        for i in range(0,2):
             future_date = (current_date + timedelta(days=i)).strftime('%d/%m/%Y')
             for data_row in self.list_data_tuple:
                 if data_row[15] == 'task' and data_row[4] == future_date and data_row[16] == 'No':
@@ -585,6 +605,7 @@ class DataStoreManager:
         try:
             for data_row in self.list_data_tuple:
                 searched_item_str = str(searched_item)
+
                 str_data_row = str(data_row)
                 item_pieces = str_data_row.lower().split()
                 for item in item_pieces:
@@ -632,7 +653,7 @@ class DataStoreManager:
                         else:
                             pass
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 203: {e}")
 
     def project_name_does_not_exist(self, project_name):
         self.make_list_data_tuple

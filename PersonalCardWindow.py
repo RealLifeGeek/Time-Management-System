@@ -6,8 +6,6 @@ from DBManager import *
 from DataStoreManager import *
 from DataFormObject import DataForm
 
-db_manager = DBManager()
-data_store_manager = DataStoreManager()
 data = DataForm()
 now = datetime.now()
 today = now.strftime('%d/%m')
@@ -17,7 +15,11 @@ yesterday = (now - timedelta(days=1)).strftime('%d/%m')
 
 class PersonalCardWindow:
 
-    def __init__(self, parent, element_id):
+    def __init__(self, parent, element_id, user_id):
+        self.user_id = user_id
+        self.db_manager = DBManager(self.user_id)
+        self.data_store_manager = DataStoreManager(self.user_id)
+
         self.window = tk.Toplevel(parent)
         self.window.geometry('800x600+200+50')
         self.window.title('Personal Card')
@@ -26,7 +28,7 @@ class PersonalCardWindow:
         self.window.resizable(0,0)
 
         if element_id == None:
-            element_id = db_manager.generate_element_id('PC')
+            element_id = self.db_manager.generate_element_id('PC')
         else:
             pass
         self.element_id = element_id
@@ -54,11 +56,11 @@ class PersonalCardWindow:
     def save_or_edit_card(self):   
         try:
             self.get_personal_data()
-            if db_manager.element_id_already_exists(self.element_id):
-                db_manager.update_db_fields(data)
+            if self.db_manager.element_id_already_exists(self.element_id):
+                self.db_manager.update_db_fields(data)
             else:
-                db_manager.save_to_db(data)
-            data_store_manager.make_list_data_tuple()
+                self.db_manager.save_to_db(data)
+            self.data_store_manager.make_list_data_tuple()
             self.window.destroy()
         except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR: {e}")
@@ -82,15 +84,15 @@ class PersonalCardWindow:
         row10 = self.email_row
         row11 = self.phone_number_row
 
-        data_store_manager.insert_values_to_personal_card_form(self.element_id, self.window, row1, row2, row3, row4,
+        self.data_store_manager.insert_values_to_personal_card_form(self.element_id, self.window, row1, row2, row3, row4,
                                                                row5, row6, row7, row8, row9, row10, row11)
         self.insert_data_to_treeviews()
 
     def insert_data_to_treeviews(self):
         name = self.name_row.get()
-        data_store_manager.insert_data_to_personal_card_treeview(self.delegated_task_treeview, 'task', name)
-        data_store_manager.insert_data_to_personal_card_treeview(self.cooperating_on_treeview, 'cooperating', name)
-        data_store_manager.insert_data_to_personal_card_treeview(self.delegated_projects_treeview, 'project', name)
+        self.data_store_manager.insert_data_to_personal_card_treeview(self.delegated_task_treeview, 'task', name)
+        self.data_store_manager.insert_data_to_personal_card_treeview(self.cooperating_on_treeview, 'cooperating', name)
+        self.data_store_manager.insert_data_to_personal_card_treeview(self.delegated_projects_treeview, 'project', name)
         self.window.after(10000, self.insert_data_to_treeviews)
 
     def create_window(self):

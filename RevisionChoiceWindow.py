@@ -3,7 +3,9 @@ from RevisionWindow import *
 
 class RevisionChoiceWindow:
 
-    def __init__(self, parent):
+    def __init__(self, parent, user_id):
+        self.user_id = user_id
+
         self.window = tk.Toplevel(parent)
         self.window.geometry('190x140+600+300')
         self.window.title('REVISION CHOICE')
@@ -13,19 +15,19 @@ class RevisionChoiceWindow:
 
     def show_day_revision_window(self):
         title = 'day'
-        day_revision_window = RevisionWindow(None, title)
+        day_revision_window = RevisionWindow(None, title, self.user_id)
         day_revision_window.create_window()
         self.exit()
 
     def show_week_revision_window(self):
         title = 'week'
-        week_revision_window = RevisionWindow(None, title)
+        week_revision_window = RevisionWindow(None, title, self.user_id)
         week_revision_window.create_window()
         self.exit()
 
     def show_month_revision_window(self):
         title = 'month'
-        month_revision_window = RevisionWindow(None, title)
+        month_revision_window = RevisionWindow(None, title, self.user_id)
         month_revision_window.create_window()
         self.exit()
 

@@ -11,24 +11,26 @@ from element_window_extended import *
 from element_window_small import *
 from list_window import *
 from DBManager import DBManager
-from DataFormObject import DataForm
+from DataFormObject import DataForm, UserForm
 from DataStoreManager import *
 from NotificationWindow import *
 from RevisionChoiceWindow import *
 from MyCalendar import *
 
-class MainScreen:
-    current_date = datetime.now()
-    date_string = current_date.strftime("%d/%m/%Y")
-    tomorrow = datetime.today() + timedelta(days=1)
-    tomorrow_date = tomorrow.strftime('%d/%m/%Y')
-    db = 'data'
-    db_manager = DBManager()
-    data = DataForm()
-    data_store_manager = DataStoreManager()
-    db_manager.create_db()
+current_date = datetime.now()
+date_string = current_date.strftime("%d/%m/%Y")
+tomorrow = datetime.today() + timedelta(days=1)
+tomorrow_date = tomorrow.strftime('%d/%m/%Y')
+#db = 'data'
+data = DataForm()
 
-    def __init__(self, root):
+
+class MainScreen:
+    def __init__(self, root, user_id):
+        self.user_id = user_id
+        self.db_manager = DBManager(self.user_id)
+        self.data_store_manager = DataStoreManager(self.user_id)
+
         self.root = root
         self.root.geometry ("800x600+300+50")
         self.root.title("Main Screen")
@@ -45,7 +47,7 @@ class MainScreen:
         self.root.after(10000, self.check_connection)
 
     def show_number_of_day_element(self, category):
-            number_elements = data_store_manager.count_number_of_day_element(category)
+            number_elements = self.data_store_manager.count_number_of_day_element(category)
             if category == 'task':
                 frame = self.middle_frame_left
                 XX = 140
@@ -73,7 +75,7 @@ class MainScreen:
             number_of_elements_label.place(x = XX, y = YY)
 
     def show_total_number_of_elements(self, category, delegated, done, ProgressBar_bool, frame, XX, YY):
-        number_elements = data_store_manager.count_total_number_of_elements(category, delegated, done, ProgressBar_bool)
+        number_elements = self.data_store_manager.count_total_number_of_elements(category, delegated, done, ProgressBar_bool)
         number_elements_label = tk.Label(
             frame,
             text = f"{number_elements}   ",
@@ -87,12 +89,12 @@ class MainScreen:
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]
-            data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+            data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
 
             data.element_id = element_id
             data.element = data_row[2]
             data.date = data_row[3]
-            data.deadline = data_row[4]
+            data.deadline = ""
             data.field1 = data_row[5]
             data.field2 = data_row[6]
             data.field3 = data_row[7]
@@ -106,9 +108,9 @@ class MainScreen:
             data.category = data_row[15]
             data.done = 'DONE'
 
-            db_manager.update_db_fields(data)
-            data_store_manager.make_list_data_tuple()
-            data_store_manager.insert_day_data_to_treeview(self.treeview, 'task')
+            self.db_manager.update_db_fields(data)
+            self.data_store_manager.make_list_data_tuple()
+            self.data_store_manager.insert_day_data_to_treeview(self.treeview, 'task')
             self.show_number_of_day_element('task')
         else:
             messagebox.showwarning("Error", "Select an element")
@@ -118,7 +120,7 @@ class MainScreen:
             selection = self.treeview.selection()
             if selection:
                 element_id = self.treeview.item(selection, 'values')[0]
-                data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+                data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
 
                 data.element_id = element_id
                 data.element = data_row[2]
@@ -137,23 +139,23 @@ class MainScreen:
                 data.category = data_row[15]
                 data.done = data_row[16]
 
-                db_manager.update_db_fields(data)
+                self.db_manager.update_db_fields(data)
                 messagebox.showinfo("Info", "Task moved to tomorrow.")
-                data_store_manager.make_list_data_tuple()
+                self.data_store_manager.make_list_data_tuple()
                 #data_store_manager.make_day_data_tuple()
-                data_store_manager.insert_day_data_to_treeview(self.treeview, 'task')
+                self.data_store_manager.insert_day_data_to_treeview(self.treeview, 'task')
                 self.show_number_of_day_element('task')
                 self.progress_bar_of_day()
             else:
                 messagebox.showwarning("ERROR", "Select an element.")
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 500: {e}")
 
     def refresh_main_screen(self):
-        data_store_manager.make_list_data_tuple()
-        data_store_manager.insert_day_data_to_treeview(self.treeview, 'task')
-        data_store_manager.insert_day_data_to_treeview(self.treeview_remarks, 'remark')
-        data_store_manager.insert_day_data_to_treeview(self.treeview_events, 'event')
+        self.data_store_manager.make_list_data_tuple()
+        self.data_store_manager.insert_day_data_to_treeview(self.treeview, 'task')
+        self.data_store_manager.insert_day_data_to_treeview(self.treeview_remarks, 'remark')
+        self.data_store_manager.insert_day_data_to_treeview(self.treeview_events, 'event')
         self.show_number_of_day_element('task')
         self.show_number_of_day_element('remark')
         self.show_number_of_day_element('event')
@@ -170,12 +172,12 @@ class MainScreen:
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]
-            db_manager.set_element_id(element_id)
+            self.db_manager.set_element_id(element_id)
             answer = messagebox.askyesno("DELETE", "DELETE from database?")
             if answer:
-                db_manager.delete_from_db()
-                data_store_manager.make_list_data_tuple()
-                data_store_manager.insert_day_data_to_treeview(self.treeview, 'task')
+                self.db_manager.delete_from_db()
+                self.data_store_manager.make_list_data_tuple()
+                self.data_store_manager.insert_day_data_to_treeview(self.treeview, 'task')
                 self.show_number_of_day_element('task')
             else:
                 pass
@@ -186,12 +188,12 @@ class MainScreen:
         selection = self.treeview_remarks.selection()
         if selection:
             element_id = self.treeview_remarks.item(selection, 'values')[0]
-            db_manager.set_element_id(element_id)
+            self.db_manager.set_element_id(element_id)
             answer = messagebox.askyesno("DELETE", "DELETE from database?")
             if answer:
-                db_manager.delete_from_db()
-                data_store_manager.make_list_data_tuple()
-                data_store_manager.insert_day_data_to_treeview(self.treeview_remarks, 'remark')
+                self.db_manager.delete_from_db()
+                self.data_store_manager.make_list_data_tuple()
+                self.data_store_manager.insert_day_data_to_treeview(self.treeview_remarks, 'remark')
                 self.show_number_of_day_element('remark')
             else:
                 pass
@@ -202,12 +204,12 @@ class MainScreen:
         selection = self.treeview_events.selection()
         if selection:
             element_id = self.treeview_events.item(selection, 'values')[0]
-            db_manager.set_element_id(element_id)
+            self.db_manager.set_element_id(element_id)
             answer = messagebox.askokcancel("DELETE", "DELETE from database?")
             if answer:
-                db_manager.delete_from_db()
-                data_store_manager.make_list_data_tuple()
-                data_store_manager.insert_day_data_to_treeview(self.treeview_events, 'event')
+                self.db_manager.delete_from_db()
+                self.data_store_manager.make_list_data_tuple()
+                self.data_store_manager.insert_day_data_to_treeview(self.treeview_events, 'event')
                 self.show_number_of_day_element('event')
             else:
                 pass
@@ -216,8 +218,8 @@ class MainScreen:
 
     def progress_bar_of_day(self):
         try:
-            number_tasks_done = data_store_manager.count_total_number_of_elements('task', '', 'DONE', 'Yes')
-            number_tasks_to_fulfill = data_store_manager.count_total_number_of_elements('task', '', 'No', 'Yes')
+            number_tasks_done = self.data_store_manager.count_total_number_of_elements('task', '', 'DONE', 'Yes')
+            number_tasks_to_fulfill = self.data_store_manager.count_total_number_of_elements('task', '', 'No', 'Yes')
             total_number_tasks = number_tasks_done + number_tasks_to_fulfill
             if total_number_tasks != 0:
                 task_value = 100/total_number_tasks
@@ -248,7 +250,7 @@ class MainScreen:
                     style_progressbar.configure("green.Horizontal.TProgressbar", background= '#20EE00',  troughcolor='#666666')
 
         except Exception as e:
-            messagebox.showerror("ERROR", f"Progress bar error: {e}")
+            messagebox.showerror("ERROR", f"Progress bar error 501: {e}")
 
     def exit_tms(self):
         answer = messagebox.askokcancel("Close TMS", "Do you want to close TMS?")
@@ -259,12 +261,12 @@ class MainScreen:
 
     def show_notificaton_window(self):
         self.notification_dot_label.place_forget()
-        notification_window = NotificationWindow(self.root)
+        notification_window = NotificationWindow(self.root, self.user_id)
         notification_window.create_window()
 
     def show_new_task_window(self):
         task_window = element_window_extended(
-            self.root, 'Task', None
+            self.root, 'Task', None, self.user_id
         )
         task_window.create_window()
 
@@ -275,7 +277,7 @@ class MainScreen:
         else:
             messagebox.showwarning("ERROR", f"Select an element")
         task_window = element_window_extended(
-            self.root, 'Task View', element_id
+            self.root, 'Task View', element_id, self.user_id
         )
         task_window.create_window()
         task_window.insert_values()
@@ -285,7 +287,7 @@ class MainScreen:
 
     def show_new_event_window(self):
         event_window = element_window_extended(
-            self.root, 'Event', None
+            self.root, 'Event', None, self.user_id
         )
         event_window.create_window()
 
@@ -296,7 +298,7 @@ class MainScreen:
         else:
             messagebox.showwarning("ERROR", f"Select an element")
         event_window = element_window_extended(
-            self.root, "Event View", element_id
+            self.root, "Event View", element_id, self.user_id
         )
         event_window.create_window()
         event_window.insert_values()
@@ -306,7 +308,7 @@ class MainScreen:
 
     def show_new_remark_window(self):
         remark_window = element_window_extended(
-            self.root, "Remark", None
+            self.root, "Remark", None, self.user_id
         )
         remark_window.create_window()
 
@@ -317,7 +319,7 @@ class MainScreen:
         else:
             messagebox.showwarning("ERROR", f"Select an element")
         remark_window = element_window_extended(
-            self.root, "Remark View", element_id
+            self.root, "Remark View", element_id, self.user_id
         )
         remark_window.create_window()
         remark_window.insert_values()
@@ -327,67 +329,67 @@ class MainScreen:
 
     def show_new_idea_window(self):
         idea_window = element_window_small(
-           self.root, 'Idea', None
+           self.root, 'Idea', None, self.user_id
         )
         idea_window.create_window()
 
     def show_new_adhoc_task_window(self):
         adhoc_task_window = element_window_small(
-            self.root, 'Adhoc Task', None
+            self.root, 'Adhoc Task', None, self.user_id
         )
         adhoc_task_window.create_window()
 
     def show_tasks_list_window(self):
-        tasks_list_window = ListWindow(self.root, 'My Tasks')
+        tasks_list_window = ListWindow(self.root, 'My Tasks', self.user_id)
         tasks_list_window.create_window()
 
     def show_delegated_tasks_list_window(self):
-        delegated_tasks_list_window = ListWindow(self.root, 'Delegated Tasks')
+        delegated_tasks_list_window = ListWindow(self.root, 'Delegated Tasks', self.user_id)
         delegated_tasks_list_window.create_window()
 
     def show_projects_list_window(self):
-        projects_list_window = ListWindow(self.root, 'Projects')
+        projects_list_window = ListWindow(self.root, 'Projects', self.user_id)
         projects_list_window.create_window()
 
     def show_maybe_sometimes_list_window(self):
-        maybe_sometimes_list_window = ListWindow(self.root, 'Maybe/Sometimes')
+        maybe_sometimes_list_window = ListWindow(self.root, 'Maybe/Sometimes', self.user_id)
         maybe_sometimes_list_window.create_window()
 
     def show_ideas_list_window(self):
-        ideas_list_window = ListWindow(self.root, 'Ideas')
+        ideas_list_window = ListWindow(self.root, 'Ideas', self.user_id)
         ideas_list_window.create_window()
 
     def show_events_list_window(self):
-        events_list_window = ListWindow(self.root, 'Events')
+        events_list_window = ListWindow(self.root, 'Events', self.user_id)
         events_list_window.create_window()
 
     def show_remarks_list_window(self):
-        remarks_list_window = ListWindow(self.root, 'Remarks')
+        remarks_list_window = ListWindow(self.root, 'Remarks', self.user_id)
         remarks_list_window.create_window()
 
     def show_events_list_window(self):
-        events_list_window = ListWindow(self.root, 'Events')
+        events_list_window = ListWindow(self.root, 'Events', self.user_id)
         events_list_window.create_window()
 
     def show_personal_cards_list_window(self):
-        personal_cards_list_window = ListWindow(self.root, 'Personal Cards')
+        personal_cards_list_window = ListWindow(self.root, 'Personal Cards', self.user_id)
         personal_cards_list_window.create_window()
 
     def show_revision_choice_window(self):
-        revision_choice_window = RevisionChoiceWindow(self.root)
+        revision_choice_window = RevisionChoiceWindow(self.root, self.user_id)
         revision_choice_window.create_window()
 
     def show_calendar_window(self):
-        calendar_window = MyCalendar(self.root)
+        calendar_window = MyCalendar(self.root, self.user_id)
         calendar_window.create_window()
 
     def check_notifications(self):
-        number_undone_tasks = data_store_manager.count_number_undone_elements('tasks', None, None, None)
-        number_undone_delegated_tasks = data_store_manager.count_number_undone_elements('delegated tasks', None, None, None)
-        number_undone_projects = data_store_manager.count_number_undone_elements('projects', None, None, None)
-        number_closing_deadlines = data_store_manager.count_closing_deadlines(None, None, None)
-        number_birthdays = data_store_manager.count_birthday()
-        number_pending_ideas = data_store_manager.count_pending_ideas(None, None, None)
+        number_undone_tasks = self.data_store_manager.count_number_undone_elements('tasks', None, None, None)
+        number_undone_delegated_tasks = self.data_store_manager.count_number_undone_elements('delegated tasks', None, None, None)
+        number_undone_projects = self.data_store_manager.count_number_undone_elements('projects', None, None, None)
+        number_closing_deadlines = self.data_store_manager.count_closing_deadlines(None, None, None)
+        number_birthdays = self.data_store_manager.count_birthday()
+        number_pending_ideas = self.data_store_manager.count_pending_ideas(None, None, None)
         result_number = number_undone_tasks + number_undone_delegated_tasks + number_undone_projects + number_closing_deadlines + number_birthdays + number_pending_ideas
 
         if result_number != 0:
@@ -1038,14 +1040,14 @@ class MainScreen:
         add_event_button.place(x = 116, y = 5)
 
         self.check_connection()
-        data_store_manager.make_list_data_tuple()
+        self.data_store_manager.make_list_data_tuple()
         self.progress_bar_of_day()
         self.show_number_of_day_element('task')
         self.show_number_of_day_element('remark')
         self.show_number_of_day_element('event')
-        data_store_manager.insert_day_data_to_treeview(self.treeview, 'task')
-        data_store_manager.insert_day_data_to_treeview(self.treeview_remarks, 'remark')
-        data_store_manager.insert_day_data_to_treeview(self.treeview_events, 'event')
+        self.data_store_manager.insert_day_data_to_treeview(self.treeview, 'task')
+        self.data_store_manager.insert_day_data_to_treeview(self.treeview_remarks, 'remark')
+        self.data_store_manager.insert_day_data_to_treeview(self.treeview_events, 'event')
         self.show_total_number_of_elements('task', '', 'No', 'No', self.right_frame, 200, 162)
         self.show_total_number_of_elements('task', 'Yes', 'No', 'No', self.right_frame, 200, 202)
         self.show_total_number_of_elements('project', '', 'No', 'No', self.right_frame, 200, 242)

@@ -11,12 +11,18 @@ from element_window_small import *
 from ProjectWindow import *
 from PersonalCardWindow import *
 
-db_manager = DBManager()
-data_store_manager = DataStoreManager()
+current_date = datetime.now()
+date_string = current_date.strftime("%d/%m/%Y")
+tomorrow = datetime.today() + timedelta(days=1)
+tomorrow_date = tomorrow.strftime('%d/%m/%Y')
 data = DataForm()
 
 class ListWindow:
-    def __init__(self, parent, title):
+    def __init__(self, parent, title, user_id):
+        self.user_id = user_id
+        self.db_manager = DBManager(self.user_id)
+        self.data_store_manager = DataStoreManager(self.user_id)
+
         self.window = tk.Toplevel(parent)
         self.window.geometry("800x550+100+100")
         self.window.configure(bg="#AFAFAF")
@@ -38,21 +44,21 @@ class ListWindow:
         if self.title == 'Ideas':
             new_title = 'Idea View'
             idea_window = element_window_small(
-                self.window, new_title, element_id
+                self.window, new_title, element_id, self.user_id
             )
             idea_window.create_window()
             idea_window.insert_values()
 
         elif self.title == 'Projects':
             project_window = ProjectWindow(
-                self.window, element_id
+                self.window, element_id, self.user_id
             )
             project_window.create_window()
             project_window.insert_values()
 
         elif self.title == 'Personal Cards':
             personal_card_window = PersonalCardWindow(
-                self.window, element_id
+                self.window, element_id, self.user_id
             )
             personal_card_window.create_window()
             personal_card_window.insert_values()
@@ -70,7 +76,7 @@ class ListWindow:
             else:
                 pass
             element_window = element_window_extended(
-                self.window, new_title, element_id
+                self.window, new_title, element_id, self.user_id
             )
             element_window.create_window()
             element_window.insert_values()
@@ -81,27 +87,27 @@ class ListWindow:
     def show_new_element_window(self):
         if self.title == 'My Tasks' or self.title == 'Delegated Tasks':
             task_window = element_window_extended(
-            self.window, 'Task', None
+            self.window, 'Task', None, self.user_id
             )
             task_window.create_window()
         elif self.title == 'Remarks':
             remark_window = element_window_extended(
-                self.window, "Remark", None
+                self.window, "Remark", None, self.user_id
             )
             remark_window.create_window()
         elif self.title == 'Events':
             event_window = element_window_extended(
-                self.window, 'Event', None
+                self.window, 'Event', None, self.user_id
             )
             event_window.create_window()
         elif self.title == 'Projects':
             project_window = ProjectWindow(
-                self.window, None
+                self.window, None, self.user_id
             )
             project_window.create_window()
         elif self.title == 'Personal Cards':
             personal_card_window = PersonalCardWindow(
-                self.window, None
+                self.window, None, self.user_id
             )
             personal_card_window.create_window()
             personal_card_window.name_row.insert(0, 'FIRST AND LAST NAME')
@@ -119,7 +125,7 @@ class ListWindow:
 
         elif self.title == 'Ideas':
             idea_window = element_window_small(
-            self.window, 'Idea', None
+            self.window, 'Idea', None, self.user_id
             )
             idea_window.create_window()
         else:
@@ -128,14 +134,29 @@ class ListWindow:
     def done(self):
         selection = self.treeview.selection()
         if selection:
-            element_name = self.treeview.item(selection, 'values')[0]        
-            element_id = data_store_manager.get_element_id_from_list_data_tuple(element_name)
+            element_id = self.treeview.item(selection, 'values')[0]        
+            data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
+
             data.element_id = element_id
-            data.element = element_name
+            data.element = data_row[2]
+            data.date = data_row[3]
+            data.deadline = ""
+            data.field1 = data_row[5]
+            data.field2 = data_row[6]
+            data.field3 = data_row[7]
+            data.project = data_row[8]
+            data.delegated = data_row[9]
+            data.cooperating = data_row[10]
+            data.field4 = data_row[11]
+            data.field5 = data_row[12]
+            data.remarks = data_row[13]
+            data.keywords = data_row[14]
+            data.category = data_row[15]
             data.done = 'DONE'
-            db_manager.update_db_fields(data)
-            data_store_manager.make_list_data_tuple()
-            data_store_manager.insert_list_data_to_treeview(self.treeview, self.title)
+
+            self.db_manager.update_db_fields(data)
+            self.data_store_manager.make_list_data_tuple()
+            self.data_store_manager.insert_list_data_to_treeview(self.treeview, self.title)
         else:
             messagebox.showwarning("Error", "Select an element to be done.")
     
@@ -143,23 +164,23 @@ class ListWindow:
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]
-            db_manager.set_element_id(element_id)
+            self.db_manager.set_element_id(element_id)
             answer = messagebox.askyesno("DELETE", "DELETE from database?")
             if answer:
-                db_manager.delete_from_db()
+                self.db_manager.delete_from_db()
                 if self.title == 'Projects':
                     element_name = self.treeview.item(selection, 'values')[1]
-                    rows = data_store_manager.get_all_project_tasks_id_from_list_data_tuple(element_name)
+                    rows = self.data_store_manager.get_all_project_tasks_id_from_list_data_tuple(element_name)
                     if rows is not None:
                         for row in rows:
-                            db_manager.set_element_id(row)
+                            self.db_manager.set_element_id(row)
                             messagebox.showwarning("DELETE ASSOCIATED", f"Asscociated task {row} is to be deleted.")
-                            db_manager.delete_from_db()
+                            self.db_manager.delete_from_db()
                     else:
                         print('No related tasks to the project: ' + element_name)
                 
-                data_store_manager.make_list_data_tuple()
-                data_store_manager.insert_list_data_to_treeview(self.treeview, self.title)
+                self.data_store_manager.make_list_data_tuple()
+                self.data_store_manager.insert_list_data_to_treeview(self.treeview, self.title)
                     
                 
             else:
@@ -169,8 +190,8 @@ class ListWindow:
     
     def find(self):
         if len(self.find_row.get()) != 0:
-            searched_item = self.find_row.get()
-            data_store_manager.find_element_in_list_tuple(self.treeview, searched_item, self.title)
+            searched_item = self.find_row.get()          
+            self.data_store_manager.find_element_in_list_tuple(self.treeview, searched_item, self.title)
         else:
             messagebox.showwarning("ERROR", "Find Field is Empty!")
     
@@ -179,7 +200,7 @@ class ListWindow:
     
     def cancel_find(self):
         self.find_row.delete(0, 'end')
-        data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
+        self.data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
 
     def change_to_task(self):
         try:
@@ -189,12 +210,12 @@ class ListWindow:
                 selection = self.treeview.selection()
                 if selection:
                     element_id = self.treeview.item(selection, 'values')[0]
-                    data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+                    data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
 
                     data.element_id = element_id
                     data.element = data_row[2]
-                    data.date = data_row[3]
-                    data.deadline = data_row[4]
+                    data.date = data_row[3]  or data_row[4]
+                    data.deadline = data_row[4] or data_row[3]
                     data.field1 = data_row[5]
                     data.field2 = data_row[6]
                     data.field3 = data_row[7]
@@ -208,13 +229,13 @@ class ListWindow:
                     data.category = 'task'
                     data.done = data_row[16]  
 
-                    db_manager.update_db_fields(data)
-                    data_store_manager.make_list_data_tuple()
-                    data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
+                    self.db_manager.update_db_fields(data)
+                    self.data_store_manager.make_list_data_tuple()
+                    self.data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
                 else:
                     messagebox.showwarning("ERROR", "Select an element.")
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 600: {e}")
 
     def change_to_remark(self):
         try:
@@ -224,12 +245,12 @@ class ListWindow:
                 selection = self.treeview.selection()
                 if selection:
                     element_id = self.treeview.item(selection, 'values')[0]
-                    data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+                    data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
                 
                     data.element_id = element_id
                     data.element = data_row[2]
                     data.date = data_row[3]
-                    data.deadline = data_row[4]
+                    data.deadline = ""
                     data.field1 = data_row[5]
                     data.field2 = data_row[6]
                     data.field3 = data_row[7]
@@ -241,22 +262,15 @@ class ListWindow:
                     data.remarks = data_row[13]
                     data.keywords = data_row[14]
                     data.category = 'remark'
-                    data.done = data_row[16]  
+                    data.done = data_row[16]
 
-                    if data.date == None or data.date == "":
-                        data.date = data.deadline
-                    if data.deadline == None or data.date == "":
-                        data.deadline = data.date
-                    else:
-                        pass
-
-                    db_manager.update_db_fields(data)
-                    data_store_manager.make_list_data_tuple()
-                    data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
+                    self.db_manager.update_db_fields(data)
+                    self.data_store_manager.make_list_data_tuple()
+                    self.data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
                 else:
                     messagebox.showwarning("ERROR", "Select an element.")
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 601: {e}")
 
     def change_to_event(self):
         try:
@@ -266,12 +280,12 @@ class ListWindow:
                 selection = self.treeview.selection()
                 if selection:
                     element_id = self.treeview.item(selection, 'values')[0]
-                    data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+                    data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
                 
                     data.element_id = element_id
                     data.element = data_row[2]
-                    data.date = data_row[3]
-                    data.deadline = data_row[4]
+                    data.date = data_row[3] or data_row[4]
+                    data.deadline = data_row[4] or data_row[3]
                     data.field1 = data_row[5]
                     data.field2 = data_row[6]
                     data.field3 = data_row[7]
@@ -285,19 +299,13 @@ class ListWindow:
                     data.category = 'event'
                     data.done = data_row[16]
 
-                    if data.date == None or data.date == "":
-                        data.date = data.deadline
-                    if data.deadline == None or data.deadline == "":
-                        data.deadline = data.date
-                    else:
-                        pass
-                    db_manager.update_db_fields(data)
-                    data_store_manager.make_list_data_tuple()
-                    data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
+                    self.db_manager.update_db_fields(data)
+                    self.data_store_manager.make_list_data_tuple()
+                    self.data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
                 else:
                     messagebox.showwarning("ERROR", "Select an element.")
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 602: {e}")
 
     def change_to_idea(self):
         try:
@@ -307,12 +315,12 @@ class ListWindow:
                 selection = self.treeview.selection()
                 if selection:
                     element_id = self.treeview.item(selection, 'values')[0]
-                    data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+                    data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
                 
                     data.element_id = element_id
                     data.element = data_row[2]
                     data.date = data_row[3]
-                    data.deadline = data_row[4]
+                    data.deadline = ""
                     data.field1 = data_row[5]
                     data.field2 = data_row[6]
                     data.field3 = data_row[7]
@@ -326,22 +334,13 @@ class ListWindow:
                     data.category = 'idea'
                     data.done = data_row[16]
 
-                    print(data.field2)
-                    print(DataForm)
-
-                    if data.date == None or data.date == "":
-                        data.date = data.deadline
-                    if data.deadline == None or data.deadline == "":
-                        data.deadline = data.date
-                    else:
-                        pass
-                    db_manager.update_db_fields(data)
-                    data_store_manager.make_list_data_tuple()
-                    data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
+                    self.db_manager.update_db_fields(data)
+                    self.data_store_manager.make_list_data_tuple()
+                    self.data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
                 else:
                     messagebox.showwarning("ERROR", "Select an element.")
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 603: {e}")
 
     def change_to_maybe_sometimes(self):
         try:
@@ -351,12 +350,12 @@ class ListWindow:
                 selection = self.treeview.selection()
                 if selection:
                     element_id = self.treeview.item(selection, 'values')[0]
-                    data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+                    data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
                 
                     data.element_id = element_id
                     data.element = data_row[2]
-                    data.date = data_row[3]
-                    data.deadline = data_row[4]
+                    data.date = ""
+                    data.deadline = ""
                     data.field1 = data_row[5]
                     data.field2 = data_row[6]
                     data.field3 = data_row[7]
@@ -369,19 +368,13 @@ class ListWindow:
                     data.keywords = data_row[14]
                     data.category = 'maybe/sometimes'
 
-                    if data.date == None or data.date == "":
-                        data.date = data.deadline
-                    if data.deadline == None or data.deadline == "":
-                        data.deadline = data.date
-                    else:
-                        pass
-                    db_manager.update_db_fields(data)
-                    data_store_manager.make_list_data_tuple()
-                    data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
+                    self.db_manager.update_db_fields(data)
+                    self.data_store_manager.make_list_data_tuple()
+                    self.data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
                 else:
                     messagebox.showwarning("ERROR", "Select an element.")
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")
+            messagebox.showerror("ERROR", f"ERROR 604: {e}")
 
     def change_to_project(self):
         try:
@@ -391,12 +384,12 @@ class ListWindow:
                 selection = self.treeview.selection()
                 if selection:
                     element_id = self.treeview.item(selection, 'values')[0]
-                    data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+                    data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
                 
                     data.element_id = element_id
                     data.element = data_row[2]
-                    data.date = data_row[3]
-                    data.deadline = data_row[4]
+                    data.date = data_row[3] or data_row[4]
+                    data.deadline = data_row[4] or data_row[3]
                     data.field1 = data_row[5]
                     data.field2 = data_row[6]
                     data.field3 = data_row[7]
@@ -409,19 +402,13 @@ class ListWindow:
                     data.keywords = data_row[14]
                     data.category = 'project'
 
-                    if data.date == None or data.date == "":
-                        data.date = data.deadline
-                    if data.deadline == None or data.deadline == "":
-                        data.deadline = data.date
-                    else:
-                        pass
-                    db_manager.update_db_fields(data)
-                    data_store_manager.make_list_data_tuple()
-                    data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
+                    self.db_manager.update_db_fields(data)
+                    self.data_store_manager.make_list_data_tuple()
+                    self.data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )
                 else:
                     messagebox.showwarning("ERROR", "Select an element.")
         except Exception as e:
-            messagebox.showerror("ERROR", f"ERROR: {e}")                
+            messagebox.showerror("ERROR", f"ERROR 605: {e}")                
                   
 
     def create_window(self):
@@ -695,6 +682,6 @@ class ListWindow:
             )
             maybe_sometimes_button.place(x=660, y=500)
 
-        data_store_manager.make_list_data_tuple()
-        data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )        
+        self.data_store_manager.make_list_data_tuple()
+        self.data_store_manager.insert_list_data_to_treeview(self.treeview, self.title )        
 

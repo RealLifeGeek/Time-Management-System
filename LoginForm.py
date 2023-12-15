@@ -4,7 +4,7 @@ from DBManager import *
 from DataFormObject import UserForm
 from MainScreen import *
 
-db_manager = DBManager()
+db_director = DBDirector()
 user = UserForm()
 
 class LoginForm:
@@ -23,7 +23,7 @@ class LoginForm:
             self.title = 'login'
 
     def get_user_data(self):
-        user.user_id = db_manager.generate_element_id('User')
+        user.user_id = db_director.generate_user_id()
         user.firstName = self.first_name_row.get()
         user.lastName = self.last_name_row.get()
         user.user_email = self.user_email_row.get()
@@ -31,7 +31,7 @@ class LoginForm:
 
     def register_new_user(self):
         self.get_user_data()
-        db_manager.save_user_to_db(user)
+        db_director.save_user_to_db(user)
 
     def hash_password(self, password):
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -40,14 +40,11 @@ class LoginForm:
     def check_password(self, input_password, hashed_password):
         return bcrypt.checkpw(input_password.encode('utf-8'), hashed_password)
 
-    def exit(self):
-        self.root.destroy()
-
     def authenticate_user(self, user_email, password):
         if len(self.user_email_row.get()) == 0 or len(self.password_row.get()) == 0:
             messagebox.showwarning("UNABLE", "Enter e-mail and password")
         else:
-            result = db_manager.get_hashed_password(user_email)
+            result = db_director.get_hashed_password(user_email)
             if result:
                 hashed_password = result[0]
                 if self.check_password(password, hashed_password):
@@ -90,9 +87,11 @@ class LoginForm:
     def sign_up(self):
         if len(self.first_name_row.get()) == 0 or len(self.last_name_row.get()) == 0 or len(self.user_email_row.get()) == 0 or len(self.password_row.get()) == 0:
             messagebox.showwarning("ERROR", "Fill the rows")
+        elif '@' and '.' not in self.user_email_row.get():
+            messagebox.showwarning("ERROR", "Invalid e-mail adress")
         else:
             self.get_user_data()
-            db_manager.save_user_to_db(user)
+            db_director.save_user_to_db(user)
             self.back_to_login()
     
     def log_in(self):
@@ -127,14 +126,14 @@ class LoginForm:
             )
             self.text2_label.place(x = 150, y = 195)
 
-            user_email_label = tk.Label(
+            self.user_email_label = tk.Label(
                 self.root,
                 text = 'E-mail',
                 font = ('Montserrat', '12'),
                 background = "#212121",
                 foreground = "#FFFFFF"
             )
-            user_email_label.place(x = 15, y = 260)
+            self.user_email_label.place(x = 15, y = 260)
 
             self.user_email_row = tk.Entry(
                 self.root,
@@ -147,14 +146,14 @@ class LoginForm:
             self.user_email_row.place(x = 15, y = 290)
             self.user_email_row.insert(0, '@')
 
-            password_label = tk.Label(
+            self.password_label = tk.Label(
                 self.root,
                 text = 'Password',
                 font = ('Montserrat', '12'),
                 background = "#212121",
                 foreground = "#FFFFFF"
             )
-            password_label.place(x = 15, y = 330)
+            self.password_label.place(x = 15, y = 330)
 
             self.password_row = tk.Entry(
                 self.root,
@@ -197,14 +196,14 @@ class LoginForm:
             self.sign_in_text2.place(x = 280, y = 479)
             self.sign_in_text2.bind("<Button-1>", self.show_register_window)
 
-            text3_label = tk.Label(
+            self.text3_label = tk.Label(
                 self.root,
                 text = 'Have a plan and stick to it',
                 font = ('Montserrat', '12', 'italic'),
                 background = "#212121",
                 foreground = "#00B0C4"
             )
-            text3_label.place(x = 15, y = 570)
+            self.text3_label.place(x = 15, y = 570)
         
         else:
             self.text1_label.place(relx = 0.5, y = 70, anchor = 'center')
@@ -265,9 +264,23 @@ class LoginForm:
 
 
     def create_main_screen(self):
-        main_screen = MainScreen(self.root)
+        user_email = self.user_email_row.get()
+        user_id = db_director.get_user_id(user_email)
+
+        self.text1_label.place_forget()
+        self.text2_label.place_forget()
+        self.text3_label.place_forget()
+        self.user_email_label.place_forget()
+        self.user_email_row.place_forget()
+        self.password_label.place_forget()
+        self.password_row.place_forget()
+        self.log_in_button.place_forget()
+        self.sign_in_text1.place_forget()
+        self.sign_in_text2.place_forget()
+
+        main_screen = MainScreen(self.root, user_id)
         main_screen.create_window()
-        self.login_window.destroy()
+
     
     def create_main_screen_on_enter_click(self, event):
         self.create_main_screen()

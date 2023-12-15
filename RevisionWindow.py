@@ -13,19 +13,21 @@ current_date = datetime.now()
 date_string = current_date.strftime("%d/%m/%Y")
 tomorrow = datetime.today() + timedelta(days=1)
 tomorrow_date = tomorrow.strftime('%d/%m/%Y')
-db_manager = DBManager()
-data_store_manager = DataStoreManager()
 data = DataForm()
 
 class RevisionWindow:
 
-    def __init__(self, parent, title):
+    def __init__(self, parent, title, user_id):
         self.window = tk.Toplevel(parent)
         self.window.geometry('800x600+300+50')
         self.window.title(str(title).upper() + ' REVISION')
         self.window.option_add('*Dialog.msg.title.bg', '#000000')
         self.window.configure(bg = "#AFAFAF")
         self.window.resizable(0,0)
+
+        self.user_id = user_id
+        self.db_manager = DBManager(self.user_id)
+        self.data_store_manager = DataStoreManager(self.user_id)
 
         self.title = title
         self.title_list_day_week = ['MY TASKS', 'DELEGATED TASKS', 'SHARED TASKS', 'MY PROJECTS', 'DELEGATED PROJECTS', 
@@ -42,7 +44,7 @@ class RevisionWindow:
             print('Wrong self.title in RevisionWindow')
 
     def insert_data_to_revision_treeview(self):
-        self.list_data_tuple = data_store_manager.make_list_data_tuple()
+        self.list_data_tuple = self.data_store_manager.make_list_data_tuple()
         self.treeview.delete(*self.treeview.get_children())
         self.rows.clear()
 
@@ -298,8 +300,8 @@ class RevisionWindow:
             print('Wrong self.title in RevisionWindow: function Next')
 
         self.insert_data_to_revision_treeview()
-        total_number_elements = len(self.rows)
-        self.treeview_label.configure(text = str(self.current_title) + ': ' + str(total_number_elements))
+        self.total_number_elements = len(self.rows)
+        self.treeview_label.configure(text = str(self.current_title) + ': ' + str(self.total_number_elements))
         if self.current_title == 'MY TASKS' or self.current_title == 'DELEGATED TASKS' or self.current_title == 'SHARED TASKS' or self.current_title == 'MY PROJECTS' or self.current_title == 'DELEGATED PROJECTS' or self.current_title == 'SHARED PROJECTS' or self.current_title == 'DEADLINES':
             self.done_button.place(x = 15, y = 400)
         else:
@@ -329,12 +331,12 @@ class RevisionWindow:
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]
-            data_row = data_store_manager.get_data_row_from_list_data_tuple(element_id)
+            data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
             if self.current_title == 'MY TASKS' or self.current_title == 'DELEGATED TASKS' or self.current_title == 'SHARED TASKS':
                 data.element_id = element_id
                 data.element = data_row[2]
                 data.date = data_row[3]
-                data.deadline = data_row[4]
+                data.deadline = ""
                 data.field1 = data_row[5]
                 data.field2 = data_row[6]
                 data.field3 = data_row[7]
@@ -348,7 +350,7 @@ class RevisionWindow:
                 data.category = data_row[15]
                 data.done = 'DONE'
 
-                db_manager.update_db_fields(data)
+                self.db_manager.update_db_fields(data)
                 self.insert_data_to_revision_treeview()
 
             elif self.current_title == 'MY PROJECTS' or self.current_title == 'DELEGATED PROJECTS' or self.current_title == 'SHARED PROJECTS':
@@ -362,14 +364,14 @@ class RevisionWindow:
                 data.category = data_row[15]
                 data.done = 'DONE'
             
-                db_manager.update_db_fields(data)
+                self.db_manager.update_db_fields(data)
             
-                rows = data_store_manager.get_all_project_tasks_id_from_list_data_tuple(data.element)
+                rows = self.data_store_manager.get_all_project_tasks_id_from_list_data_tuple(data.element)
                 if rows is not None:
                     for row in rows:
                         messagebox.showwarning("DONE ASSOCIATED", f"Asscociated task {row} is to be done")
-                        db_manager.set_element_id(row)
-                        data_row = data_store_manager.get_data_row_from_list_data_tuple(row)
+                        self.db_manager.set_element_id(row)
+                        data_row = self.data_store_manager.get_data_row_from_list_data_tuple(row)
 
                         data.element_id = row
                         data.element = data_row[2]
@@ -388,7 +390,7 @@ class RevisionWindow:
                         data.category = data_row[15]
                         data.done = 'DONE'
 
-                        db_manager.update_db_fields(data)
+                        self.db_manager.update_db_fields(data)
 
             else:
                 print('Wrong self.current_title in done function: RevisionWindow')
@@ -399,18 +401,18 @@ class RevisionWindow:
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]
-            db_manager.set_element_id(element_id)
+            self.db_manager.set_element_id(element_id)
             answer = messagebox.askyesno("DELETE", "DELETE from database?")
             if answer:
-                db_manager.delete_from_db()
+                self.db_manager.delete_from_db()
                 if self.current_title == 'MY PROJECTS' or self.current_title == 'DELEGATED PROJECTS' or self.current_title == 'SHARED PROJECTS':
                     element_name = self.treeview.item(selection, 'values')[1]
-                    rows = data_store_manager.get_all_project_tasks_id_from_list_data_tuple(element_name)
+                    rows = self.data_store_manager.get_all_project_tasks_id_from_list_data_tuple(element_name)
                     if rows is not None:
                         for row in rows:
-                            db_manager.set_element_id(row)
+                            self.db_manager.set_element_id(row)
                             messagebox.showwarning("DELETE ASSOCIATED", f"Asscociated task {row} is to be deleted.")
-                            db_manager.delete_from_db()
+                            self.db_manager.delete_from_db()
                 self.insert_data_to_revision_treeview()
             else:
                 pass
@@ -429,14 +431,14 @@ class RevisionWindow:
 
         if self.current_title == 'MY PROJECTS' or self.current_title == 'DELEGATED PROJECTS' or self.current_title == 'SHARED PROJECTS':
             project_window = ProjectWindow(
-                self.window, element_id
+                self.window, element_id, self.user_id
             )
             project_window.create_window()
             project_window.insert_values()
 
         elif self.current_title == 'BIRTHDAYS':
             personal_card_window = PersonalCardWindow(
-                self.window, element_id
+                self.window, element_id, self.user_id
             )
             personal_card_window.create_window()
             personal_card_window.insert_values()
@@ -454,7 +456,7 @@ class RevisionWindow:
             else:
                 new_title = 'Task View'
             element_window = element_window_extended(
-                self.window, new_title, element_id
+                self.window, new_title, element_id, self.user_id
             )
             element_window.create_window()
             element_window.insert_values()
@@ -464,7 +466,7 @@ class RevisionWindow:
 
     def show_new_idea_window(self):
         idea_window = element_window_small(
-            self.window, 'Idea', None
+            self.window, 'Idea', None, self.user_id
         )
         idea_window.create_window()
     
