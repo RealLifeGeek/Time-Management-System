@@ -112,7 +112,7 @@ class NotificationWindow:
 
             elif data_row[15] == 'project':
                 project_window = ProjectWindow(
-                    self.window, element_id
+                    self.window, element_id, self.user_id
                 )
                 project_window.create_window()
                 project_window.insert_values()
@@ -120,7 +120,7 @@ class NotificationWindow:
             elif data_row[15] == 'idea':
                 title = 'Idea View'      
                 idea_window = element_window_small(
-                self.window, title, element_id
+                self.window, title, element_id, self.user_id
                 )
                 idea_window.create_window()
                 idea_window.insert_values()
