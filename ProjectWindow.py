@@ -85,18 +85,17 @@ class ProjectWindow:
     def get_project_data(self):
         data.element_id = self.element_id
         data.element = self.project_name_row.get()
+        data.date = ""
         data.deadline = self.deadline_row.get()
         data.project = self.project_name_row.get() 
         data.delegated = self.responsible_person_row.get()
         data.cooperating = self.cooperating_with_row.get()
+        data.field4 = ""
+        data.field5 = ""
+        data.remarks = ""
         data.keywords = self.keywords_row.get()
         data.category = 'project'
-
-        if data.deadline == None or data.deadline == '':
-            messagebox.showerror("ERROR", "Deadline is not selected.")
-            return
-        else:
-            pass
+        data.done = 'No'
 
     def show_new_task_window(self):
         task_window = element_window_extended(
@@ -111,7 +110,7 @@ class ProjectWindow:
         else:
             messagebox.showwarning("ERROR", f"Select an element")
         task_window = element_window_extended(
-            self.window, 'Task View', element_id
+            self.window, 'Task View', element_id, self.user_id
         )
         task_window.create_window()
         task_window.insert_values()
@@ -122,12 +121,16 @@ class ProjectWindow:
     def save_or_edit_project(self):       
         try:
             self.get_project_data()
-            if self.db_manager.element_id_already_exists(self.element_id):
-                self.db_manager.update_db_fields(data)
+            if data.deadline == None or data.deadline == '':
+                messagebox.showerror("ERROR", "Deadline is not selected.")
+                return
             else:
-                self.db_manager.save_to_db(data)
-            self.data_store_manager.make_list_data_tuple()
-            self.window.destroy()
+                if self.db_manager.element_id_already_exists(self.element_id):
+                    self.db_manager.update_db_fields(data)
+                else:
+                    self.db_manager.save_to_db(data)
+                self.data_store_manager.make_list_data_tuple()
+                self.window.destroy()
         except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR 700: {e}")
                 self.window.destroy()
@@ -148,7 +151,7 @@ class ProjectWindow:
                         self.db_manager.set_element_id(row)
                         data_row = self.data_store_manager.get_data_row_from_list_data_tuple(row)
 
-                        data.element_id = row
+                        data.element_id = row[1]
                         data.element = data_row[2]
                         data.date = data_row[3]
                         data.deadline = data_row[4]
@@ -295,6 +298,7 @@ class ProjectWindow:
 
         self.treeview.place (x = 15, y = 55)
         self.treeview.bind("<Double-1>", self.show_task_window_on_double_click)
+        self.treeview.bind("<Return>", self.show_task_window_on_double_click)
 
         self.header_label = tk.Label(
             self.window,

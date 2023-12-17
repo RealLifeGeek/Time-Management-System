@@ -521,6 +521,7 @@ class RevisionWindow:
 
         self.treeview.place (x = 15, y = 105)
         self.treeview.bind('<Double-1>', self.show_element_window_on_double_click)
+        self.treeview.bind('<Return>', self.show_element_window_on_double_click)
 
         self.done_button = tk.Button(
             self.window,

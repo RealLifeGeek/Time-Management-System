@@ -265,10 +265,10 @@ class MainScreen:
         notification_window.create_window()
 
     def show_new_task_window(self):
-        task_window = element_window_extended(
+        new_task_window = element_window_extended(
             self.root, 'Task', None, self.user_id
         )
-        task_window.create_window()
+        new_task_window.create_window()      
 
     def show_existing_task_window(self):
         selection = self.treeview.selection()
@@ -286,10 +286,10 @@ class MainScreen:
         self.show_existing_task_window()
 
     def show_new_event_window(self):
-        event_window = element_window_extended(
+        new_event_window = element_window_extended(
             self.root, 'Event', None, self.user_id
         )
-        event_window.create_window()
+        new_event_window.create_window()
 
     def show_existing_event_window(self):
         selection = self.treeview_events.selection()
@@ -307,10 +307,10 @@ class MainScreen:
         self.show_existing_event_window()
 
     def show_new_remark_window(self):
-        remark_window = element_window_extended(
+        new_remark_window = element_window_extended(
             self.root, "Remark", None, self.user_id
         )
-        remark_window.create_window()
+        new_remark_window.create_window()
 
     def show_existing_remark_window(self):
         selection = self.treeview_remarks.selection()
@@ -817,6 +817,7 @@ class MainScreen:
         self.treeview.column('#3', width=100)
         self.treeview.place (x = 15, y = 35)
         self.treeview.bind("<Double-1>", self.show_task_window_on_double_click)
+        self.treeview.bind("<Return>", self.show_task_window_on_double_click)
         
         self.bottom_frame_left = tk.Frame(
             self.root,
@@ -846,6 +847,7 @@ class MainScreen:
         self.treeview_remarks.column('#2', width=210)
         self.treeview_remarks.place (x = 10, y = 35)
         self.treeview_remarks.bind("<Double-1>", self.show_remark_window_on_double_click)
+        self.treeview_remarks.bind("<Return>", self.show_remark_window_on_double_click)
 
         self.view_database_button_img = PhotoImage(
         file = r"Pictures\view_list.png"
@@ -919,6 +921,7 @@ class MainScreen:
         self.treeview_events.column('#2', width=210)
         self.treeview_events.place (x = 10, y = 35)
         self.treeview_events.bind("<Double-1>", self.show_event_on_double_click)
+        self.treeview_events.bind("<Return>", self.show_event_on_double_click)
 
         self.event_database_button = tk.Button(
             self.bottom_frame_right,

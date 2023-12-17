@@ -496,6 +496,7 @@ class ListWindow:
             self.treeview.place (x = 15, y = 75)
         
         self.treeview.bind("<Double-1>", self.show_element_window_on_double_click)
+        self.treeview.bind("<Return>", self.show_element_window_on_double_click)
 
         if self.title == 'Maybe/Sometimes':
             pass

@@ -112,7 +112,7 @@ class NotificationWindow:
 
             elif data_row[15] == 'project':
                 project_window = ProjectWindow(
-                    self.window, element_id
+                    self.window, element_id, self.user_id
                 )
                 project_window.create_window()
                 project_window.insert_values()
@@ -120,7 +120,7 @@ class NotificationWindow:
             elif data_row[15] == 'idea':
                 title = 'Idea View'      
                 idea_window = element_window_small(
-                self.window, title, element_id
+                self.window, title, element_id, self.user_id
                 )
                 idea_window.create_window()
                 idea_window.insert_values()
@@ -352,6 +352,7 @@ class NotificationWindow:
 
         self.treeview.place (x = 250, y = 175)
         self.treeview.bind("<Double-1>", self. show_element_window_on_double_click)
+        self.treeview.bind("<Return>", self. show_element_window_on_double_click)
 
         view_button = tk.Button(
             self.window,
@@ -412,6 +413,7 @@ class NotificationWindow:
 
         self.birthday_treeview.place (x = 250, y = 375)
         self.birthday_treeview.bind("<Double-1>", self.show_personal_card_on_double_click)
+        self.birthday_treeview.bind("<Return>", self.show_personal_card_on_double_click)
 
         view_birthday_button = tk.Button(
             self.window,
