@@ -352,6 +352,7 @@ class NotificationWindow:
 
         self.treeview.place (x = 250, y = 175)
         self.treeview.bind("<Double-1>", self. show_element_window_on_double_click)
+        self.treeview.bind("<Return>", self. show_element_window_on_double_click)
 
         view_button = tk.Button(
             self.window,
@@ -412,6 +413,7 @@ class NotificationWindow:
 
         self.birthday_treeview.place (x = 250, y = 375)
         self.birthday_treeview.bind("<Double-1>", self.show_personal_card_on_double_click)
+        self.birthday_treeview.bind("<Return>", self.show_personal_card_on_double_click)
 
         view_birthday_button = tk.Button(
             self.window,

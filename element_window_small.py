@@ -69,7 +69,7 @@ class element_window_small: # Ahoc Task, Idea
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
         data.date = self.date_string
-        data.deadline = self.date_string
+        data.deadline = ""
         data.field1 = self.field1_row.get()
         data.field2 = self.field2_row.get()
         data.field3 = ""
