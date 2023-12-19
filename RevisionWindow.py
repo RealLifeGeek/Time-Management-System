@@ -22,7 +22,8 @@ class RevisionWindow:
         self.window.geometry('800x600+300+50')
         self.window.title(str(title).upper() + ' REVISION')
         self.window.option_add('*Dialog.msg.title.bg', '#000000')
-        self.window.configure(bg = "#AFAFAF")
+        #self.window.configure(bg = "#AFAFAF")
+        self.window.configure(bg = "#2F3030")
         self.window.resizable(0,0)
 
         self.user_id = user_id
@@ -475,8 +476,8 @@ class RevisionWindow:
             self.window,
             text = str(self.title).upper() + " REVISION",
             font = ('Montserrat', '25', 'bold'),
-            background = "#AFAFAF",
-            foreground = "#2D4A54"
+            background = "#2F3030",
+            foreground = "#00B0C4"
         )
         header_label.place(relx = 0.5, y = 35, anchor = 'center')
 
@@ -484,8 +485,8 @@ class RevisionWindow:
             self.window,
             text = "MY TASKS: ",
             font = ('Montserrat', '14', 'bold'),
-            background = "#AFAFAF",
-            foreground = "#2D4A54"
+            background = "#2F3030",
+            foreground = "#00B0C4"
         )
         self.treeview_label.place(x = 15, y = 75)
 
@@ -493,10 +494,14 @@ class RevisionWindow:
             self.window,
             text = "",
             font = ('Montserrat', '12', 'bold'),
-            background = "#AFAFAF",
-            foreground = "#2D4A54"
+            background = "#2F3030",
+            foreground = "#00B0C4"
         )
         self.time_interval_label.place(x = 570, y = 75)
+
+        style = ttk.Style(self.window)
+        style.theme_use("clam")
+        style.configure("Treeview", background = "#FFFFFF", fieldbackground = "#FFFFFF", foreground = "#2D4A54")
 
         self.treeview = ttk.Treeview(
             self.window, 
@@ -562,10 +567,11 @@ class RevisionWindow:
             font = ('Arial', '15', 'bold'),
             width = 15,
             command = self.back,
-            background = '#6700DC',
-            foreground = '#FFFFFF'
+            background = '#00B0C4',
+            foreground = '#000000'
         )
         back_button.place(x=80, y = 470)
+        #02B46B
 
         add_idea_button = tk.Button(
             self.window,
@@ -584,8 +590,8 @@ class RevisionWindow:
             font = ('Arial', '15', 'bold'),
             width = 15,
             command = self.next,
-            background = '#06CA00',
-            foreground = '#FFFFFF'
+            background = '#00B0C4',
+            foreground = '#000000'
         )
         next_button.place(x=530, y = 470)
 

@@ -7,23 +7,24 @@ import datetime
 from datetime import datetime, timedelta
 from tkinter import messagebox
 from functions import check_internet
+import os
+import pyglet
 from element_window_extended import *
 from element_window_small import *
 from list_window import *
 from DBManager import DBManager
-from DataFormObject import DataForm, UserForm
+from DataFormObject import DataForm
 from DataStoreManager import *
 from NotificationWindow import *
 from RevisionChoiceWindow import *
 from MyCalendar import *
+from TimerWindow import *
 
 current_date = datetime.now()
 date_string = current_date.strftime("%d/%m/%Y")
 tomorrow = datetime.today() + timedelta(days=1)
 tomorrow_date = tomorrow.strftime('%d/%m/%Y')
-#db = 'data'
 data = DataForm()
-
 
 class MainScreen:
     def __init__(self, root, user_id):
@@ -38,6 +39,10 @@ class MainScreen:
         self.root.configure(bg = "#212121")
 
         self.root.protocol("WM_DELETE_WINDOW", self.exit_tms)
+
+        script_dir = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        notification_sound_path = os.path.join(script_dir, "Sounds", "notification_alarm.wav")
+        self.notification_sound = pyglet.media.load(notification_sound_path)
 
         self.tooltip_window = None
         self.refresh_button_img = None
@@ -383,6 +388,18 @@ class MainScreen:
         calendar_window = MyCalendar(self.root, self.user_id)
         calendar_window.create_window()
 
+    def show_timer_window(self):
+        selection = self.treeview.selection()
+        if selection:
+            task_name_for_timer = self.treeview.item(selection, 'values')[1]
+        else:
+            task_name_for_timer = ""
+
+        timer_window = TimerWindow(
+            self.root, task_name_for_timer
+        )
+        timer_window.create_window()
+
     def check_notifications(self):
         number_undone_tasks = self.data_store_manager.count_number_undone_elements('tasks', None, None, None)
         number_undone_delegated_tasks = self.data_store_manager.count_number_undone_elements('delegated tasks', None, None, None)
@@ -395,7 +412,11 @@ class MainScreen:
         if result_number != 0:
             self.notification_dot_label.config(text="!")
             self.notification_dot_label.place(x=135, y=15)
-            messagebox.showinfo('NOTIFICATION', 'Check notifications' )
+
+            player = pyglet.media.Player()
+            player.queue(self.notification_sound)
+            player.play()
+            #messagebox.showinfo('NOTIFICATION', 'Check notifications' )
         else:
             pass
             self.notification_dot_label.place_forget()
@@ -415,8 +436,8 @@ class MainScreen:
                 label.configure(text = 'Task View')
             elif hovered_button == self.do_it_tomorrow_button:
                 label.configure(text = 'Do Task Tomorrow')
-            elif hovered_button == self.move_to_button:
-                label.configure(text = 'Move Task to')
+            elif hovered_button == self.timer_button:
+                label.configure(text = 'Task Timer')
             elif hovered_button == self.delete_button:
                 label.configure(text ='Delete Task' )
             elif hovered_button == self.refresh_button:
@@ -460,8 +481,11 @@ class MainScreen:
         )
         header_label.place(x = 15, y = 50)
 
+
+        script_dir = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        image_path = os.path.join(script_dir, "Pictures", "refresh_icon2.png")
         self.refresh_button_img = PhotoImage(
-        file = r"Pictures\refresh_icon2.png"
+        file = image_path
         )
         self.small_refresh_button_img = self.refresh_button_img.subsample(2)
 
@@ -478,8 +502,9 @@ class MainScreen:
         self.refresh_button.bind("<Enter>", self.show_tooltip)
         self.refresh_button.bind("<Leave>", self.hide_tooltip)
 
+        image_path = os.path.join(script_dir, "Pictures", "empty_inbox2.png")
         self.empty_inbox_img = PhotoImage(
-        file = r"Pictures\empty_inbox2.png"
+        file = image_path
         )
         self.small_empty_inbox_img = self.empty_inbox_img.subsample(2)
 
@@ -706,8 +731,9 @@ class MainScreen:
         )
         middle_frame_right.place(x = 510, y = 157)
 
+        image_path = os.path.join(script_dir, "Pictures", "done_icon.png")
         self.done_button_img = PhotoImage(
-        file = r"Pictures\done_icon.png"
+        file = image_path
         )
         self.small_done_button_img = self.done_button_img.subsample(2)
 
@@ -724,8 +750,9 @@ class MainScreen:
         self.done_button.bind("<Enter>", self.show_tooltip)
         self.done_button.bind("<Leave>", self.hide_tooltip)
 
+        image_path = os.path.join(script_dir, "Pictures", "magnifier_icon.png")
         see_task_button_img = PhotoImage(
-        file = r"Pictures\magnifier_icon.png"
+        file = image_path
         )
         small_see_task_button_img = see_task_button_img.subsample(3)
 
@@ -742,8 +769,9 @@ class MainScreen:
         self.see_task_button.bind("<Enter>", self.show_tooltip)
         self.see_task_button.bind("<Leave>", self.hide_tooltip)
 
+        image_path = os.path.join(script_dir, "Pictures", "tomorrow_icon.png")
         self.do_tommorrow_button_img = PhotoImage(
-        file = r"Pictures\tomorrow_icon.png"
+        file = image_path
         )
         self.small_do_tommorrow_button_img = self.do_tommorrow_button_img.subsample(2)
 
@@ -760,26 +788,28 @@ class MainScreen:
         self.do_it_tomorrow_button.bind("<Enter>", self.show_tooltip)
         self.do_it_tomorrow_button.bind("<Leave>", self.hide_tooltip)
 
-        self.move_to_button_img = PhotoImage(
-        file = r"Pictures\change_icon.png"
+        image_path = os.path.join(script_dir, "Pictures", "timer_icon.png")
+        self.timer_img = PhotoImage(
+        file = image_path
         )
-        self.small_move_to_button_img = self.move_to_button_img.subsample(3)
+        self.small_timer_img = self.timer_img.subsample(3)
 
-        self.move_to_button = tk.Button(
+        self.timer_button = tk.Button(
             middle_frame_right,
-            image = self.small_move_to_button_img,
+            image = self.small_timer_img,
             font = ('Arial', '11'),
             width = 27,
-            command = None,
+            command = self.show_timer_window,
             background = '#DBDBDB',
             foreground = '#FFFFFF'
         )
-        self.move_to_button.place(x = 10, y = 140)
-        self.move_to_button.bind("<Enter>", self.show_tooltip)
-        self.move_to_button.bind("<Leave>", self.hide_tooltip)
+        self.timer_button.place(x = 10, y = 140)
+        self.timer_button.bind("<Enter>", self.show_tooltip)
+        self.timer_button.bind("<Leave>", self.hide_tooltip)
 
+        image_path = os.path.join(script_dir, "Pictures", "delete_icon.png")
         self.delete_button_img = PhotoImage(
-        file = r"Pictures\delete_icon.png"
+        file = image_path
         )
         self.small_delete_button_img = self.delete_button_img.subsample(1)
 
@@ -849,8 +879,9 @@ class MainScreen:
         self.treeview_remarks.bind("<Double-1>", self.show_remark_window_on_double_click)
         self.treeview_remarks.bind("<Return>", self.show_remark_window_on_double_click)
 
+        image_path = os.path.join(script_dir, "Pictures", "view_list.png")
         self.view_database_button_img = PhotoImage(
-        file = r"Pictures\view_list.png"
+        file = image_path
         )
         self.small_view_database_button_img = self.view_database_button_img.subsample(2)
 
