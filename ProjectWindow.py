@@ -2,9 +2,6 @@ import tkinter as tk
 from tkinter import ttk
 from tkcalendar import Calendar
 from tkinter import messagebox
-import sqlite3
-import random
-import string
 import datetime
 from DBManager import *
 from DataStoreManager import *
@@ -12,6 +9,7 @@ from DataFormObject import *
 from element_window_extended import *
 
 current_date = datetime.now()
+timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
 date_string = current_date.strftime("%d/%m/%Y")
 data = DataForm()
 
@@ -83,6 +81,14 @@ class ProjectWindow:
         self.deadline_row.insert(0, chosen_deadline)
 
     def get_project_data(self):
+        current_date = datetime.now()
+        timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+        data_row = self.data_store_manager.get_data_row_from_list_data_tuple(self.element_id)
+        if data_row == None:
+            data.timestamp_created = timestamp
+        else:
+            data.timestamp_created = data_row[17] 
+
         data.element_id = self.element_id
         data.element = self.project_name_row.get()
         data.date = ""
@@ -96,6 +102,7 @@ class ProjectWindow:
         data.keywords = self.keywords_row.get()
         data.category = 'project'
         data.done = 'No'
+        data.timestamp_finished = ''
 
     def show_new_task_window(self):
         task_window = element_window_extended(
@@ -136,6 +143,9 @@ class ProjectWindow:
                 self.window.destroy()
     
     def project_done(self):
+        current_date = datetime.now()
+        timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+
         if self.db_manager.element_id_already_exists(self.element_id):
             self.get_project_data()
             if data.done == 'DONE':
@@ -167,6 +177,8 @@ class ProjectWindow:
                         data.keywords = data_row[14]
                         data.category = data_row[15]
                         data.done = 'DONE'
+                        data.timestamp_created = data_row[17]
+                        data.timestamp_finished = timestamp
 
                         self.db_manager.update_db_fields(data)
                 else:
@@ -184,6 +196,9 @@ class ProjectWindow:
         task_window.project_row.insert(0, self.project_name)
 
     def task_done(self):
+        current_date = datetime.now()
+        timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]
@@ -205,6 +220,8 @@ class ProjectWindow:
             data.keywords = data_row[14]
             data.category = data_row[15]
             data.done = 'DONE'
+            data.timestamp_created = data_row[17]
+            data.timestamp_finished = timestamp
 
             self.db_manager.update_db_fields(data)
             self.data_store_manager.make_list_data_tuple()

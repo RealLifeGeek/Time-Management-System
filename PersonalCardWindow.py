@@ -9,6 +9,7 @@ from DataFormObject import DataForm
 data = DataForm()
 now = datetime.now()
 today = now.strftime('%d/%m')
+timestamp = now.strftime("%d/%m/%Y-%H:%M:%S")
 tomorrow = (now + timedelta(days=1)).strftime('%d/%m')
 yesterday = (now - timedelta(days=1)).strftime('%d/%m')
 
@@ -34,24 +35,30 @@ class PersonalCardWindow:
         self.element_id = element_id
 
     def get_personal_data(self):
-            data.element_id = self.element_id
-            if self.name_row.get() == 'FIRST AND LAST NAME':
-                self.name_row.get() == "No name inserted"
-                messagebox.showerror("ERROR", "Insert name!")
-            else:
-                pass
-            data.element = self.name_row.get()
-            data.date = self.day_month_row.get()
-            data.deadline = self.year_date_row.get()
-            data.field1 = self.field1_row.get()
-            data.field2 = self.field2_row.get()
-            data.field3 = self.field3_row.get()
-            data.cooperating = self.company_row.get()
-            data.field4 = self.title_before_row.get()
-            data.field5 = self.title_after_row.get()
-            data.remarks = self.email_row.get()
-            data.keywords = self.phone_number_row.get()
-            data.category = 'personal card'
+        current_date = datetime.now()
+        timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+        
+        data.element_id = self.element_id
+        if self.name_row.get() == 'FIRST AND LAST NAME':
+            self.name_row.get() == "No name inserted"
+            messagebox.showerror("ERROR", "Insert name!")
+        else:
+            pass
+        data.element = self.name_row.get()
+        data.date = self.day_month_row.get()
+        data.deadline = self.year_date_row.get()
+        data.field1 = self.field1_row.get()
+        data.field2 = self.field2_row.get()
+        data.field3 = self.field3_row.get()
+        data.cooperating = self.company_row.get()
+        data.field4 = self.title_before_row.get()
+        data.field5 = self.title_after_row.get()
+        data.remarks = self.email_row.get()
+        data.keywords = self.phone_number_row.get()
+        data.category = 'personal card'
+        data.done = 'No'
+        data.timestamp_created = timestamp
+        data.timestamp_finished = ''
 
     def save_or_edit_card(self):   
         try:

@@ -15,6 +15,7 @@ current_date = datetime.now()
 date_string = current_date.strftime("%d/%m/%Y")
 tomorrow = datetime.today() + timedelta(days=1)
 tomorrow_date = tomorrow.strftime('%d/%m/%Y')
+timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
 data = DataForm()
 
 class ListWindow:
@@ -132,6 +133,9 @@ class ListWindow:
             print('Not matched in def show_new_elemenet_window in ListWindow')
 
     def done(self):
+        current_date = datetime.now()
+        timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+        
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]        
@@ -153,6 +157,8 @@ class ListWindow:
             data.keywords = data_row[14]
             data.category = data_row[15]
             data.done = 'DONE'
+            data.timestamp_created = data_row[17]
+            data.timestamp_finished = timestamp
 
             self.db_manager.update_db_fields(data)
             self.data_store_manager.make_list_data_tuple()
@@ -227,7 +233,9 @@ class ListWindow:
                     data.remarks = data_row[13]
                     data.keywords = data_row[14]
                     data.category = 'task'
-                    data.done = data_row[16]  
+                    data.done = 'No'
+                    data.timestamp_created = data_row[17]
+                    data.timestamp_finished = ''
 
                     self.db_manager.update_db_fields(data)
                     self.data_store_manager.make_list_data_tuple()
@@ -262,7 +270,9 @@ class ListWindow:
                     data.remarks = data_row[13]
                     data.keywords = data_row[14]
                     data.category = 'remark'
-                    data.done = data_row[16]
+                    data.done = 'No'
+                    data.timestamp_created = data_row[17]
+                    data.timestamp_finished = ''
 
                     self.db_manager.update_db_fields(data)
                     self.data_store_manager.make_list_data_tuple()
@@ -297,7 +307,9 @@ class ListWindow:
                     data.remarks = data_row[13]
                     data.keywords = data_row[14]
                     data.category = 'event'
-                    data.done = data_row[16]
+                    data.done = 'No'
+                    data.timestamp_created = data_row[17]
+                    data.timestamp_finished = ''
 
                     self.db_manager.update_db_fields(data)
                     self.data_store_manager.make_list_data_tuple()
@@ -332,7 +344,9 @@ class ListWindow:
                     data.remarks = data_row[13]
                     data.keywords = data_row[14]
                     data.category = 'idea'
-                    data.done = data_row[16]
+                    data.done = 'No'
+                    data.timestamp_created = data_row[17]
+                    data.timestamp_finished = ''
 
                     self.db_manager.update_db_fields(data)
                     self.data_store_manager.make_list_data_tuple()
@@ -367,6 +381,9 @@ class ListWindow:
                     data.remarks = data_row[13]
                     data.keywords = data_row[14]
                     data.category = 'maybe/sometimes'
+                    data.done = 'No'
+                    data.timestamp_created = data_row[17]
+                    data.timestamp_finished = ''
 
                     self.db_manager.update_db_fields(data)
                     self.data_store_manager.make_list_data_tuple()
@@ -401,6 +418,9 @@ class ListWindow:
                     data.remarks = data_row[13]
                     data.keywords = data_row[14]
                     data.category = 'project'
+                    data.done = 'No'
+                    data.timestamp_created = data_row[17]
+                    data.timestamp_finished = ''
 
                     self.db_manager.update_db_fields(data)
                     self.data_store_manager.make_list_data_tuple()

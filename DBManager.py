@@ -146,10 +146,37 @@ class DBManager(DBDirector):
     def create_data_db(self):
         try:
             self.open_db()
-            self.cursor.execute(f'CREATE TABLE IF NOT EXISTS {self.table_name} (id INTEGER PRIMARY KEY,'
-                                'element_ID TEXT, element TEXT, date TEXT, deadline TEXT, field1 TEXT,'
-                                'field2 TEXT, field3 TEXT, project TEXT, delegated TEXT, cooperating TEXT, field4 TEXT,'
-                                'field5 TEXT, remarks TEXT, keywords TEXT, category TEXT, done TEXT)')
+            self.cursor.execute(f'''
+                                CREATE TABLE IF NOT EXISTS {self.table_name} (
+                                    id INTEGER PRIMARY KEY,
+                                    element_ID TEXT,
+                                    element TEXT,
+                                    date TEXT,
+                                    deadline TEXT,
+                                    field1 TEXT,
+                                    field2 TEXT,
+                                    field3 TEXT,
+                                    project TEXT,
+                                    delegated TEXT,
+                                    cooperating TEXT,
+                                    field4 TEXT,
+                                    field5 TEXT,
+                                    remarks TEXT,
+                                    keywords TEXT,
+                                    category TEXT,
+                                    done TEXT,
+                                    timestamp_created TEXT,
+                                    timestamp_finished TEXT
+                                )
+                                ''')
+            self.cursor.execute(f'''
+                                CREATE TABLE IF NOT EXISTS login_logout (
+                                    id INTEGER PRIMARY KEY,
+                                    user_ID TEXT,
+                                    act TEXT,
+                                    timestamp TEXT
+                                )
+                                ''')
             self.conn.commit()
         except Exception as e:
             messagebox.showerror("ERROR", f"ERROR 110: {e}")
@@ -175,7 +202,7 @@ class DBManager(DBDirector):
             self.open_db()
             answer = messagebox.askyesno("SAVE", "Save element?")
             if answer:
-                query = f"INSERT INTO {self.table_name} (element_ID, element, date, deadline, field1, field2, field3, project, delegated, cooperating, field4, field5, remarks, keywords, category, done) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                query = f"INSERT INTO {self.table_name} (element_ID, element, date, deadline, field1, field2, field3, project, delegated, cooperating, field4, field5, remarks, keywords, category, done, timestamp_created, timestamp_finished) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                 values = (
                     data.element_id,
                     data.element,
@@ -192,13 +219,31 @@ class DBManager(DBDirector):
                     data.remarks,
                     data.keywords,
                     data.category,
-                    data.done
+                    data.done,
+                    data.timestamp_created,
+                    data.timestamp_finished
                 )
                 self.cursor.execute(query, values)
                 self.conn.commit()
                 messagebox.showinfo("SUCCESS", "Successfully SAVED!")
             else:
                 pass
+        except Exception as e:
+            messagebox.showerror("ERROR",f"ERROR 112: {e}")
+        finally:
+            self.close_db()
+    
+    def save_login_logout_time(self, act, timestamp):
+        try:
+            self.open_db()
+            query = f"INSERT INTO login_logout (user_ID, act, timestamp) VALUES (?, ?, ?)"
+            values = (
+                self.user_id,
+                act,
+                timestamp
+            )
+            self.cursor.execute(query, values)
+            self.conn.commit()
         except Exception as e:
             messagebox.showerror("ERROR",f"ERROR 112: {e}")
         finally:
@@ -210,9 +255,9 @@ class DBManager(DBDirector):
             answer = messagebox.askyesno("UPDATE", "Update element?")
             if answer:
                 query = f"UPDATE {self.table_name} SET element = ?, date = ?, deadline = ?, field1 = ?, field2 = ?, field3 = ?, project = ?, delegated = ?, cooperating = ?, " \
-                        "field4 = ?, field5 = ?, remarks = ?, keywords = ?, category = ?, done = ? WHERE element_ID = ?"
-                if data.deadline == date_string or data.deadline == None:
-                    data.deadline = tomorrow_date
+                        "field4 = ?, field5 = ?, remarks = ?, keywords = ?, category = ?, done = ?, timestamp_created = ?, timestamp_finished = ? WHERE element_ID = ?"
+                #if data.deadline == date_string or data.deadline == None:
+                #    data.deadline = tomorrow_date
 
                 values = (
                     data.element,
@@ -230,6 +275,8 @@ class DBManager(DBDirector):
                     data.keywords,
                     data.category,
                     data.done,
+                    data.timestamp_created,
+                    data.timestamp_finished,
                     data.element_id
                 )
 

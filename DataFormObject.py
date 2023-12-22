@@ -17,6 +17,8 @@ class DataForm:
         self.keywords = ""          # in Personal Cards == phone number
         self.category = ""
         self.done = "No"            # Initially 'No' for everything, when done the field is updated to 'DONE'
+        self.timestamp_created = ""
+        self.timestamp_finished = ""  
 
 class UserForm:
     def __init__(self):
