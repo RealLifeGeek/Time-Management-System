@@ -82,6 +82,7 @@ class TimerWindow:
             
             player = pyglet.media.Player()
             player.queue(self.sound)
+            player.seek(0.0)
             player.play()
 
             self.required_hours_row.delete(0, 'end')

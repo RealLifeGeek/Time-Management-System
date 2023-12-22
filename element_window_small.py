@@ -1,10 +1,13 @@
 import tkinter as tk
 from tkinter import messagebox
 import datetime
+from datetime import datetime, timedelta
 from DBManager import *
 from DataStoreManager import *
 from DataFormObject import *
 
+current_date = datetime.now()
+timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
 data = DataForm()
 
 
@@ -49,6 +52,14 @@ class element_window_small: # Ahoc Task, Idea
             )
 
     def get_task_data(self):
+        current_date = datetime.now()
+        timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+        data_row = self.data_store_manager.get_data_row_from_list_data_tuple(self.element_id)
+        if data_row == None:
+            data.timestamp_created = timestamp
+        else:
+            data.timestamp_created = data_row[17] 
+
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
         data.date = self.date_string
@@ -64,8 +75,18 @@ class element_window_small: # Ahoc Task, Idea
         data.remarks = ""
         data.keywords = self.keywords_row.get()
         data.category = 'task'
+        data.done = 'No'
+        data.timestamp_finished = ''
 
     def get_idea_data(self):
+        current_date = datetime.now()
+        timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+        data_row = self.data_store_manager.get_data_row_from_list_data_tuple(self.element_id)
+        if data_row == None:
+            data.timestamp_created = timestamp
+        else:
+            data.timestamp_created = data_row[17] 
+        
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
         data.date = self.date_string
@@ -80,7 +101,9 @@ class element_window_small: # Ahoc Task, Idea
         data.field5 = ""
         data.remarks = ""
         data.keywords = ""
-        data.category = 'idea'      
+        data.category = 'idea'
+        data.done = ''
+        data.timestamp_finished = '' 
 
     def save_or_edit_task(self):
         try:

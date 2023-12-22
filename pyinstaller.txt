@@ -1,1 +1,6 @@
 pyinstaller.exe --onefile -w --add-data "Pictures;Pictures" --add-data "Sounds;Sounds" --hiddenimport=babel.numbers App.py
+
+
+User DB development:
+timestamp - created
+timestamp - finished - either done or deleted

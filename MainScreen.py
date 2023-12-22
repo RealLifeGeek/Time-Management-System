@@ -24,6 +24,7 @@ current_date = datetime.now()
 date_string = current_date.strftime("%d/%m/%Y")
 tomorrow = datetime.today() + timedelta(days=1)
 tomorrow_date = tomorrow.strftime('%d/%m/%Y')
+timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
 data = DataForm()
 
 class MainScreen:
@@ -46,6 +47,8 @@ class MainScreen:
 
         self.tooltip_window = None
         self.refresh_button_img = None
+
+        self.db_manager.save_login_logout_time('login', timestamp)
 
     def check_connection(self):
         check_internet(self.top_frame_left, self.top_frame_right)
@@ -91,6 +94,9 @@ class MainScreen:
         number_elements_label.place(x = XX, y = YY)
 
     def task_done(self):
+        current_date = datetime.now()
+        timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]
@@ -112,6 +118,8 @@ class MainScreen:
             data.keywords = data_row[14]
             data.category = data_row[15]
             data.done = 'DONE'
+            data.timestamp_created = data_row[17]
+            data.timestamp_finished = timestamp
 
             self.db_manager.update_db_fields(data)
             self.data_store_manager.make_list_data_tuple()
@@ -142,12 +150,13 @@ class MainScreen:
                 data.remarks = data_row[13]
                 data.keywords = data_row[14]
                 data.category = data_row[15]
-                data.done = data_row[16]
+                data.done = 'No'
+                data.timestamp_created = data_row[17]
+                data.timestamp_finished = ''
 
                 self.db_manager.update_db_fields(data)
                 messagebox.showinfo("Info", "Task moved to tomorrow.")
                 self.data_store_manager.make_list_data_tuple()
-                #data_store_manager.make_day_data_tuple()
                 self.data_store_manager.insert_day_data_to_treeview(self.treeview, 'task')
                 self.show_number_of_day_element('task')
                 self.progress_bar_of_day()
@@ -260,6 +269,9 @@ class MainScreen:
     def exit_tms(self):
         answer = messagebox.askokcancel("Close TMS", "Do you want to close TMS?")
         if answer:
+            current_date = datetime.now()
+            timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+            self.db_manager.save_login_logout_time('logout', timestamp)
             sys.exit()
         else:
             pass
@@ -413,10 +425,11 @@ class MainScreen:
             self.notification_dot_label.config(text="!")
             self.notification_dot_label.place(x=135, y=15)
 
-            player = pyglet.media.Player()
-            player.queue(self.notification_sound)
-            player.play()
-            #messagebox.showinfo('NOTIFICATION', 'Check notifications' )
+            self.player = pyglet.media.Player()
+            self.player.queue(self.notification_sound)
+            self.player.seek(0.0)
+            self.player.play()
+
         else:
             pass
             self.notification_dot_label.place_forget()
@@ -1089,6 +1102,5 @@ class MainScreen:
         self.show_total_number_of_elements('maybe/sometimes', '', 'No', 'No', self.right_frame, 200, 322)
         self.show_total_number_of_elements('personal card', 'None', 'No', 'No', self.right_frame, 200, 362)
         self.check_notifications()
-        
-        
+
         self.root.mainloop()

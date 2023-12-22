@@ -1,6 +1,8 @@
 import tkinter as tk
 from tkcalendar import Calendar
 from tkinter import messagebox
+import datetime
+from datetime import datetime, timedelta
 from DBManager import *
 from DataFormObject import *
 from DataStoreManager import *
@@ -8,6 +10,8 @@ from DataStoreManager import *
 chosen_date = None
 chosen_deadline = None
 element_id = None
+current_date = datetime.now()
+timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
 data = DataForm()
 
 
@@ -56,6 +60,14 @@ class element_window_extended: # task, remark, event
         self.deadline_row.insert(0, chosen_deadline)
 
     def get_task_data(self):
+        current_date = datetime.now()
+        timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+        data_row = self.data_store_manager.get_data_row_from_list_data_tuple(self.element_id)
+        if data_row == None:
+            data.timestamp_created = timestamp
+        else:
+            data.timestamp_created = data_row[17] 
+
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
         data.date = self.date_row.get() or self.deadline_row.get()
@@ -71,12 +83,24 @@ class element_window_extended: # task, remark, event
         data.remarks = self.keywords_row.get()
         data.keywords = self.keywords_row.get()
         data.category = 'task'
+        data.done = 'No'
+        data.timestamp_finished = ''
 
         if self.title == 'Maybe/Sometimes View':
             data.category = 'maybe/sometimes'
-
+        
+        print('Timestamp_created: ' + str(data.timestamp_created))
+        print('Timestamp_finished: ' + str(data.timestamp_finished))
     
     def get_event_data(self):
+        current_date = datetime.now()
+        timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+        data_row = self.data_store_manager.get_data_row_from_list_data_tuple(self.element_id)
+        if data_row == None:
+            data.timestamp_created = timestamp
+        else:
+            data.timestamp_created = data_row[17] 
+
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
         data.date = self.date_row.get() or self.deadline_row.get()
@@ -92,15 +116,18 @@ class element_window_extended: # task, remark, event
         data.remarks = ""
         data.keywords = ""
         data.category = 'event'
-
-        if data.date is not None and data.deadline is None or data.deadline == '':
-            data.deadline = data.date
-        if data.date is None or data.date == '' and data.deadline is not None:
-            data.date = data.deadline
-        else:
-            pass
+        data.done = 'No'
+        data.timestamp_finished = ''
 
     def get_remark_data(self):
+        current_date = datetime.now()
+        timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+        data_row = self.data_store_manager.get_data_row_from_list_data_tuple(self.element_id)
+        if data_row == None:
+            data.timestamp_created = timestamp
+        else:
+            data.timestamp_created = data_row[17] 
+
         data.element_id = self.element_id
         data.element = self.element_description_row.get()
         data.date = self.date_row.get()
@@ -116,6 +143,8 @@ class element_window_extended: # task, remark, event
         data.remarks = ""
         data.keywords = ""
         data.category = 'remark'
+        data.done = 'No'
+        data.timestamp_finished = ''
 
     def save_or_edit_task(self):
         try:
@@ -150,8 +179,6 @@ class element_window_extended: # task, remark, event
         except Exception as e:
                 messagebox.showerror("ERROR", f"ERROR 300: {e}")
                 self.window.destroy()
-        else:
-            pass
 
     def save_or_edit_event(self):
         try:

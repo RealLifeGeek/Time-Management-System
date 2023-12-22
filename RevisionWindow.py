@@ -13,6 +13,7 @@ current_date = datetime.now()
 date_string = current_date.strftime("%d/%m/%Y")
 tomorrow = datetime.today() + timedelta(days=1)
 tomorrow_date = tomorrow.strftime('%d/%m/%Y')
+timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
 data = DataForm()
 
 class RevisionWindow:
@@ -329,6 +330,9 @@ class RevisionWindow:
             self.current_index -= 0
 
     def done(self):
+        current_date = datetime.now()
+        timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]
@@ -350,6 +354,8 @@ class RevisionWindow:
                 data.keywords = data_row[14]
                 data.category = data_row[15]
                 data.done = 'DONE'
+                data.timestamp_created = data_row[17]
+                data.timestamp_finished = timestamp
 
                 self.db_manager.update_db_fields(data)
                 self.insert_data_to_revision_treeview()
@@ -364,6 +370,8 @@ class RevisionWindow:
                 data.keywords = data_row[14]
                 data.category = data_row[15]
                 data.done = 'DONE'
+                data.timestamp_created = data_row[17]
+                data.timestamp_finished = timestamp
             
                 self.db_manager.update_db_fields(data)
             
@@ -390,6 +398,8 @@ class RevisionWindow:
                         data.keywords = data_row[14]
                         data.category = data_row[15]
                         data.done = 'DONE'
+                        data.timestamp_created = data_row[17]
+                        data.timestamp_finished = timestamp
 
                         self.db_manager.update_db_fields(data)
 
