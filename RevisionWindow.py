@@ -99,12 +99,12 @@ class RevisionWindow:
                         if data_row[1] not in self.rows:
                             self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
                             self.rows.append(data_row[1])
-                        for i in range(1,7):
-                            future_date = (current_date + timedelta(days=i)).strftime("%d/%m/%Y")
-                            if data_row[15] == 'task' and data_row[4] == future_date and data_row[9] == "" and data_row[10] != "" and data_row[16] == 'No':
-                                if data_row[1] not in self.rows:
-                                    self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
-                                    self.rows.append(data_row[1])
+                    for i in range(0,7):
+                        future_date = (current_date + timedelta(days=i)).strftime("%d/%m/%Y")
+                        if data_row[15] == 'task' and data_row[4] == future_date and data_row[9] == "" and data_row[10] != "" and data_row[16] == 'No':
+                            if data_row[1] not in self.rows:
+                                self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                                self.rows.append(data_row[1])
 
                 elif self.current_title == 'MY PROJECTS':
                     self.time_interval_label.configure(text = '(in following 7 days)')
@@ -147,7 +147,11 @@ class RevisionWindow:
 
                 elif self.current_title == 'REMARKS':
                     self.time_interval_label.configure(text = '(for tomorrow)')
-                    if data_row[15] == 'remark' and data_row[3] == tomorrow_date:
+                    if data_row[15] == 'remark' and data_row[3] == date_string:
+                        if data_row[1] not in self.rows:
+                            self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
+                            self.rows.append(data_row[1])
+                    elif data_row[15] == 'remark' and data_row[3] == tomorrow_date:
                         if data_row[1] not in self.rows:
                             self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
                             self.rows.append(data_row[1])
@@ -163,7 +167,7 @@ class RevisionWindow:
                     self.time_interval_label.configure(text = '(in following 7 days)')
                     for i in range(0,7):
                         future_date = (current_date + timedelta(days=i)).strftime("%d/%m")
-                        if data_row[15] == 'personal card' and data_row[3] == future_date:
+                        if data_row[15] == 'personal card' and data_row[3] == future_date and data_row[16] == 'No':
                             if data_row[1] not in self.rows:
                                 self.treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9], data_row[10]))
                                 self.rows.append(data_row[1])
@@ -412,18 +416,66 @@ class RevisionWindow:
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]
-            self.db_manager.set_element_id(element_id)
+            #self.db_manager.set_element_id(element_id)
             answer = messagebox.askyesno("DELETE", "DELETE from database?")
             if answer:
-                self.db_manager.delete_from_db()
+                current_date = datetime.now()
+                timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+                data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
+
+                data.element_id = element_id
+                data.element = data_row[2]
+                data.date = data_row[3]
+                data.deadline = ""
+                data.field1 = data_row[5]
+                data.field2 = data_row[6]
+                data.field3 = data_row[7]
+                data.project = data_row[8]
+                data.delegated = data_row[9]
+                data.cooperating = data_row[10]
+                data.field4 = data_row[11]
+                data.field5 = data_row[12]
+                data.remarks = data_row[13]
+                data.keywords = data_row[14]
+                data.category = data_row[15]
+                data.done = 'DELETED'
+                data.timestamp_created = data_row[17]
+                data.timestamp_finished = timestamp
+
+                self.db_manager.update_db_fields(data)
+                messagebox.showinfo("DELETED", f"Element {data_row[2]} deleted")
+
+                #self.db_manager.delete_from_db()
                 if self.current_title == 'MY PROJECTS' or self.current_title == 'DELEGATED PROJECTS' or self.current_title == 'SHARED PROJECTS':
                     element_name = self.treeview.item(selection, 'values')[1]
                     rows = self.data_store_manager.get_all_project_tasks_id_from_list_data_tuple(element_name)
                     if rows is not None:
                         for row in rows:
-                            self.db_manager.set_element_id(row)
-                            messagebox.showwarning("DELETE ASSOCIATED", f"Asscociated task {row} is to be deleted.")
-                            self.db_manager.delete_from_db()
+                            data_row = self.data_store_manager.get_data_row_from_list_data_tuple(row)
+
+                            data.element_id = row
+                            data.element = data_row[2]
+                            data.date = data_row[3]
+                            data.deadline = ""
+                            data.field1 = data_row[5]
+                            data.field2 = data_row[6]
+                            data.field3 = data_row[7]
+                            data.project = data_row[8]
+                            data.delegated = data_row[9]
+                            data.cooperating = data_row[10]
+                            data.field4 = data_row[11]
+                            data.field5 = data_row[12]
+                            data.remarks = data_row[13]
+                            data.keywords = data_row[14]
+                            data.category = data_row[15]
+                            data.done = 'DELETED'
+                            data.timestamp_created = data_row[17]
+                            data.timestamp_finished = timestamp
+
+                            self.db_manager.update_db_fields(data)
+                            messagebox.showinfo("DELETE ASSOCIATED", f"Asscociated task {row} deleted.")
+                            #self.db_manager.set_element_id(row)
+                            #self.db_manager.delete_from_db()
                 self.insert_data_to_revision_treeview()
             else:
                 pass
