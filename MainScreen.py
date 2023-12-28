@@ -186,10 +186,35 @@ class MainScreen:
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]
-            self.db_manager.set_element_id(element_id)
+            #self.db_manager.set_element_id(element_id)
             answer = messagebox.askyesno("DELETE", "DELETE from database?")
             if answer:
-                self.db_manager.delete_from_db()
+                current_date = datetime.now()
+                timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+                data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
+
+                data.element_id = element_id
+                data.element = data_row[2]
+                data.date = data_row[3]
+                data.deadline = ""
+                data.field1 = data_row[5]
+                data.field2 = data_row[6]
+                data.field3 = data_row[7]
+                data.project = data_row[8]
+                data.delegated = data_row[9]
+                data.cooperating = data_row[10]
+                data.field4 = data_row[11]
+                data.field5 = data_row[12]
+                data.remarks = data_row[13]
+                data.keywords = data_row[14]
+                data.category = data_row[15]
+                data.done = 'DELETED'
+                data.timestamp_created = data_row[17]
+                data.timestamp_finished = timestamp
+
+                self.db_manager.update_db_fields(data)
+                messagebox.showinfo("DELETED", f"Element {data_row[2]} deleted")
+                #self.db_manager.delete_from_db()
                 self.data_store_manager.make_list_data_tuple()
                 self.data_store_manager.insert_day_data_to_treeview(self.treeview, 'task')
                 self.show_number_of_day_element('task')
@@ -202,10 +227,35 @@ class MainScreen:
         selection = self.treeview_remarks.selection()
         if selection:
             element_id = self.treeview_remarks.item(selection, 'values')[0]
-            self.db_manager.set_element_id(element_id)
+            #self.db_manager.set_element_id(element_id)
             answer = messagebox.askyesno("DELETE", "DELETE from database?")
             if answer:
-                self.db_manager.delete_from_db()
+                current_date = datetime.now()
+                timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+                data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
+
+                data.element_id = element_id
+                data.element = data_row[2]
+                data.date = data_row[3]
+                data.deadline = ""
+                data.field1 = data_row[5]
+                data.field2 = data_row[6]
+                data.field3 = data_row[7]
+                data.project = data_row[8]
+                data.delegated = data_row[9]
+                data.cooperating = data_row[10]
+                data.field4 = data_row[11]
+                data.field5 = data_row[12]
+                data.remarks = data_row[13]
+                data.keywords = data_row[14]
+                data.category = data_row[15]
+                data.done = 'DELETED'
+                data.timestamp_created = data_row[17]
+                data.timestamp_finished = timestamp
+
+                self.db_manager.update_db_fields(data)
+                messagebox.showinfo("DELETED", f"Element {data_row[2]} deleted")
+                #self.db_manager.delete_from_db()
                 self.data_store_manager.make_list_data_tuple()
                 self.data_store_manager.insert_day_data_to_treeview(self.treeview_remarks, 'remark')
                 self.show_number_of_day_element('remark')
@@ -218,10 +268,35 @@ class MainScreen:
         selection = self.treeview_events.selection()
         if selection:
             element_id = self.treeview_events.item(selection, 'values')[0]
-            self.db_manager.set_element_id(element_id)
+            #self.db_manager.set_element_id(element_id)
             answer = messagebox.askokcancel("DELETE", "DELETE from database?")
             if answer:
-                self.db_manager.delete_from_db()
+                current_date = datetime.now()
+                timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+                data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
+
+                data.element_id = element_id
+                data.element = data_row[2]
+                data.date = data_row[3]
+                data.deadline = ""
+                data.field1 = data_row[5]
+                data.field2 = data_row[6]
+                data.field3 = data_row[7]
+                data.project = data_row[8]
+                data.delegated = data_row[9]
+                data.cooperating = data_row[10]
+                data.field4 = data_row[11]
+                data.field5 = data_row[12]
+                data.remarks = data_row[13]
+                data.keywords = data_row[14]
+                data.category = data_row[15]
+                data.done = 'DELETED'
+                data.timestamp_created = data_row[17]
+                data.timestamp_finished = timestamp
+
+                self.db_manager.update_db_fields(data)
+                messagebox.showinfo("DELETED", f"Element {data_row[2]} deleted")
+                #self.db_manager.delete_from_db()
                 self.data_store_manager.make_list_data_tuple()
                 self.data_store_manager.insert_day_data_to_treeview(self.treeview_events, 'event')
                 self.show_number_of_day_element('event')

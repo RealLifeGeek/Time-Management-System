@@ -170,18 +170,64 @@ class ListWindow:
         selection = self.treeview.selection()
         if selection:
             element_id = self.treeview.item(selection, 'values')[0]
-            self.db_manager.set_element_id(element_id)
+            #self.db_manager.set_element_id(element_id)
             answer = messagebox.askyesno("DELETE", "DELETE from database?")
             if answer:
-                self.db_manager.delete_from_db()
+                current_date = datetime.now()
+                timestamp = current_date.strftime("%d/%m/%Y-%H:%M:%S")
+                data_row = self.data_store_manager.get_data_row_from_list_data_tuple(element_id)
+
+                data.element_id = element_id
+                data.element = data_row[2]
+                data.date = data_row[3]
+                data.deadline = ""
+                data.field1 = data_row[5]
+                data.field2 = data_row[6]
+                data.field3 = data_row[7]
+                data.project = data_row[8]
+                data.delegated = data_row[9]
+                data.cooperating = data_row[10]
+                data.field4 = data_row[11]
+                data.field5 = data_row[12]
+                data.remarks = data_row[13]
+                data.keywords = data_row[14]
+                data.category = data_row[15]
+                data.done = 'DELETED'
+                data.timestamp_created = data_row[17]
+                data.timestamp_finished = timestamp
+
+                self.db_manager.update_db_fields(data)
+                messagebox.showinfo("DELETED", f"Element {data_row[2]} deleted")
+                #self.db_manager.delete_from_db()
                 if self.title == 'Projects':
                     element_name = self.treeview.item(selection, 'values')[1]
                     rows = self.data_store_manager.get_all_project_tasks_id_from_list_data_tuple(element_name)
                     if rows is not None:
                         for row in rows:
-                            self.db_manager.set_element_id(row)
-                            messagebox.showwarning("DELETE ASSOCIATED", f"Asscociated task {row} is to be deleted.")
-                            self.db_manager.delete_from_db()
+                            data_row = self.data_store_manager.get_data_row_from_list_data_tuple(row)
+
+                            data.element_id = row
+                            data.element = data_row[2]
+                            data.date = data_row[3]
+                            data.deadline = ""
+                            data.field1 = data_row[5]
+                            data.field2 = data_row[6]
+                            data.field3 = data_row[7]
+                            data.project = data_row[8]
+                            data.delegated = data_row[9]
+                            data.cooperating = data_row[10]
+                            data.field4 = data_row[11]
+                            data.field5 = data_row[12]
+                            data.remarks = data_row[13]
+                            data.keywords = data_row[14]
+                            data.category = data_row[15]
+                            data.done = 'DELETED'
+                            data.timestamp_created = data_row[17]
+                            data.timestamp_finished = timestamp
+                            #self.db_manager.set_element_id(row)
+                            self.db_manager.update_db_fields(data)
+                            messagebox.showinfo("DELETE ASSOCIATED", f"Asscociated task {row} deleted.")
+                            #self.db_manager.delete_from_db()
                     else:
                         print('No related tasks to the project: ' + element_name)
                 

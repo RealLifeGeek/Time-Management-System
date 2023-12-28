@@ -98,8 +98,7 @@ class DataStoreManager:
                 today_birthday_date = current_date.strftime("%d/%m")
                 tomorrow_birthday_date = tomorrow.strftime("%d/%m")
                 for data_row in self.list_data_tuple:
-
-                    if data_row[15] == 'personal card' and data_row[3] == future_date:
+                    if data_row[15] == 'personal card' and data_row[3] == future_date and data_row[16] == 'No':
                         if data_row[3] == today_birthday_date:
                             treeview.insert('', 'end', values=(data_row[1], data_row[2], 'TODAY', data_row[4]))
                         elif data_row[3] == tomorrow_birthday_date:
@@ -150,7 +149,7 @@ class DataStoreManager:
                     if data_row [15] == 'project' and data_row[16] == 'No':
                         treeview.insert('', 'end', values=(data_row[1], data_row[2], data_row[3], data_row[4], data_row[9]))
                 elif list_category == 'Personal Cards':
-                    if data_row[15] == 'personal card':
+                    if data_row[15] == 'personal card' and data_row[16] == 'No':
                         treeview.insert('', 'end', values=(data_row[1], data_row[11], data_row[2], data_row[3], data_row[4]))
                 elif list_category == 'Events':
                     if data_row[15] == 'event':
@@ -199,7 +198,7 @@ class DataStoreManager:
                     if data_row[1] not in check_list:
                         number_elements += 1
                         check_list.append(data_row[1])
-                elif data_row[15] == category and category != 'task':
+                elif data_row[15] == category and category != 'task' and data_row[16] == 'No':
                     if data_row[1] not in check_list:
                         number_elements += 1
                         check_list.append(data_row[1])
@@ -248,7 +247,7 @@ class DataStoreManager:
                             if data_row[16] == 'DONE':
                                 rows.append(data_row[2])
                 else:
-                    if data_row[15] == category:
+                    if data_row[15] == category and data_row[16] == 'No':
                         rows.append(data_row[2])
             number_elements = len(rows)
             return number_elements
@@ -308,7 +307,7 @@ class DataStoreManager:
         for i in range(0,7):
             future_date = (current_date + timedelta(days=i)).strftime('%d/%m')
             for data_row in self.list_data_tuple:
-                if data_row[15] == 'personal card' and data_row[3] == future_date:
+                if data_row[15] == 'personal card' and data_row[3] == future_date and data_row[16] == 'No':
                     results.append(data_row[1])
                 else:
                     pass
